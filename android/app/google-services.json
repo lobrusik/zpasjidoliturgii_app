@@ -12,7 +12,12 @@
           "package_name": "com.example.zpasjidoliturgii"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1038776967097-3hk6apt3h9v2ic7es19so5snc6qdh8oq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC6T9hZY0dYxI_9f2wVBMH1q3pcyF7Mcuc"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1038776967097-3hk6apt3h9v2ic7es19so5snc6qdh8oq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

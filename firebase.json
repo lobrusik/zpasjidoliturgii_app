@@ -1,16 +1,1 @@
-{
-  "hosting": {
-    "public": "build/web",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
-  }
-}
+{"hosting":{"public":"build/web","ignore":["firebase.json","**/.*","**/node_modules/**"],"rewrites":[{"source":"**","destination":"/index.html"}]},"flutter":{"platforms":{"android":{"default":{"projectId":"liturgical-app","appId":"1:1038776967097:android:e68884e7b69484defbe068","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"liturgical-app","configurations":{"android":"1:1038776967097:android:e68884e7b69484defbe068","ios":"1:1038776967097:ios:42e6e8d6f3201104fbe068","web":"1:1038776967097:web:942d864a577c4650fbe068"}}}}}}
