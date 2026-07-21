@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../data/repositories/auth_repository.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -20,33 +21,19 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _isRegisteringMode = false;
 
-  void _handleEmailAction(bool isLogin) async {
-    setState(() => _isRegisteringMode = !isLogin);
+  void _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
     try {
-      if (isLogin) {
-        await _authRepo.signInWithEmail(_emailController.text.trim(), _passwordController.text);
-      } else {
-        await _authRepo.signUpWithEmail(_emailController.text.trim(), _passwordController.text);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Konto utworzone! Sprawdź e-mail, aby aktywować konto.'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }
-      }
+      await _authRepo.signInWithEmail(_emailController.text.trim(), _passwordController.text);
+      
     } on FirebaseAuthException catch (e) {
       String errorMsg = 'Wystąpił błąd.';
       if (e.code == 'email-not-verified') {
         errorMsg = 'Konto nieaktywne. Sprawdź swoją skrzynkę i kliknij w link weryfikacyjny!';
       } else if (e.code == 'user-not-found' || e.code == 'wrong-password' || e.code == 'invalid-credential') {
         errorMsg = 'Nieprawidłowy e-mail lub hasło.';
-      } else if (e.code == 'email-already-in-use') {
-        errorMsg = 'Ten e-mail jest już zajęty.';
       } else {
         errorMsg = e.message ?? 'Nieznany błąd';
       }
@@ -190,14 +177,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) return 'Podaj hasło';
-                    
-                    if (_isRegisteringMode) {
-                      if (value.length < 8) return 'Hasło musi mieć minimum 8 znaków';
-                      final RegExp passwordRegex = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$');
-                      if (!passwordRegex.hasMatch(value)) {
-                        return 'Wymagana mała i duża litera, cyfra oraz znak specjalny';
-                      }
-                    }
                     return null;
                   },
                 ),
@@ -217,12 +196,19 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Center(child: CircularProgressIndicator())
                 else ...[
                   ElevatedButton(
-                    onPressed: () => _handleEmailAction(true),
+                    onPressed: () => _handleLogin,
                     child: const Text('Zaloguj się'),
                   ),
                   const SizedBox(height: 16),
                   TextButton(
-                    onPressed: () => _handleEmailAction(false),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterScreen(),
+                        ),
+                      );
+                    },
                     child: const Text('Nie masz konta? Zarejestruj się'),
                   ),
                   
