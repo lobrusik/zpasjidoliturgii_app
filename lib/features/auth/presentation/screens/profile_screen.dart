@@ -11,9 +11,16 @@ class ProfileScreen extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
     final theme = Theme.of(context);
 
+    // Formatowanie daty dołącze
+    final joinDate = user?.metadata.creationTime;
+    final dateString = joinDate != null
+        ? '${joinDate.day.toString().padLeft(2, '0')}.${joinDate.month.toString().padLeft(2, '0')}.${joinDate.year}'
+        : 'Brak danych';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Twój Profil'),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -27,203 +34,137 @@ class ProfileScreen extends StatelessWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // User information
-            CircleAvatar(
-              radius: 50,
-              backgroundColor: theme.colorScheme.primaryContainer,
-              child: Text(
-                user?.email?.substring(0, 1).toUpperCase() ?? 'U',
-                style: TextStyle(
-                  fontSize: 40, 
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onPrimaryContainer,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
+            
+            // Account Information (Email)
             Text(
               user?.email ?? 'Brak adresu e-mail',
-              style: theme.textTheme.titleLarge,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: Colors.grey.shade400,
+              ),
+              textAlign: TextAlign.center,
             ),
-            
             const SizedBox(height: 24),
 
+            // Administrator Panel - visible only to a specific user
             if (user?.email == 'lobrusik@gmail.com') ...[
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red.shade900,
                   foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
                 icon: const Icon(Icons.admin_panel_settings),
                 label: const Text('Panel Administratora'),
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AdminScreen()),
+                    MaterialPageRoute(builder: (context) => const AdminScreen()),
                   );
                 },
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
             ],
 
-           
-            const SizedBox(height: 48),
-            
-            // STATISTICS 
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Twoje postępy w kursach',
-                style: theme.textTheme.titleLarge?.copyWith(fontSize: 18),
-              ),
+            Text(
+              'Ukończone lekcje',
+              style: theme.textTheme.headlineSmall,
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
+
+            // Retrieving a user's progress in real time
+            if (user != null)
+              StreamBuilder<DocumentSnapshot>(
+                stream: FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
+                builder: (context, snapshot) {
+                  int trunkLessons = 0;
+                  int spiritLessons = 0;
+                  int serviceLessons = 0;
+                  int dailyLessons = 0;
+
+                  // Counting completed lessons if the user's data exists
+                  if (snapshot.hasData && snapshot.data!.exists) {
+                    final data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
+                    final progressMap = data['progress'] as Map<String, dynamic>? ?? {};
+
+                    progressMap.forEach((courseId, completedLessons) {
+                      final lessonsCount = (completedLessons as List?)?.length ?? 0;
+
+                      if (courseId.startsWith('trunk_')) {
+                        trunkLessons += lessonsCount;
+                      } else if (courseId.startsWith('soul_')) {
+                        spiritLessons += lessonsCount;
+                      } else if (courseId.startsWith('service_')) {
+                        serviceLessons += lessonsCount;
+                      } else if (courseId.startsWith('day_') || courseId == 'day') {
+                        dailyLessons += lessonsCount;
+                      }
+                    });
+                  }
+
+                  // 2x2 grid of stats area
+                  return GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: 1.0,
+                    children: [
+                      _buildStatCard('Pień\n(Podstawy)', trunkLessons, Icons.park, Colors.brown.shade400, theme),
+                      _buildStatCard('Gałąź\ndla Ducha', spiritLessons, Icons.spa, Colors.green.shade400, theme),
+                      _buildStatCard('Gałąź\ndla Służby', serviceLessons, Icons.volunteer_activism, Colors.redAccent.shade200, theme),
+                      _buildStatCard('Codzienne\nlekcje', dailyLessons, Icons.calendar_today, Colors.blue.shade400, theme),
+                    ],
+                  );
+                },
+              ),
+
+            const SizedBox(height: 32),
             
-            // Rendering a list of courses with progress bars
-            _buildProgressList(context, user?.uid),
+            // Join date retrieved from the Google/Firebase account
+            Text(
+              'Data dołączenia: $dateString',
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),
     );
   }
 
-  // A function that retrieves a list of all courses
-  Widget _buildProgressList(BuildContext context, String? userId) {
-    if (userId == null) return const SizedBox.shrink();
-
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('courses').snapshots(),
-      builder: (context, courseSnapshot) {
-        if (!courseSnapshot.hasData) return const Center(child: CircularProgressIndicator());
-        
-        final courses = courseSnapshot.data!.docs;
-        if (courses.isEmpty) {
-          return const Text('Brak dostępnych kursów do śledzenia.');
-        }
-
-        return ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: courses.length,
-          itemBuilder: (context, index) {
-            final course = courses[index];
-            return _CourseProgressCard(
-              courseId: course.id,
-              courseTitle: course['title'] ?? 'Nieznany kurs',
-              userId: userId,
-            );
-          },
-        );
-      },
-    );
-  }
-}
-
-// INTERNAL WIDGET: Single course card with a dynamic progress bar
-class _CourseProgressCard extends StatelessWidget {
-  final String courseId;
-  final String courseTitle;
-  final String userId;
-
-  const _CourseProgressCard({
-    required this.courseId,
-    required this.courseTitle,
-    required this.userId,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
-    // Request for all materials from a specific course
-    final totalPlansStream = FirebaseFirestore.instance
-        .collection('study_plans')
-        .where('courseId', isEqualTo: courseId)
-        .snapshots();
-
-    // Request for a user profile (with saved progress)
-    final userProgressStream = FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .snapshots();
-
+  // Function that draws a square statistics tile
+  Widget _buildStatCard(String title, int count, IconData icon, Color iconColor, ThemeData theme) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 2,
+      color: theme.colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: theme.colorScheme.outline.withOpacity(0.2)),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Icon(icon, size: 36, color: iconColor),
+            const Spacer(),
             Text(
-              courseTitle,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             ),
-            const SizedBox(height: 16),
-            
-            StreamBuilder<QuerySnapshot>(
-              stream: totalPlansStream,
-              builder: (context, plansSnapshot) {
-                if (!plansSnapshot.hasData) return const LinearProgressIndicator();
-                
-                final totalPlans = plansSnapshot.data!.docs.length;
-                
-                if (totalPlans == 0) {
-                  return const Text('Brak materiałów w tym kursie', style: TextStyle(color: Colors.grey));
-                }
-
-                // How many lessons has the user completed
-                return StreamBuilder<DocumentSnapshot>(
-                  stream: userProgressStream,
-                  builder: (context, userSnapshot) {
-                    int completedPlans = 0;
-                    
-                    if (userSnapshot.hasData && userSnapshot.data!.exists) {
-                      final data = userSnapshot.data!.data() as Map<String, dynamic>? ?? {};
-                      final progressMap = data['progress'] as Map<String, dynamic>? ?? {};
-                      final courseProgress = progressMap[courseId] as List<dynamic>? ?? [];
-                      completedPlans = courseProgress.length;
-                    }
-
-                    // Protection against logical errors
-                    if (completedPlans > totalPlans) completedPlans = totalPlans;
-                    
-                    final double progressPercent = totalPlans > 0 ? (completedPlans / totalPlans) : 0.0;
-
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Ukończono $completedPlans z $totalPlans etapów',
-                              style: theme.textTheme.bodyMedium,
-                            ),
-                            Text(
-                              '${(progressPercent * 100).toInt()}%',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: LinearProgressIndicator(
-                            value: progressPercent,
-                            minHeight: 8,
-                            backgroundColor: theme.colorScheme.primaryContainer,
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
+            const SizedBox(height: 8),
+            Text(
+              '$count',
+              style: TextStyle(
+                fontSize: 28, 
+                fontWeight: FontWeight.bold, 
+                color: iconColor,
+              ),
             ),
           ],
         ),
