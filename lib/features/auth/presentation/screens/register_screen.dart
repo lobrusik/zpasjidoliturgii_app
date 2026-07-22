@@ -26,12 +26,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+
+      await userCredential.user?.sendEmailVerification();
       
-      if (mounted) Navigator.of(context).pop();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Konto utworzone! Sprawdź e-mail, aby kliknąć w link aktywacyjny.'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 5),
+            ),
+        );
+        Navigator.of(context).pop();
+      }
       
     } on FirebaseAuthException catch (e) {
       setState(() {
