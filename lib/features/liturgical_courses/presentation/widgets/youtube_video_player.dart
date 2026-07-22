@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class YoutubeVideoPlayer extends StatefulWidget {
   final String videoUrl;
@@ -12,68 +12,51 @@ class YoutubeVideoPlayer extends StatefulWidget {
 
 class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
   late YoutubePlayerController _controller;
-  bool _isError = false;
 
   @override
   void initState() {
     super.initState();
     // Automatically extract the ID from any YouTube link
-    final videoId = YoutubePlayer.convertUrlToId(widget.videoUrl);
+    final videoId = YoutubePlayerController.convertUrlToId(widget.videoUrl) ?? '';
     
-    if (videoId != null) {
-      _controller = YoutubePlayerController(
-        initialVideoId: videoId,
-        flags: const YoutubePlayerFlags(
-          autoPlay: false,
-          mute: false,
-        ),
-      );
-    } else {
-      _isError = true;
-    }
+    _controller = YoutubePlayerController.fromVideoId(
+      videoId: videoId,
+      params: const YoutubePlayerParams(
+        showControls: true,
+        showFullscreenButton: true,
+        mute: false,
+      ),
+    );
   }
 
   @override
   void dispose() {
-    if (!_isError) {
-      _controller.dispose();
-    }
+    _controller.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isError) {
-      return Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.error.withOpacity(0.1),
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.black,
           borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Row(
-          children: [
-            Icon(Icons.error_outline, color: Colors.red),
-            SizedBox(width: 8),
-            Expanded(child: Text('Nieprawidłowy link do wideo z YouTube')),
+
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
           ],
         ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: YoutubePlayer(
+            controller: _controller,
+            aspectRatio: 16 / 9,
+          ),
+        ),
       );
-    }
-
-    // ClipRRect rounds the corners of the player itself
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: YoutubePlayer(
-        controller: _controller,
-        showVideoProgressIndicator: true,
-        progressIndicatorColor: Theme.of(context).colorScheme.primary,
-        bottomActions: [
-          CurrentPosition(),
-          ProgressBar(isExpanded: true),
-          RemainingDuration(),
-          const PlaybackSpeedButton(),
-        ],
-      ),
-    );
   }
 }
