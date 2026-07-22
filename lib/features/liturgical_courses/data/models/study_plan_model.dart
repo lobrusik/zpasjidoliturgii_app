@@ -61,9 +61,11 @@ class StudyPlanModel extends Equatable {
 
   factory StudyPlanModel.fromFirestore(Map<String, dynamic> json, String documentId) {
     var quizList = json['quiz'] as List? ?? [];
-    List<QuizQuestion> parsedQuiz = quizList
-        .map((q) => QuizQuestion.fromMap(q as Map<String, dynamic>))
-        .toList();
+    
+    List<QuizQuestion> parsedQuiz = quizList.map((q) {
+      final safeMap = Map<String, dynamic>.from(q as Map);
+      return QuizQuestion.fromMap(safeMap);
+    }).toList();
 
     return StudyPlanModel(
       id: documentId,
