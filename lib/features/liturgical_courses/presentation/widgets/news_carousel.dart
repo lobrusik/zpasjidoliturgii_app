@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:url_launcher/url_launcher.dart'; // Dodane dla linków
+import 'package:url_launcher/url_launcher.dart'; 
+import 'package:html_unescape/html_unescape.dart';
 
 class NewsCarousel extends StatelessWidget {
   const NewsCarousel({super.key});
@@ -21,6 +22,8 @@ class NewsCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final unescape = HtmlUnescape();
+
     return FutureBuilder(
       future: fetchNews(),
       builder: (context, snapshot) {
@@ -37,6 +40,14 @@ class NewsCarousel extends StatelessWidget {
           ),
           itemBuilder: (context, index, realIndex) {
             final post = posts[index];
+
+            final rawTitle = post['title']['rendered'].replaceAll(RegExp(r'<[^>]*>'), '');
+            final cleanTitle = unescape.convert(rawTitle);
+            final rawExcerpt = post['excerpt']['rendered'].replaceAll(RegExp(r'<[^>]*>'), '');
+            var cleanExcerpt = unescape.convert(rawExcerpt);
+
+            cleanExcerpt = cleanExcerpt.replaceAll('[&hellip;]', '...');
+
             return Container(
               margin: const EdgeInsets.symmetric(horizontal: 5),
               decoration: BoxDecoration(
@@ -49,13 +60,13 @@ class NewsCarousel extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      post['title']['rendered'].replaceAll(RegExp(r'<[^>]*>'), ''),
+                      cleanTitle,
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                       maxLines: 2,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      post['excerpt']['rendered'].replaceAll(RegExp(r'<[^>]*>'), ''),
+                      cleanExcerpt,
                       style: const TextStyle(color: Colors.grey, fontSize: 12),
                       maxLines: 2,
                     ),
