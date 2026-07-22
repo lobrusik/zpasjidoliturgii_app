@@ -5,6 +5,7 @@ import '../bloc/study_plan_bloc.dart';
 import '../bloc/progress_bloc.dart';
 import '../widgets/youtube_video_player.dart';
 import '../widgets/interactive_quiz.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CourseDetailsScreen extends StatelessWidget {
   final String courseId;
@@ -68,11 +69,31 @@ class CourseDetailsScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Text(
-                    plan.textMaterials,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      height: 1.5,
-                      color: Colors.grey.shade400,
+
+                  //Creating a clickable link
+                  GestureDetector(
+                    onTap: () async {
+                      if (plan.textMaterials.isEmpty) return;
+                      
+                      final Uri url = Uri.parse(plan.textMaterials);
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url, mode: LaunchMode.externalApplication);
+                      } else {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Nie udało się otworzyć linku.', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+                          );
+                        }
+                      }
+                    },
+                    child: Text(
+                      'Przeczytaj artykuł rozszerzający ten temat', 
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        height: 1.5,
+                        color: Colors.blueAccent,
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.blueAccent,
+                      ),
                     ),
                   ),
 
