@@ -21,22 +21,28 @@ class NewsCarousel extends StatelessWidget {
   }
 
   // I love wordpress texts
-  String _cleanText(String rawText) async {
+  String _cleanText(String rawText) {
     if (rawText.isEmpty) return '';
 
     String text = rawText.replaceAll(RegExp(r'<[^>]*>'), '');
-    text = HtmlUnescape().convert(text);
 
-    return text
-        .replaceAll('&#8222;', '„')
-        .replaceAll('&#8221;', '”')
-        .replaceAll('&#8220;', '“')
-        .replaceAll('&#8211;', '–')
-        .replaceAll('&#8212;', '—') 
-        .replaceAll('&#8216;', '‘')
-        .replaceAll('&#8217;', '’')
-        .replaceAll('&#8230;', '...') 
+    text = text
+        .replaceAll('&amp;#8222;', '„').replaceAll('&#8222;', '„')
+        .replaceAll('&amp;#8221;', '”').replaceAll('&#8221;', '”')
+        .replaceAll('&amp;#8220;', '“').replaceAll('&#8220;', '“')
+        .replaceAll('&amp;#8211;', '–').replaceAll('&#8211;', '–')
+        .replaceAll('&amp;#8212;', '—').replaceAll('&#8212;', '—')
+        .replaceAll('&amp;#8216;', '‘').replaceAll('&#8216;', '‘')
+        .replaceAll('&amp;#8217;', '’').replaceAll('&#8217;', '’')
+        .replaceAll('&amp;#8230;', '...').replaceAll('&#8230;', '...')
         .replaceAll('[&hellip;]', '...');
+
+    final unescape = HtmlUnescape();
+    text = unescape.convert(text);
+    text = unescape.convert(text);
+
+    return text;
+
   }
 
   @override
