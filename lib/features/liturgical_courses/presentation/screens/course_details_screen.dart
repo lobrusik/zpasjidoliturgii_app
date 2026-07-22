@@ -75,24 +75,32 @@ class CourseDetailsScreen extends StatelessWidget {
                     onTap: () async {
                       if (plan.textMaterials.isEmpty) return;
                       
+                      final String rawUrl = plan.textMaterials.trim();
                       final Uri url = Uri.parse(plan.textMaterials);
-                      if (await canLaunchUrl(url)) {
-                        await launchUrl(url, mode: LaunchMode.externalApplication);
-                      } else {
+
+                      try {
+                        await launchUrl(url, mode: LaunchMode.externalApplication); 
+                      } catch (e){
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Nie udało się otworzyć linku.', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+                            SnackBar(
+                              content: Text('Błąd: Nie można otworzyć strony. Upewnij się, że przeglądarka nie blokuje wyskakujących okienek.', style: const TextStyle(color: Colors.white)), 
+                              backgroundColor: Colors.red,
+                            ),
                           );
                         }
                       }
                     },
-                    child: Text(
-                      'Przeczytaj artykuł rozszerzający ten temat', 
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        height: 1.5,
-                        color: Colors.blueAccent,
-                        decoration: TextDecoration.underline,
-                        decorationColor: Colors.blueAccent,
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: Text(
+                        'Przeczytaj artykuł rozszerzający ten temat', 
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          height: 1.5,
+                          color: Colors.blueAccent, 
+                          decoration: TextDecoration.underline, 
+                          decorationColor: Colors.blueAccent,
+                        ),
                       ),
                     ),
                   ),
