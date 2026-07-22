@@ -20,6 +20,25 @@ class NewsCarousel extends StatelessWidget {
     }
   }
 
+  // I love wordpress texts
+  String _cleanText(String rawText) async {
+    if (rawText.isEmpty) return '';
+
+    String text = rawText.replaceAll(RegExp(r'<[^>]*>'), '');
+    text = HtmlUnescape().convert(text);
+
+    return text
+        .replaceAll('&#8222;', '„')
+        .replaceAll('&#8221;', '”')
+        .replaceAll('&#8220;', '“')
+        .replaceAll('&#8211;', '–')
+        .replaceAll('&#8212;', '—') 
+        .replaceAll('&#8216;', '‘')
+        .replaceAll('&#8217;', '’')
+        .replaceAll('&#8230;', '...') 
+        .replaceAll('[&hellip;]', '...');
+  }
+
   @override
   Widget build(BuildContext context) {
     final unescape = HtmlUnescape();
@@ -41,10 +60,8 @@ class NewsCarousel extends StatelessWidget {
           itemBuilder: (context, index, realIndex) {
             final post = posts[index];
 
-            final rawTitle = post['title']['rendered'].replaceAll(RegExp(r'<[^>]*>'), '');
-            final cleanTitle = unescape.convert(rawTitle);
-            final rawExcerpt = post['excerpt']['rendered'].replaceAll(RegExp(r'<[^>]*>'), '');
-            var cleanExcerpt = unescape.convert(rawExcerpt);
+            final cleanTitle = _cleanText(post['title']['rendered']);
+            var cleanExcerpt = _cleanText(post['excerpt']['rendered']);
 
             cleanExcerpt = cleanExcerpt.replaceAll('[&hellip;]', '...');
 
