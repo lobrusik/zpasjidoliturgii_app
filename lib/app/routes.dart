@@ -145,7 +145,7 @@ class AppRoutes {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/podcasts',
+                path: '/podcast',
                 builder: (context, state) => const PodcastScreen(),
               ),
             ],
