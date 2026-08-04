@@ -12,8 +12,8 @@ class PodcastScreen extends StatelessWidget {
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection('podcasts')
-            //.orderBy('order')
+            .collection('podcast')
+            .orderBy('order')
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
