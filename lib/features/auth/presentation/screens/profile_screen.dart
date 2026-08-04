@@ -11,7 +11,6 @@ class ProfileScreen extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
     final theme = Theme.of(context);
 
-    // Formatowanie daty dołącze
     final joinDate = user?.metadata.creationTime;
     final dateString = joinDate != null
         ? '${joinDate.day.toString().padLeft(2, '0')}.${joinDate.month.toString().padLeft(2, '0')}.${joinDate.year}'
@@ -48,7 +47,7 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Administrator Panel - visible only to a specific user
-            if (user?.email == 'lobrusik@gmail.com', 'administracja@zpasjidoliturgii.pl') ...[
+            if (user?.email == 'lobrusik@gmail.com'|| user?.email == 'administracja@zpasjidoliturgii.pl') ...[
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red.shade900,
