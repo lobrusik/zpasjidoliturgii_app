@@ -38,13 +38,13 @@ class PodcastScreen extends StatelessWidget {
             );
           }
 
-          final podcasts = snapshot.data!.docs;
+          final podcast = snapshot.data!.docs;
 
           return ListView.builder(
             padding: const EdgeInsets.all(16.0),
-            itemCount: podcasts.length,
+            itemCount: podcast.length,
             itemBuilder: (context, index) {
-              final data = podcasts[index].data() as Map<String, dynamic>;
+              final data = podcast[index].data() as Map<String, dynamic>;
               final title = data['title'] ?? 'Brak tytułu';
               final description = data['description'] ?? 'Brak opisu';
 
