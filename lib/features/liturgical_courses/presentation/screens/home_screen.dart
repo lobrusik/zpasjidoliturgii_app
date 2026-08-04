@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/news_carousel.dart';
 import '../widgets/buy_coffee_button.dart';
+import '../widgets/about_contact_section.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -147,21 +148,17 @@ class HomeScreen extends StatelessWidget {
                 onTap: () => context.go('/plan')
               ),
 
-              const SizedBox(height: 32),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Text(
-                  'Wesprzyj projekt',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 32),
 
-            const Center(
-              child: BuyCoffeeButton(),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: AboutAndContactSection(),
             ),
+
+            const SizedBox(height: 32),
+
+            const Center(child: BuyCoffeeButton(),),
+
             const SizedBox(height: 32),
               
               Center(

@@ -36,7 +36,7 @@ class _AdminScreenState extends State<AdminScreen> {
       await FirebaseFirestore.instance.collection(collectionName).doc(docId).set(parsedData);
 
       _showMsg('Sukces! Wgrano do $collectionName.', Colors.green);
-      _jsonController.clear(); // Czyścimy pole po udanym wgraniu
+      _jsonController.clear();
       
     } catch (e) {
       _showMsg('Błąd formatu JSON: $e', Colors.red);
@@ -63,7 +63,7 @@ class _AdminScreenState extends State<AdminScreen> {
             Expanded(
               child: TextField(
                 controller: _jsonController,
-                maxLines: null, // Pozwala na wieloliniowy tekst
+                maxLines: null,
                 expands: true,
                 decoration: InputDecoration(
                   hintText: '{\n  "courseId": "trunk_02",\n  "title": "..."\n}',
