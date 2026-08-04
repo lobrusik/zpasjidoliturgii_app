@@ -24,7 +24,7 @@ class BuyCoffeeButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: const Color(0x50141F1C),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -50,7 +50,7 @@ class BuyCoffeeButton extends StatelessWidget {
                   const Text(
                     'Podoba Ci się to, co robimy?',
                     style: TextStyle(
-                      color: Colors.black87,
+                      color: Colors.white,
                       fontSize: 12,
                     ),
                   ),
