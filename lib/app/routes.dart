@@ -19,6 +19,8 @@ import '../features/liturgical_courses/data/repositories/progress_repository.dar
 import '../features/liturgical_courses/presentation/bloc/progress_bloc.dart';
 import '../features/liturgical_courses/presentation/screens/daily_lesson_screen.dart';
 
+import 'package:zpasjidoliturgii/features/liturgical_courses/presentation/screens/podcast_screen.dart';
+
 class AppRoutes {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -70,6 +72,7 @@ class AppRoutes {
                   )..add(LoadCourses()),
                   child: const PathScreen(), 
                 ),
+
                 routes: [
                   GoRoute(
                     path: 'details/:id',
@@ -138,6 +141,16 @@ class AppRoutes {
               ),
             ],
           ),
+
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/podcasts',
+                builder: (context, state) => const PodcastScreen(),
+              ),
+            ],
+          ),
+
         ],
       ),
     ],
