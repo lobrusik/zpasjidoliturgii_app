@@ -6,6 +6,7 @@ import '../bloc/progress_bloc.dart';
 import '../widgets/youtube_video_player.dart';
 import '../widgets/interactive_quiz.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../widgets/buy_coffee_button.dart';
 
 class CourseDetailsScreen extends StatelessWidget {
   final String courseId;
@@ -188,7 +189,12 @@ class CourseDetailsScreen extends StatelessWidget {
             onPressed: () => context.pop(),
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2E7D32), minimumSize: const Size(double.infinity, 50)),
             child: const Text('Wróć do mapy kursów'),
-          )
+          ),
+          const SizedBox(height: 20),
+          const Center(
+            child: BuyCoffeeButton(),
+          ),
+          const SizedBox(height: 40),
         ],
       ),
     );

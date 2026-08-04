@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/news_carousel.dart';
+import '../widgets/buy_coffee_button.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -40,7 +41,7 @@ class HomeScreen extends StatelessWidget {
                           children: [
                             Text('TWOJA DROGA DO LITURGII', style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.2)),
                             const SizedBox(height: 12),
-                            Text('Tu zaczyna się Twoja pasja do świętej liturgii', style: theme.textTheme.headlineLarge),
+                            Text('Tu zaczyna się Twoja pasja do Świętej Liturgii', style: theme.textTheme.headlineLarge),
                             const SizedBox(height: 12),
                             Text('Oglądaj, czytaj, rozwiązuj quizy i odkrywaj piękno Mszy Świętej.', style: theme.textTheme.bodyMedium),
                             const SizedBox(height: 24),
@@ -147,7 +148,22 @@ class HomeScreen extends StatelessWidget {
               ),
 
               const SizedBox(height: 32),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Text(
+                  'Wesprzyj projekt',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            const SizedBox(height: 16),
 
+            const Center(
+              child: BuyCoffeeButton(),
+            ),
+            const SizedBox(height: 32),
+              
               Center(
                 child: Column(
                   children: [
