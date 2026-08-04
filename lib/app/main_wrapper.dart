@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zpasjidoliturgii/features/liturgical_courses/presentation/screens/podcast_screen.dart';
 
 class MainWrapper extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -45,6 +46,7 @@ class MainWrapper extends StatelessWidget {
           BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Start'),
           BottomNavigationBarItem(icon: Icon(Icons.account_tree_outlined), label: 'Ścieżka'),
           BottomNavigationBarItem(icon: Icon(Icons.calendar_today_outlined), label: 'Plan'),
+          BottomNavigationBarItem(icon: Icon(Icons.headset_mic_outlined), label: 'Podcast'),
         ],
         selectedItemColor: theme.colorScheme.primary,
         unselectedItemColor: Colors.grey,
