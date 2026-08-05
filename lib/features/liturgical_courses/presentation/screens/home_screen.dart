@@ -136,16 +136,23 @@ class HomeScreen extends StatelessWidget {
               _buildPathCard(
                 context, 
                 title: 'Drzewko wiedzy', 
-                description: 'Podstawy, Służba, Duch. Ucz się we własnym tempie.', 
+                description: 'Podstawy, służba, duch. Ucz się we własnym tempie.', 
                 imagePlaceholder: Icons.account_tree_outlined, 
                 onTap: () => context.go('/courses')
               ),
               _buildPathCard(
                 context, 
                 title: 'Codziennie z liturgią', 
-                description: 'Zobacz, Zrozum, Sprawdź się, Zastosuj. 1 lekcja dziennie.', 
+                description: 'Zobacz, zrozum, sprawdź się, zastosuj. 1 lekcja dziennie.', 
                 imagePlaceholder: Icons.calendar_today_outlined, 
                 onTap: () => context.go('/plan')
+              ),
+              _buildPathCard(
+                context, 
+                title: 'Ścieżka muzyczna', 
+                description: 'Poznaj piękno muzyki kościelnej. Chorał, śpiew i schola.', 
+                imagePlaceholder: Icons.library_music_outlined,
+                onTap: () => context.go('/courses')
               ),
 
             const SizedBox(height: 32),

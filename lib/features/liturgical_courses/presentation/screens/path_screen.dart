@@ -9,112 +9,6 @@ import '../bloc/courses_state.dart';
 class PathScreen extends StatelessWidget {
   const PathScreen({super.key});
 
-  //temporary button
-  Future<void> _addTestData(BuildContext context) async {
-    try {
-      await FirebaseFirestore.instance.collection('courses').doc('music_trunk_01').set({
-        'category': 'music_trunk',
-        'description': 'Opis pierwszej lekcji muzycznej - dodany z przycisku.',
-        'isLocked': false,
-        'order': 1,
-        'thumbnailUrl': 'https://youtu.be/AzuarmqLc4I?si=EIeqeWwF4EwyRy6i', 
-        'title': 'Lekcja 1 - Wstęp do Muzyki',
-      });
-
-      await FirebaseFirestore.instance.collection('study_plans').doc('music_trunk_01').set({
-        'courseId': 'music_trunk_01',
-        'dayStage': 1,
-        'liturgicalContent': 'To jest przykładowa treść Twojej pierwszej lekcji muzycznej. Została wygenerowana z kodu aplikacji wraz z gotowym zestawem 7 pytań.',
-        'quiz': [
-          {
-            'correctAnswerIndex': 1,
-            'explanation': 'Muzyka liturgiczna jest integralną częścią uroczystej liturgii, a nie tylko tłem.',
-            'options': [
-              'Tylko "wypełniaczem" czasu', 
-              'Integralną częścią liturgii', 
-              'Koncertem dla wiernych', 
-              'Zwykłym dodatkiem'
-            ]
-          },
-          {
-            'correctAnswerIndex': 0,
-            'explanation': 'Chorał gregoriański jest własnym i głównym śpiewem Kościoła rzymskiego.',
-            'options': [
-              'Oficjalnym śpiewem Kościoła', 
-              'Pieśnią ludową', 
-              'Utworem rozrywkowym', 
-              'Nowoczesną piosenką'
-            ]
-          },
-          {
-            'correctAnswerIndex': 2,
-            'explanation': 'Śpiew a cappella (z wł. "jak w kaplicy") to śpiew bez akompaniamentu.',
-            'options': [
-              'Śpiew z gitarą', 
-              'Śpiew z organami', 
-              'Śpiew bez instrumentów', 
-              'Śpiew chóralny na dwa głosy'
-            ]
-          },
-          {
-            'correctAnswerIndex': 1,
-            'explanation': 'Podczas Triduum Paschalnego (od hymnu Chwała na wysokości w Wielki Czwartek do Wigilii Paschalnej) milkną instrumenty.',
-            'options': [
-              'W Adwencie', 
-              'W Triduum Paschalne', 
-              'W okresie zwykłym', 
-              'Podczas każdego postu'
-            ]
-          },
-          {
-            'correctAnswerIndex': 3,
-            'explanation': 'Schola to powołany zespół śpiewaków, pełniący funkcję liturgiczną.',
-            'options': [
-              'Zbiór instrumentów', 
-              'Ministranci przy ołtarzu', 
-              'Rada parafialna', 
-              'Zespół śpiewaków liturgicznych'
-            ]
-          },
-          {
-            'correctAnswerIndex': 0,
-            'explanation': 'Psałterzysta wykonuje psalm responsoryjny, zazwyczaj z ambony.',
-            'options': [
-              'Osoba śpiewająca psalm', 
-              'Osoba grająca na organach', 
-              'Główny celebrans', 
-              'Kantor intonujący pieśni'
-            ]
-          },
-          {
-            'correctAnswerIndex': 2,
-            'explanation': 'Klucz wiolinowy (klucz G) jest najczęściej używanym kluczem do zapisu melodii śpiewanej.',
-            'options': [
-              'Klucz basowy', 
-              'Klucz altowy', 
-              'Klucz wiolinowy', 
-              'Klucz tenorowy'
-            ]
-          }
-        ]
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('SUKCES: Utworzono lekcję z 7 pytaniami!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('BŁĄD: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -124,14 +18,6 @@ class PathScreen extends StatelessWidget {
     return DefaultTabController(
       length: 2, 
       child: Scaffold(
-        //to remove!
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => _addTestData(context),
-          backgroundColor: Colors.red,
-          icon: const Icon(Icons.add_to_drive, color: Colors.white),
-          label: const Text('Dodaj testowe dane', style: TextStyle(color: Colors.white)),
-        ),
-
         body: Column(
           children: [
             // Tabs bar at the top of the screen
