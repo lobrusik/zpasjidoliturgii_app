@@ -84,43 +84,43 @@ class CourseDetailsScreen extends StatelessWidget {
                       listBullet: TextStyle(color: theme.colorScheme.primary, fontSize: 18),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  //const SizedBox(height: 24),
 
                   //Creating a clickable link
-                  GestureDetector(
-                    onTap: () async {
-                      if (plan.textMaterials.isEmpty) return;
-                      
-                      final String rawUrl = plan.textMaterials.trim();
-                      final Uri url = Uri.parse(plan.textMaterials);
+                  if (plan.textMaterials.trim().isNotEmpty) ... [
+                    const SizedBox(height: 24),
+                    GestureDetector(
+                      onTap: () async {
+                        final String rawUrl = plan.textMaterials.trim();
+                        final Uri url = Uri.parse(rawUrl);
 
-                      try {
-                        await launchUrl(url, mode: LaunchMode.externalApplication); 
-                      } catch (e){
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Błąd: Nie można otworzyć strony. Upewnij się, że przeglądarka nie blokuje wyskakujących okienek.', style: const TextStyle(color: Colors.white)), 
-                              backgroundColor: Colors.red,
-                            ),
-                          );
+                        try {
+                          await launchUrl(url, mode: LaunchMode.externalApplication); 
+                        } catch (e){
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Błąd: Nie można otworzyć strony. Upewnij się, że przeglądarka nie blokuje wyskakujących okienek.', style: const TextStyle(color: Colors.white)), 
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
                         }
-                      }
-                    },
-                    child: MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: Text(
-                        'Przeczytaj artykuł rozszerzający ten temat', 
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          height: 1.5,
-                          color: Colors.blueAccent, 
-                          decoration: TextDecoration.underline, 
-                          decorationColor: Colors.blueAccent,
+                      },
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: Text(
+                          'Przeczytaj artykuł rozszerzający ten temat', 
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            height: 1.5,
+                            color: Colors.blueAccent, 
+                            decoration: TextDecoration.underline, 
+                            decorationColor: Colors.blueAccent,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-
+                  ],
                   const SizedBox(height: 48),
 
                   _buildSectionHeader(context, '3', 'Sprawdź się'),
