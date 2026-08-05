@@ -47,9 +47,9 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Administrator Panel - visible only to a specific user
-            if (user?.email == 'lobrusik@gmail.com'|| user?.email == 'administracja@zpasjidoliturgii.pl') ...[
+            if (['lobrusik@gmail.com', 'administracja@zpasjidoliturgii.pl'].contains(user?.email)) ...[
               ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
+                style: ElevatedButton.styleFrom( 
                   backgroundColor: Colors.red.shade900,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
