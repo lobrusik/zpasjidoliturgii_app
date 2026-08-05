@@ -80,10 +80,10 @@ class ProfileScreen extends StatelessWidget {
                 builder: (context, snapshot) {
 
                   //liturgical tree
-                  int trunkLessons = 0;
-                  int massLessons = 0;
-                  int placeLessons = 0;
-                  int historyLessons = 0;
+                  int liturgicalLessons = 0;
+                  // int massLessons = 0;
+                  // int placeLessons = 0;
+                  // int historyLessons = 0;
 
                   //musical tree
                   int musicLessons = 0;
@@ -104,14 +104,16 @@ class ProfileScreen extends StatelessWidget {
 
                       //liturgical tree
                       if (courseId.startsWith('trunk_')) {
-                        trunkLessons += lessonsCount;
-                      } else if (courseId.startsWith('mass_')) {
-                        massLessons += lessonsCount;
-                      } else if (courseId.startsWith('place_')) {
-                        placeLessons += lessonsCount;
-                      }else if (courseId.startsWith('history_')) {
-                        historyLessons += lessonsCount;
-                      } 
+                        liturgicalLessons += lessonsCount;
+                      }
+                      // else if (courseId.startsWith('mass_')) {
+                      //   massLessons += lessonsCount;
+                      // } else if (courseId.startsWith('place_')) {
+                      //   placeLessons += lessonsCount;
+                      // }else if (courseId.startsWith('history_')) {
+                      //   historyLessons += lessonsCount;
+                      // } 
+
                       //music tree
                       else if (courseId.startsWith('music_')) {
                         musicLessons += lessonsCount;
@@ -136,10 +138,10 @@ class ProfileScreen extends StatelessWidget {
                     childAspectRatio: 1.0,
                     children: [
                       //liturgical
-                      _buildStatCard('Teologia\nliturgii', trunkLessons, Icons.park, Colors.brown.shade400, theme),
-                      _buildStatCard('Msza św.\nkrok po kroku', massLessons, Icons.spa, Colors.green.shade400, theme),
-                      _buildStatCard('Miejsce\nświęte', placeLessons, Icons.church, Colors.redAccent.shade200, theme),
-                      _buildStatCard('Historia\nministrantury', historyLessons, Icons.history_edu, Colors.brown.shade400, theme),
+                      _buildStatCard('Teologia\nliturgii', liturgicalLessons, Icons.park, Colors.brown.shade400, theme),
+                      // _buildStatCard('Msza św.\nkrok po kroku', massLessons, Icons.spa, Colors.green.shade400, theme),
+                      // _buildStatCard('Miejsce\nświęte', placeLessons, Icons.church, Colors.redAccent.shade200, theme),
+                      // _buildStatCard('Historia\nministrantury', historyLessons, Icons.history_edu, Colors.brown.shade400, theme),
                       //musical
                       _buildStatCard('Ścieżka\nMuzyczna', musicLessons, Icons.music_note, Colors.blue.shade400, theme),
                       //e-zbiorki

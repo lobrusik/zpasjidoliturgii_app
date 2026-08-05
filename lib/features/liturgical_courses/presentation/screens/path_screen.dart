@@ -291,6 +291,7 @@ class PathScreen extends StatelessWidget {
           courses.sort((a, b) => a.order.compareTo(b.order));
 
           final collectionCourses = courses.where((c) => c.category == 'collection_trunk').toList();
+          final collectionBibleCourses = courses.where((c) => c.category == 'collection_bible').toList();
           
 
           return StreamBuilder<DocumentSnapshot>(
@@ -300,6 +301,20 @@ class PathScreen extends StatelessWidget {
             builder: (context, snapshot) {
               final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
               final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
+
+              int completedCollectionTrunkLessons = 0;
+              for (var course in collectionCourses) {
+                if (progressMap.containsKey(course.id)) {
+                  final courseProgress = progressMap[course.id];
+                  if (courseProgress is List) {
+                    completedCollectionTrunkLessons += courseProgress.length;
+                  }
+                }
+              }
+
+              // 4 lesson - you can move on
+              final int requiredCollectionLessons = 4; 
+              bool areAdvancedCollectionUnlocked = completedCollectionTrunkLessons >= requiredCollectionLessons;
 
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(20.0),
@@ -325,15 +340,31 @@ class PathScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 32),
 
+                    //TRUNK
                     _buildBranchSection(
                       context: context,
-                      title: 'Odprawy i Formacja',
-                      description: 'Materiały i quizy na e-zbiórki ministranckie.',
+                      title: 'Podstawy liturgii',
+                      description: 'Obowiązkowe dla wszystkich',
                       icon: Icons.groups,
                       branchColor: const Color(0xFFFF9800),
                       courses: collectionCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: true,
+                    ),
+                    const SizedBox(height: 48),
+
+                    //  COLLECTION BRANCH - BIBLE
+                    _buildBranchSection(
+                      context: context,
+                      title: 'Gałąź — Wprowadzenie do Pisma Świętego',
+                      description: areAdvancedCollectionUnlocked
+                          ? 'Co wspólnego ma Pismo Święte z Eucharystią.'
+                          : 'Zablokowane. Ukończono $completedCollectionTrunkLessons/$requiredCollectionLessons podstaw.',
+                      icon: Icons.menu_book,
+                      branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
+                      courses: collectionBibleCourses,
+                      progressMap: progressMap,
+                      isBranchUnlocked: areAdvancedCollectionUnlocked,
                     ),
                     const SizedBox(height: 48),
                   ],
