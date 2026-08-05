@@ -78,9 +78,20 @@ class ProfileScreen extends StatelessWidget {
               StreamBuilder<DocumentSnapshot>(
                 stream: FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
                 builder: (context, snapshot) {
+
+                  //liturgical tree
                   int trunkLessons = 0;
-                  int spiritLessons = 0;
-                  int serviceLessons = 0;
+                  int massLessons = 0;
+                  int placeLessons = 0;
+                  int historyLessons = 0;
+
+                  //musical tree
+                  int musicLessons = 0;
+
+                  //e-zbiorka tree
+                  int collectionLessons = 0;
+
+                  //daily lessons
                   int dailyLessons = 0;
 
                   // Counting completed lessons if the user's data exists
@@ -91,19 +102,31 @@ class ProfileScreen extends StatelessWidget {
                     progressMap.forEach((courseId, completedLessons) {
                       final lessonsCount = (completedLessons as List?)?.length ?? 0;
 
+                      //liturgical tree
                       if (courseId.startsWith('trunk_')) {
                         trunkLessons += lessonsCount;
-                      } else if (courseId.startsWith('soul_')) {
-                        spiritLessons += lessonsCount;
-                      } else if (courseId.startsWith('service_')) {
-                        serviceLessons += lessonsCount;
-                      } else if (courseId.startsWith('day_') || courseId == 'day') {
+                      } else if (courseId.startsWith('mass_')) {
+                        massLessons += lessonsCount;
+                      } else if (courseId.startsWith('place_')) {
+                        placeLessons += lessonsCount;
+                      }else if (courseId.startsWith('history_')) {
+                        historyLessons += lessonsCount;
+                      } 
+                      //music tree
+                      else if (courseId.startsWith('music_')) {
+                        musicLessons += lessonsCount;
+                      }
+                      //e-zbiorki tree
+                      else if (courseId.startsWith('collection_')) {
+                        collectionLessons += lessonsCount;
+                      }
+                      //daily lessons
+                      else if (courseId.startsWith('day_') || courseId == 'day') {
                         dailyLessons += lessonsCount;
                       }
                     });
                   }
 
-                  // 2x2 grid of stats area
                   return GridView.count(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -112,9 +135,16 @@ class ProfileScreen extends StatelessWidget {
                     crossAxisSpacing: 16,
                     childAspectRatio: 1.0,
                     children: [
-                      _buildStatCard('Pień\n(Podstawy)', trunkLessons, Icons.park, Colors.brown.shade400, theme),
-                      _buildStatCard('Gałąź\ndla Ducha', spiritLessons, Icons.spa, Colors.green.shade400, theme),
-                      _buildStatCard('Gałąź\ndla Służby', serviceLessons, Icons.volunteer_activism, Colors.redAccent.shade200, theme),
+                      //liturgical
+                      _buildStatCard('Teologia\nliturgii', trunkLessons, Icons.park, Colors.brown.shade400, theme),
+                      _buildStatCard('Msza św.\nkrok po kroku', massLessons, Icons.spa, Colors.green.shade400, theme),
+                      _buildStatCard('Miejsce\nświęte', placeLessons, Icons.volunteer_activism, Colors.redAccent.shade200, theme),
+                      _buildStatCard('Historia\nministrantury', historyLessons, Icons.history_edu, Colors.brown.shade400, theme),
+                      //musical
+                      _buildStatCard('Ścieżka\nMuzyczna', musicLessons, Icons.music_note, Colors.blue.shade400, theme),
+                      //e-zbiorki
+                      _buildStatCard('E-zbiórki\n(Odprawy)', collectionLessons, Icons.groups, Colors.orange.shade400, theme),
+                      //daily
                       _buildStatCard('Codzienne\nlekcje', dailyLessons, Icons.calendar_today, Colors.blue.shade400, theme),
                     ],
                   );

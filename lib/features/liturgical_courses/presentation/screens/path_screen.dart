@@ -8,115 +8,7 @@ import '../bloc/courses_state.dart';
 
 class PathScreen extends StatelessWidget {
   const PathScreen({super.key});
-  //TEMPRORARY
-  Future<void> _addCollectionTestData(BuildContext context) async {
-    try {
-      await FirebaseFirestore.instance.collection('courses').doc('collection_trunk_01').set({
-        'category': 'collection_trunk',
-        'description': 'Opis pierwszej e-zbiórki ministranckiej.',
-        'isLocked': false,
-        'order': 1,
-        'thumbnailUrl': 'https://youtu.be/gogOnpwI1SE?si=dSssZHxrpeWzX73-', 
-        'title': 'Lekcja 1 - Odprawa i podział funkcji',
-      });
-
-      await FirebaseFirestore.instance.collection('study_plans').doc('collection_trunk_01').set({
-        'courseId': 'collection_trunk_01',
-        'dayStage': 1,
-        'liturgicalContent': 'Zbiórka to najważniejszy moment przygotowania do służby. To wtedy ustalamy podział funkcji, modlimy się i wyciszamy przed wyjściem do ołtarza.',
-        'quiz': [
-          {
-            'correctAnswerIndex': 1,
-            'explanation': 'Zbiórka przed Mszą Świętą to czas na organizację, podział funkcji i modlitwę, a nie spotkanie towarzyskie.',
-            'options': [
-              'Czasem na pogawędki z kolegami', 
-              'Spotkaniem organizacyjnym i modlitewnym przed służbą', 
-              'Zbiórką pieniędzy na tacę', 
-              'Obowiązkową karą dla spóźnialskich'
-            ]
-          },
-          {
-            'correctAnswerIndex': 0,
-            'explanation': 'Ministrant powinien pojawić się w zakrystii zazwyczaj 15 minut przed rozpoczęciem liturgii, aby spokojnie się ubrać i przygotować.',
-            'options': [
-              '15 minut przed Mszą', 
-              'Dokładnie o godzinie rozpoczęcia Mszy', 
-              'Podczas dzwonka na wejście', 
-              'Godzinę po Mszy'
-            ]
-          },
-          {
-            'correctAnswerIndex': 2,
-            'explanation': 'Podziałem funkcji zazwyczaj zajmuje się ceremoniarz, prezes lub najstarszy animator w porozumieniu z księdzem.',
-            'options': [
-              'Osoba, która przyjdzie ostatnia', 
-              'Najmłodszy ministrant', 
-              'Ceremoniarz lub ksiądz opiekun', 
-              'Kościelny'
-            ]
-          },
-          {
-            'correctAnswerIndex': 3,
-            'explanation': 'Każda zbiórka i służba powinny zaczynać się i kończyć krótką modlitwą (np. "Króluj nam Chryste").',
-            'options': [
-              'Śpiewem hymnu państwowego', 
-              'Sprawdzeniem obecności w zeszycie', 
-              'Złożeniem ofiary', 
-              'Wspólną modlitwą (przed i po służbie)'
-            ]
-          },
-          {
-            'correctAnswerIndex': 1,
-            'explanation': 'Wyciszenie w zakrystii pomaga w skupieniu i duchowym przygotowaniu do spotkania z Bogiem w liturgii.',
-            'options': [
-              'Można głośno rozmawiać i żartować', 
-              'Należy zachować ciszę i skupienie', 
-              'Trzeba cały czas śpiewać', 
-              'Należy dyskutować o podziale funkcji'
-            ]
-          },
-          {
-            'correctAnswerIndex': 0,
-            'explanation': 'E-zbiórka w naszej aplikacji to forma wirtualnego spotkania, sprawdzania wiedzy i formacji poza murami parafii.',
-            'options': [
-              'Formuła nauki i formacji ministranckiej online', 
-              'Aplikacja do zbierania datków', 
-              'Gra komputerowa o księżach', 
-              'Strona z planem lekcji'
-            ]
-          },
-          {
-            'correctAnswerIndex': 2,
-            'explanation': 'Po zakończeniu liturgii i modlitwie po Mszy, ministranci starannie składają szaty liturgiczne i odkładają je na miejsce.',
-            'options': [
-              'Rzucają szaty na krzesło i wybiegają', 
-              'Zostawiają wszystko kościelnemu', 
-              'Starannie składają komże lub alby na miejsce', 
-              'Zabierają szaty do prania za każdym razem'
-            ]
-          }
-        ]
-      });
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('SUKCES: Utworzono poprawną lekcję E-zbiórki LSO!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('BŁĄD: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
+ 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -126,15 +18,6 @@ class PathScreen extends StatelessWidget {
     return DefaultTabController(
       length: 3, 
       child: Scaffold(
-
-        //TEMPRORARY
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => _addCollectionTestData(context),
-          backgroundColor: Colors.red, 
-          icon: const Icon(Icons.add_to_drive, color: Colors.white),
-          label: const Text('Dodaj 7 pytań (Odprawa LSO)', style: TextStyle(color: Colors.white)),
-        ),
-
         body: Column(
           children: [
             // Tabs bar at the top of the screen

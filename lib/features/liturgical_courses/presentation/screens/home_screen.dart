@@ -136,7 +136,7 @@ class HomeScreen extends StatelessWidget {
               _buildPathCard(
                 context, 
                 title: 'Drzewko wiedzy', 
-                description: 'Podstawy, służba, duch. Ucz się we własnym tempie.', 
+                description: 'Podstawy, Msza Śwęta, miejsce święte, historia ministrantury. Ucz się we własnym tempie.', 
                 imagePlaceholder: Icons.account_tree_outlined, 
                 onTap: () => context.go('/courses')
               ),
@@ -152,6 +152,13 @@ class HomeScreen extends StatelessWidget {
                 title: 'Ścieżka muzyczna', 
                 description: 'Poznaj piękno muzyki kościelnej. Chorał, śpiew i schola.', 
                 imagePlaceholder: Icons.library_music_outlined,
+                onTap: () => context.go('/courses')
+              ),
+              _buildPathCard(
+                context, 
+                title: 'E-zbiórki ministranckie', 
+                description: 'Poznaj najważniejsze zasady i fakty dotyczące służby przy ołtarzu.', 
+                imagePlaceholder: Icons.groups,
                 onTap: () => context.go('/courses')
               ),
 
