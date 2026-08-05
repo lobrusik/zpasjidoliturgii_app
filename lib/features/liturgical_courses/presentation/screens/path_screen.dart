@@ -8,92 +8,91 @@ import '../bloc/courses_state.dart';
 
 class PathScreen extends StatelessWidget {
   const PathScreen({super.key});
-
-  //temporary
+  //TEMPRORARY
   Future<void> _addCollectionTestData(BuildContext context) async {
     try {
       await FirebaseFirestore.instance.collection('courses').doc('collection_trunk_01').set({
         'category': 'collection_trunk',
-        'description': 'Opis pierwszej lekcji e-zbiórki - dodany z przycisku.',
+        'description': 'Opis pierwszej e-zbiórki ministranckiej.',
         'isLocked': false,
         'order': 1,
-        'thumbnailUrl': 'https://youtu.be/gogOnpwI1SE?si=dSssZHxrpeWzX73-',
-        'title': 'Lekcja 1 - Wstęp do E-zbiórki',
+        'thumbnailUrl': 'https://youtu.be/gogOnpwI1SE?si=dSssZHxrpeWzX73-', 
+        'title': 'Lekcja 1 - Odprawa i podział funkcji',
       });
 
       await FirebaseFirestore.instance.collection('study_plans').doc('collection_trunk_01').set({
         'courseId': 'collection_trunk_01',
         'dayStage': 1,
-        'liturgicalContent': 'To jest przykładowa treść Twojej pierwszej lekcji z modułu E-zbiórki. Została wygenerowana z kodu aplikacji wraz z zestawem 7 pytań.',
+        'liturgicalContent': 'Zbiórka to najważniejszy moment przygotowania do służby. To wtedy ustalamy podział funkcji, modlimy się i wyciszamy przed wyjściem do ołtarza.',
         'quiz': [
           {
             'correctAnswerIndex': 1,
-            'explanation': 'Jałmużna to uczynek miłosierdzia, który obok postu i modlitwy jest jednym z filarów chrześcijańskiej pobożności.',
+            'explanation': 'Zbiórka przed Mszą Świętą to czas na organizację, podział funkcji i modlitwę, a nie spotkanie towarzyskie.',
             'options': [
-              'Tylko zbiórką pieniędzy', 
-              'Uczynkiem miłosierdzia i wyrazem miłości', 
-              'Obowiązkowym podatkiem', 
-              'Nowoczesnym wymysłem'
-            ]
-          },
-          {
-            'correctAnswerIndex': 2,
-            'explanation': 'Zbiórka (kolekta) podczas Mszy Świętej odbywa się w czasie przygotowania darów (ofiarowania).',
-            'options': [
-              'Przed Mszą Świętą', 
-              'Po Komunii Świętej', 
-              'Podczas przygotowania darów', 
-              'W czasie kazania'
+              'Czasem na pogawędki z kolegami', 
+              'Spotkaniem organizacyjnym i modlitewnym przed służbą', 
+              'Zbiórką pieniędzy na tacę', 
+              'Obowiązkową karą dla spóźnialskich'
             ]
           },
           {
             'correctAnswerIndex': 0,
-            'explanation': 'Ofiary zbierane podczas liturgii służą utrzymaniu wspólnoty, kultu oraz pomocy najuboższym.',
+            'explanation': 'Ministrant powinien pojawić się w zakrystii zazwyczaj 15 minut przed rozpoczęciem liturgii, aby spokojnie się ubrać i przygotować.',
             'options': [
-              'Utrzymaniu kościoła i pomocy ubogim', 
-              'Tylko na dekoracje kwiatowe', 
-              'Dla biskupa diecezjalnego', 
-              'Na opłacenie prądu w kościele'
+              '15 minut przed Mszą', 
+              'Dokładnie o godzinie rozpoczęcia Mszy', 
+              'Podczas dzwonka na wejście', 
+              'Godzinę po Mszy'
+            ]
+          },
+          {
+            'correctAnswerIndex': 2,
+            'explanation': 'Podziałem funkcji zazwyczaj zajmuje się ceremoniarz, prezes lub najstarszy animator w porozumieniu z księdzem.',
+            'options': [
+              'Osoba, która przyjdzie ostatnia', 
+              'Najmłodszy ministrant', 
+              'Ceremoniarz lub ksiądz opiekun', 
+              'Kościelny'
             ]
           },
           {
             'correctAnswerIndex': 3,
-            'explanation': 'W nauczaniu Kościoła najbardziej liczy się hojność serca i bezinteresowność, a nie sama wysokość datku.',
+            'explanation': 'Każda zbiórka i służba powinny zaczynać się i kończyć krótką modlitwą (np. "Króluj nam Chryste").',
             'options': [
-              'Jak najwyższa kwota', 
-              'Oddanie tego, co nam zbywa', 
-              'Składanie ofiary na pokaz', 
-              'Postawa serca i hojność duchowa'
+              'Śpiewem hymnu państwowego', 
+              'Sprawdzeniem obecności w zeszycie', 
+              'Złożeniem ofiary', 
+              'Wspólną modlitwą (przed i po służbie)'
             ]
           },
           {
             'correctAnswerIndex': 1,
-            'explanation': 'Biblijna opowieść uczy, że Bóg patrzy na miarę naszego oddania. Wdowa oddała wszystko, co miała na swoje utrzymanie.',
+            'explanation': 'Wyciszenie w zakrystii pomaga w skupieniu i duchowym przygotowaniu do spotkania z Bogiem w liturgii.',
             'options': [
-              'Należy oddawać tylko drobniaki', 
-              'Wartość ofiary mierzy się oddaniem, a nie kwotą', 
-              'Bogaci nie powinni dawać ofiar', 
-              'Bóg nie przyjmuje małych ofiar'
+              'Można głośno rozmawiać i żartować', 
+              'Należy zachować ciszę i skupienie', 
+              'Trzeba cały czas śpiewać', 
+              'Należy dyskutować o podziale funkcji'
             ]
           },
           {
             'correctAnswerIndex': 0,
-            'explanation': 'Forma przekazania ofiary (taca, przelew, e-zbiórka) jest sprawą techniczną. Ważna jest intencja i dar serca.',
+            'explanation': 'E-zbiórka w naszej aplikacji to forma wirtualnego spotkania, sprawdzania wiedzy i formacji poza murami parafii.',
             'options': [
-              'Tak, liczy się intencja i dar serca', 
-              'Nie, tylko monety mają wartość', 
-              'Nie, trzeba ofiarę złożyć osobiście', 
-              'Tylko gotówka jest biblijna'
+              'Formuła nauki i formacji ministranckiej online', 
+              'Aplikacja do zbierania datków', 
+              'Gra komputerowa o księżach', 
+              'Strona z planem lekcji'
             ]
           },
           {
             'correctAnswerIndex': 2,
-            'explanation': 'Proboszcz, często przy wsparciu rady parafialnej, jest głównym administratorem dóbr materialnych parafii.',
+            'explanation': 'Po zakończeniu liturgii i modlitwie po Mszy, ministranci starannie składają szaty liturgiczne i odkładają je na miejsce.',
             'options': [
-              'Kościelny', 
-              'Rada Gminy', 
-              'Proboszcz', 
-              'Organista'
+              'Rzucają szaty na krzesło i wybiegają', 
+              'Zostawiają wszystko kościelnemu', 
+              'Starannie składają komże lub alby na miejsce', 
+              'Zabierają szaty do prania za każdym razem'
             ]
           }
         ]
@@ -102,7 +101,7 @@ class PathScreen extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('SUKCES: Utworzono lekcję E-zbiórki z 7 pytaniami!'),
+            content: Text('SUKCES: Utworzono poprawną lekcję E-zbiórki LSO!'),
             backgroundColor: Colors.green,
           ),
         );
@@ -118,7 +117,6 @@ class PathScreen extends StatelessWidget {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -128,12 +126,13 @@ class PathScreen extends StatelessWidget {
     return DefaultTabController(
       length: 3, 
       child: Scaffold(
-          //TEMPORARY
-          floatingActionButton: FloatingActionButton.extended(
+
+        //TEMPRORARY
+        floatingActionButton: FloatingActionButton.extended(
           onPressed: () => _addCollectionTestData(context),
           backgroundColor: Colors.red, 
           icon: const Icon(Icons.add_to_drive, color: Colors.white),
-          label: const Text('Dodaj 7 pytań E-zbiórki', style: TextStyle(color: Colors.white)),
+          label: const Text('Dodaj 7 pytań (Odprawa LSO)', style: TextStyle(color: Colors.white)),
         ),
 
         body: Column(
@@ -410,7 +409,6 @@ class PathScreen extends StatelessWidget {
 
           final collectionCourses = courses.where((c) => c.category == 'collection_trunk').toList();
           
-          // final collectionAdvanced = courses.where((c) => c.category == 'collection_advanced').toList();
 
           return StreamBuilder<DocumentSnapshot>(
             stream: userId != null 
@@ -439,16 +437,16 @@ class PathScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Dowiedz się, jak działa nasza zbiórka i zgłębiaj wiedzę w tym temacie.',
+                      'Formacja LSO, podział funkcji i spotkania online.',
                       style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey.shade400),
                     ),
                     const SizedBox(height: 32),
 
                     _buildBranchSection(
                       context: context,
-                      title: 'Wprowadzenie do e-zbiórki',
-                      description: 'Podstawowe informacje i lekcje.',
-                      icon: Icons.volunteer_activism,
+                      title: 'Odprawy i Formacja',
+                      description: 'Materiały i quizy na e-zbiórki ministranckie.',
+                      icon: Icons.groups,
                       branchColor: const Color(0xFFFF9800),
                       courses: collectionCourses,
                       progressMap: progressMap,
@@ -465,6 +463,7 @@ class PathScreen extends StatelessWidget {
       },
     );
   }
+  
   //VIEW HELPERS
   Widget _buildBranchSection({
     required BuildContext context,
