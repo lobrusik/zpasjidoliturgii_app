@@ -38,6 +38,8 @@ dependencies:
   html_unescape: ^2.0.0
   universal_html: ^2.3.0
   youtube_player_iframe: ^6.0.2
+  flutter_markdown: ^0.6.18
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

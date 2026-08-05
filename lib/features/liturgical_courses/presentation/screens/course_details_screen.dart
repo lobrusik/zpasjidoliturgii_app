@@ -7,6 +7,7 @@ import '../widgets/youtube_video_player.dart';
 import '../widgets/interactive_quiz.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../widgets/buy_coffee_button.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class CourseDetailsScreen extends StatelessWidget {
   final String courseId;
@@ -62,11 +63,25 @@ class CourseDetailsScreen extends StatelessWidget {
 
                   _buildSectionHeader(context, '2', 'Zrozum'),
                   const SizedBox(height: 16),
-                  Text(
-                    plan.liturgicalContent,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.onSurface,
-                      height: 1.6,
+                  MarkdownBody(
+                    data: plan.liturgicalContent,
+                    styleSheet: MarkdownStyleSheet(
+                      // Main text (paragraphs)
+                      p: theme.textTheme.bodyLarge?.copyWith(
+                        color: theme.colorScheme.onSurface,
+                        height: 1.6,
+                      ),
+                      // Bold
+                      strong: TextStyle(
+                        fontWeight: FontWeight.bold, 
+                        color: theme.colorScheme.onSurface,
+                      ),
+                      // Headings
+                      h1: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                      h2: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      h3: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                      // Dots in List
+                      listBullet: TextStyle(color: theme.colorScheme.primary, fontSize: 18),
                     ),
                   ),
                   const SizedBox(height: 24),
