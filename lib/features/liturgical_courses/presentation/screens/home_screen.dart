@@ -142,13 +142,6 @@ class HomeScreen extends StatelessWidget {
               ),
               _buildPathCard(
                 context, 
-                title: 'Codziennie z liturgią', 
-                description: 'Zobacz, zrozum, sprawdź się, zastosuj. 1 lekcja dziennie.', 
-                imagePlaceholder: Icons.calendar_today_outlined, 
-                onTap: () => context.go('/plan')
-              ),
-              _buildPathCard(
-                context, 
                 title: 'Ścieżka muzyczna', 
                 description: 'Poznaj piękno muzyki kościelnej. Chorał, śpiew i schola.', 
                 imagePlaceholder: Icons.library_music_outlined,
@@ -160,6 +153,13 @@ class HomeScreen extends StatelessWidget {
                 description: 'Poznaj najważniejsze zasady i fakty dotyczące służby przy ołtarzu.', 
                 imagePlaceholder: Icons.groups,
                 onTap: () => context.go('/courses')
+              ),
+              _buildPathCard(
+                context, 
+                title: 'Codziennie z liturgią', 
+                description: 'Zobacz, zrozum, sprawdź się, zastosuj. 1 lekcja dziennie.', 
+                imagePlaceholder: Icons.calendar_today_outlined, 
+                onTap: () => context.go('/plan')
               ),
 
             const SizedBox(height: 32),
