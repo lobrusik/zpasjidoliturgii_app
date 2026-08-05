@@ -31,7 +31,7 @@ class PathScreen extends StatelessWidget {
                 tabs: [
                   Tab(icon: Icon(Icons.menu_book), text: 'Liturgia'),
                   Tab(icon: Icon(Icons.music_note), text: 'Muzyka'),
-                  Tab(icon: Icon(Icons.volunteer_activism), text: 'E-zbiórka'),
+                  Tab(icon: Icon(Icons.groups), text: 'E-zbiórka'),
                 ],
               ),
             ),
@@ -108,7 +108,7 @@ class PathScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Najpierw opanuj Pień (Podstawy). Potem otworzą się gałęzie dla Służby i dla Ducha.',
+                      'Najpierw opanuj teologię liturgii. Potem otworzą się gałęzie.',
                       style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey.shade400),
                     ),
                     const SizedBox(height: 32),
@@ -116,8 +116,8 @@ class PathScreen extends StatelessWidget {
                     // TRUNK
                     _buildBranchSection(
                       context: context,
-                      title: 'Pień — Podstawy',
-                      description: 'Co dzieje się na Mszy. Obowiązkowe dla wszystkich.',
+                      title: 'Teologia Liturgii',
+                      description: 'Obowiązkowe dla wszystkich.',
                       icon: Icons.eco,
                       branchColor: const Color(0xFF4CAF50),
                       courses: trunkCourses,

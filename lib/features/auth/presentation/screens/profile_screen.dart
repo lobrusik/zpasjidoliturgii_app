@@ -138,7 +138,7 @@ class ProfileScreen extends StatelessWidget {
                       //liturgical
                       _buildStatCard('Teologia\nliturgii', trunkLessons, Icons.park, Colors.brown.shade400, theme),
                       _buildStatCard('Msza św.\nkrok po kroku', massLessons, Icons.spa, Colors.green.shade400, theme),
-                      _buildStatCard('Miejsce\nświęte', placeLessons, Icons.volunteer_activism, Colors.redAccent.shade200, theme),
+                      _buildStatCard('Miejsce\nświęte', placeLessons, Icons.church, Colors.redAccent.shade200, theme),
                       _buildStatCard('Historia\nministrantury', historyLessons, Icons.history_edu, Colors.brown.shade400, theme),
                       //musical
                       _buildStatCard('Ścieżka\nMuzyczna', musicLessons, Icons.music_note, Colors.blue.shade400, theme),
