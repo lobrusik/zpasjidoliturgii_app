@@ -9,6 +9,116 @@ import '../bloc/courses_state.dart';
 class PathScreen extends StatelessWidget {
   const PathScreen({super.key});
 
+  //temporary
+  Future<void> _addCollectionTestData(BuildContext context) async {
+    try {
+      await FirebaseFirestore.instance.collection('courses').doc('collection_trunk_01').set({
+        'category': 'collection_trunk',
+        'description': 'Opis pierwszej lekcji e-zbiórki - dodany z przycisku.',
+        'isLocked': false,
+        'order': 1,
+        'thumbnailUrl': 'https://youtu.be/gogOnpwI1SE?si=dSssZHxrpeWzX73-',
+        'title': 'Lekcja 1 - Wstęp do E-zbiórki',
+      });
+
+      await FirebaseFirestore.instance.collection('study_plans').doc('collection_trunk_01').set({
+        'courseId': 'collection_trunk_01',
+        'dayStage': 1,
+        'liturgicalContent': 'To jest przykładowa treść Twojej pierwszej lekcji z modułu E-zbiórki. Została wygenerowana z kodu aplikacji wraz z zestawem 7 pytań.',
+        'quiz': [
+          {
+            'correctAnswerIndex': 1,
+            'explanation': 'Jałmużna to uczynek miłosierdzia, który obok postu i modlitwy jest jednym z filarów chrześcijańskiej pobożności.',
+            'options': [
+              'Tylko zbiórką pieniędzy', 
+              'Uczynkiem miłosierdzia i wyrazem miłości', 
+              'Obowiązkowym podatkiem', 
+              'Nowoczesnym wymysłem'
+            ]
+          },
+          {
+            'correctAnswerIndex': 2,
+            'explanation': 'Zbiórka (kolekta) podczas Mszy Świętej odbywa się w czasie przygotowania darów (ofiarowania).',
+            'options': [
+              'Przed Mszą Świętą', 
+              'Po Komunii Świętej', 
+              'Podczas przygotowania darów', 
+              'W czasie kazania'
+            ]
+          },
+          {
+            'correctAnswerIndex': 0,
+            'explanation': 'Ofiary zbierane podczas liturgii służą utrzymaniu wspólnoty, kultu oraz pomocy najuboższym.',
+            'options': [
+              'Utrzymaniu kościoła i pomocy ubogim', 
+              'Tylko na dekoracje kwiatowe', 
+              'Dla biskupa diecezjalnego', 
+              'Na opłacenie prądu w kościele'
+            ]
+          },
+          {
+            'correctAnswerIndex': 3,
+            'explanation': 'W nauczaniu Kościoła najbardziej liczy się hojność serca i bezinteresowność, a nie sama wysokość datku.',
+            'options': [
+              'Jak najwyższa kwota', 
+              'Oddanie tego, co nam zbywa', 
+              'Składanie ofiary na pokaz', 
+              'Postawa serca i hojność duchowa'
+            ]
+          },
+          {
+            'correctAnswerIndex': 1,
+            'explanation': 'Biblijna opowieść uczy, że Bóg patrzy na miarę naszego oddania. Wdowa oddała wszystko, co miała na swoje utrzymanie.',
+            'options': [
+              'Należy oddawać tylko drobniaki', 
+              'Wartość ofiary mierzy się oddaniem, a nie kwotą', 
+              'Bogaci nie powinni dawać ofiar', 
+              'Bóg nie przyjmuje małych ofiar'
+            ]
+          },
+          {
+            'correctAnswerIndex': 0,
+            'explanation': 'Forma przekazania ofiary (taca, przelew, e-zbiórka) jest sprawą techniczną. Ważna jest intencja i dar serca.',
+            'options': [
+              'Tak, liczy się intencja i dar serca', 
+              'Nie, tylko monety mają wartość', 
+              'Nie, trzeba ofiarę złożyć osobiście', 
+              'Tylko gotówka jest biblijna'
+            ]
+          },
+          {
+            'correctAnswerIndex': 2,
+            'explanation': 'Proboszcz, często przy wsparciu rady parafialnej, jest głównym administratorem dóbr materialnych parafii.',
+            'options': [
+              'Kościelny', 
+              'Rada Gminy', 
+              'Proboszcz', 
+              'Organista'
+            ]
+          }
+        ]
+      });
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('SUKCES: Utworzono lekcję E-zbiórki z 7 pytaniami!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('BŁĄD: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -16,8 +126,16 @@ class PathScreen extends StatelessWidget {
 
     // Tabs Management
     return DefaultTabController(
-      length: 2, 
+      length: 3, 
       child: Scaffold(
+          //TEMPORARY
+          floatingActionButton: FloatingActionButton.extended(
+          onPressed: () => _addCollectionTestData(context),
+          backgroundColor: Colors.red, 
+          icon: const Icon(Icons.add_to_drive, color: Colors.white),
+          label: const Text('Dodaj 7 pytań E-zbiórki', style: TextStyle(color: Colors.white)),
+        ),
+
         body: Column(
           children: [
             // Tabs bar at the top of the screen
@@ -27,9 +145,11 @@ class PathScreen extends StatelessWidget {
                 indicatorColor: Color(0xFF00965E),
                 labelColor: Color(0xFF00965E),
                 unselectedLabelColor: Colors.grey,
+                labelPadding: EdgeInsets.symmetric(horizontal: 12),
                 tabs: [
                   Tab(icon: Icon(Icons.menu_book), text: 'Liturgia'),
                   Tab(icon: Icon(Icons.music_note), text: 'Muzyka'),
+                  Tab(icon: Icon(Icons.volunteer_activism), text: 'E-zbiórka'),
                 ],
               ),
             ),
@@ -40,6 +160,7 @@ class PathScreen extends StatelessWidget {
                 children: [
                   _buildLiturgyTree(context, theme, userId), //liturgical tree
                   _buildMusicTree(context, theme, userId), // musical tree
+                  _buildCollectionTree(context, theme, userId), //e-zbiorka
                 ] 
               ),
             ),
@@ -61,8 +182,9 @@ class PathScreen extends StatelessWidget {
           courses.sort((a, b) => a.order.compareTo(b.order));
 
           final trunkCourses = courses.where((c) => c.category == 'trunk').toList();
-          final serviceCourses = courses.where((c) => c.category == 'service').toList();
-          final spiritCourses = courses.where((c) => c.category == 'spirit').toList();
+          final massCourses = courses.where((c) => c.category == 'mass').toList();
+          final placeCourses = courses.where((c) => c.category == 'place').toList();
+          final historyCourses = courses.where((c) => c.category == 'history').toList();
 
           return StreamBuilder<DocumentSnapshot>(
             stream: userId != null 
@@ -125,13 +247,13 @@ class PathScreen extends StatelessWidget {
                     // branch 1
                     _buildBranchSection(
                       context: context,
-                      title: 'Gałąź 1',
+                      title: 'Gałąź - Msza Święta krok oo kroku',
                       description: areAdvancedBranchesUnlocked
-                          ? 'Rubryki, naczynia, szaty. Dla ministrantów.'
+                          ? 'Opis gałęzi Mass.'
                           : 'Zablokowane. Ukończono $completedTrunkLessons/$requiredLessons podstaw.',
                       icon: Icons.local_fire_department,
                       branchColor: areAdvancedBranchesUnlocked ? const Color(0xFFFFB300) : Colors.grey.shade800,
-                      courses: serviceCourses,
+                      courses: massCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedBranchesUnlocked,
                     ),
@@ -140,13 +262,28 @@ class PathScreen extends StatelessWidget {
                     // branch 2
                     _buildBranchSection(
                       context: context,
-                      title: 'Gałąź — Dla Ducha',
+                      title: 'Gałąź — Przewodnik po miejscu świętym',
                       description: areAdvancedBranchesUnlocked
-                          ? 'Teologia i znaczenie symboli.'
+                          ? 'Opis gałęzi Place.'
                           : 'Zablokowane. Ukończono $completedTrunkLessons/$requiredLessons podstaw.',
                       icon: Icons.air,
                       branchColor: areAdvancedBranchesUnlocked ? const Color(0xFFAB47BC) : Colors.grey.shade800,
-                      courses: spiritCourses,
+                      courses: placeCourses,
+                      progressMap: progressMap,
+                      isBranchUnlocked: areAdvancedBranchesUnlocked,
+                    ),
+                    const SizedBox(height: 24),
+
+                    // branch 1
+                    _buildBranchSection(
+                      context: context,
+                      title: 'Gałąź - Historia ministrantury',
+                      description: areAdvancedBranchesUnlocked
+                          ? 'Opis gałęzi History.'
+                          : 'Zablokowane. Ukończono $completedTrunkLessons/$requiredLessons podstaw.',
+                      icon: Icons.local_fire_department,
+                      branchColor: areAdvancedBranchesUnlocked ? const Color(0xFFFFB300) : Colors.grey.shade800,
+                      courses: historyCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedBranchesUnlocked,
                     ),
@@ -260,6 +397,74 @@ class PathScreen extends StatelessWidget {
     );
   }
 
+  //E-ZBIÓRKA
+  Widget _buildCollectionTree(BuildContext context, ThemeData theme, String? userId) {
+    return BlocBuilder<CoursesBloc, CoursesState>(
+      builder: (context, state) {
+        if (state is CoursesLoading) return const Center(child: CircularProgressIndicator());
+        if (state is CoursesError) return Center(child: Text(state.message));
+
+        if (state is CoursesLoaded) {
+          final courses = state.courses;
+          courses.sort((a, b) => a.order.compareTo(b.order));
+
+          final collectionCourses = courses.where((c) => c.category == 'collection_trunk').toList();
+          
+          // final collectionAdvanced = courses.where((c) => c.category == 'collection_advanced').toList();
+
+          return StreamBuilder<DocumentSnapshot>(
+            stream: userId != null 
+              ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
+              : const Stream.empty(),
+            builder: (context, snapshot) {
+              final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
+              final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
+
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Text('📱', style: TextStyle(fontSize: 28)),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'E-zbiórka',
+                            style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Dowiedz się, jak działa nasza zbiórka i zgłębiaj wiedzę w tym temacie.',
+                      style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey.shade400),
+                    ),
+                    const SizedBox(height: 32),
+
+                    _buildBranchSection(
+                      context: context,
+                      title: 'Wprowadzenie do e-zbiórki',
+                      description: 'Podstawowe informacje i lekcje.',
+                      icon: Icons.volunteer_activism,
+                      branchColor: const Color(0xFFFF9800),
+                      courses: collectionCourses,
+                      progressMap: progressMap,
+                      isBranchUnlocked: true,
+                    ),
+                    const SizedBox(height: 48),
+                  ],
+                ),
+              );
+            },
+          );
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
   //VIEW HELPERS
   Widget _buildBranchSection({
     required BuildContext context,
