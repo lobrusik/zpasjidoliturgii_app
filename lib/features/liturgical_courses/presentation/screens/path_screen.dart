@@ -86,7 +86,7 @@ class PathScreen extends StatelessWidget {
                 }
               }
 
-              final int requiredLessons = 10;
+              final int requiredLessons = 8;
               bool areAdvancedBranchesUnlocked = completedTrunkLessons >= requiredLessons;
 
               return SingleChildScrollView(
@@ -213,8 +213,8 @@ class PathScreen extends StatelessWidget {
                 }
               }
 
-              // 10 lesson - you can move on
-              final int requiredMusicLessons = 10; 
+              // 5 lesson - you can move on
+              final int requiredMusicLessons = 5; 
               bool areAdvancedMusicUnlocked = completedMusicTrunkLessons >= requiredMusicLessons;
 
               return SingleChildScrollView(
