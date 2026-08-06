@@ -296,7 +296,7 @@ class PathScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: const [
                                   Text(
-                                    'Podcast: Melodie Psalmów',
+                                    'Melodie Psalmów',
                                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                                   ),
                                   SizedBox(height: 6),

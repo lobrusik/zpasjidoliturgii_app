@@ -22,7 +22,7 @@ class PodcastScreen extends StatelessWidget {
     if (category != null) {
       query = query.where('category', isEqualTo: category);
     }
-    query = query.orderBy('order');
+    //query = query.orderBy('order');
 
     return Scaffold(
       appBar: AppBar(
@@ -53,7 +53,15 @@ class PodcastScreen extends StatelessWidget {
             );
           }
 
-          final podcast = snapshot.data!.docs;
+          final podcast = snapshot.data!.docs.toList();
+
+          podcast.sort((a, b) {
+            final aData = a.data() as Map<String, dynamic>;
+            final bData = b.data() as Map<String, dynamic>;
+            final aOrder = aData['order'] ?? 0;
+            final bOrder = bData['order'] ?? 0;
+            return aOrder.compareTo(bOrder);
+          });
 
           return ListView.builder(
             padding: const EdgeInsets.all(16.0),
