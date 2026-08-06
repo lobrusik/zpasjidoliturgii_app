@@ -12,6 +12,7 @@ class CompletoriumDayDetailScreen extends StatefulWidget {
     required this.dayTitle,
     required this.youtubeUrl,
   });
+  //
 
   @override
   State<CompletoriumDayDetailScreen> createState() => _CompletoriumDayDetailScreenState();
