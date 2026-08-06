@@ -104,23 +104,7 @@ class PodcastScreen extends StatelessWidget {
                   ),
                   trailing: const Icon(Icons.play_circle_fill, color: Colors.white, size: 36),
                   onTap: () {
-                    if (collectionName == 'psalms' || collectionName == 'podcast') {
-                      final audioUrl = data['audioUrl'] ?? '';
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => AudioPodcastPlayerScreen(
-                            audioUrl: audioUrl,
-                            title: itemTitle,
-                          ),
-                        ),
-                      );
-                    } else if (collectionName == 'courses') {
-                      context.push('/courses/details/$docId', extra: itemTitle);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Odtwarzacz wkrótce!')),
-                      );
-                    }
+                    context.push('/courses/details/$docId', extra: itemTitle);
                   },
                 ),
               );
