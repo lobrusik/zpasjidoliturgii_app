@@ -264,8 +264,7 @@ class PathScreen extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (context) => const PodcastScreen(
                               title: 'Melodie Psalmów',
-                              collectionName: 'courses', 
-                              category: 'music_podcast', 
+                              collectionName: 'psalms',
                             ),
                           ),
                         );
