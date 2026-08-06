@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../bloc/courses_bloc.dart';
 import '../bloc/courses_state.dart';
+import '../screens/podcast_screen.dart';
 
 class PathScreen extends StatelessWidget {
   const PathScreen({super.key});
@@ -256,6 +257,62 @@ class PathScreen extends StatelessWidget {
                       style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey.shade400),
                     ),
                     const SizedBox(height: 32),
+
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const PodcastScreen(
+                              title: 'Melodie Psalmów',
+                              collectionName: 'courses', 
+                              category: 'music_podcast', 
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF673AB7), Color(0xFF512DA8)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 5)),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            const CircleAvatar(
+                              backgroundColor: Colors.white24,
+                              radius: 30,
+                              child: Icon(Icons.headphones, color: Colors.white, size: 32),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: const [
+                                  Text(
+                                    'Podcast: Melodie Psalmów',
+                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                                  ),
+                                  SizedBox(height: 6),
+                                  Text(
+                                    'Nagrania na cały rok liturgiczny.\nDostępne w każdej chwili!',
+                                    style: TextStyle(fontSize: 13, color: Colors.white70),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.arrow_forward_ios, color: Colors.white54),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 48),
 
                     // MUSICAL TRUNK
                     _buildBranchSection(
@@ -564,4 +621,6 @@ class PathScreen extends StatelessWidget {
       ),
     );
   }
+  
+
 }

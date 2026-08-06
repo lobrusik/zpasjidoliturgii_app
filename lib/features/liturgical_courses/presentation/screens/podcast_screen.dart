@@ -1,20 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:go_router/go_router.dart';
 
 class PodcastScreen extends StatelessWidget {
-  const PodcastScreen({super.key});
+
+  final String title;
+  final String collectionName;
+  final String? category;
+
+  const PodcastScreen({
+    super.key,
+    this.title = 'Katechezy ks. Mateusza Kopy',
+    this.collectionName = 'podcast',
+    this.category,
+  });
 
   @override
   Widget build(BuildContext context) {
+
+    Query query = FirebaseFirestore.instance.collection(collectionName);
+    if (category != null) {
+      query = query.where('category', isEqualTo: category);
+    }
+    query = query.orderBy('order');
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Katechezy ks. Kopy'),
+        title: Text(title),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('podcast')
-            .orderBy('order')
-            .snapshots(),
+        stream: query.snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -30,9 +45,9 @@ class PodcastScreen extends StatelessWidget {
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(
+            return Center(
               child: Text(
-                'Brak dostępnych katechez.',
+                'Brak dostępnych nagrań w sekcji:\n$title',
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
             );
@@ -44,8 +59,9 @@ class PodcastScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             itemCount: podcast.length,
             itemBuilder: (context, index) {
+              final docId = podcast[index].id;
               final data = podcast[index].data() as Map<String, dynamic>;
-              final title = data['title'] ?? 'Brak tytułu';
+              final itemTitle = data['title'] ?? 'Brak tytułu';
               final description = data['description'] ?? 'Brak opisu';
 
               return Card(
@@ -62,7 +78,7 @@ class PodcastScreen extends StatelessWidget {
                     child: Icon(Icons.mic, color: Colors.white),
                   ),
                   title: Text(
-                    title,
+                    itemTitle,
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -74,14 +90,18 @@ class PodcastScreen extends StatelessWidget {
                       description,
                       style: const TextStyle(color: Colors.grey, fontSize: 12),
                       maxLines: 2,
-                      overflow: TextOverflow.ellipsis, // Trimming Excessively Long Text
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   trailing: const Icon(Icons.play_circle_fill, color: Colors.white, size: 36),
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Odtwarzacz wkrótce!')),
-                    );
+                    if (collectionName == 'courses') {
+                      context.push('/courses/details/$docId', extra: itemTitle);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Odtwarzacz wkrótce!')),
+                      );
+                    }
                   },
                 ),
               );
