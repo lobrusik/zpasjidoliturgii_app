@@ -8,6 +8,7 @@ import '../widgets/interactive_quiz.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../widgets/buy_coffee_button.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import '../widgets/drag_and_drop_quiz.dart';
 
 class CourseDetailsScreen extends StatelessWidget {
   final String courseId;
@@ -137,6 +138,22 @@ class CourseDetailsScreen extends StatelessWidget {
                         return _buildSuccessBanner(context);
                       }
                       
+                      // DRAG & DROP IF DATA EXISTS IN THE DATABASE
+                      if (plan.interactiveActivity != null) {
+                        return DragAndDropQuiz(
+                          activityData: plan.interactiveActivity!,
+                          onCompleted: () {
+                            context.read<ProgressBloc>().add(
+                              ToggleLessonProgress(
+                                courseId: courseId,
+                                planId: plan.id,
+                                isCompleted: true,
+                              ),
+                            );
+                          },
+                        );
+                      }
+
                       if (plan.quiz.isEmpty) {
                          return _buildManualCompletionButton(context, plan.id);
                       }

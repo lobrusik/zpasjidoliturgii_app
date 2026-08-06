@@ -48,6 +48,7 @@ class StudyPlanModel extends Equatable {
   final String textMaterials;
   final List<String> videoLinks;
   final List<QuizQuestion> quiz;
+  final Map<String, dynamic>? interactiveActivity; //new - drag & drop
 
   const StudyPlanModel({
     required this.id,
@@ -57,6 +58,7 @@ class StudyPlanModel extends Equatable {
     required this.textMaterials,
     required this.videoLinks,
     required this.quiz,
+    this.interactiveActivity,
   });
 
   factory StudyPlanModel.fromFirestore(Map<String, dynamic> json, String documentId) {
@@ -76,6 +78,10 @@ class StudyPlanModel extends Equatable {
       // Safely mapping a dynamic array from Firebase to a List<String>
       videoLinks: List<String>.from(json['videoLinks'] ?? []),
       quiz: parsedQuiz,
+
+      interactiveActivity: json['interactiveActivity'] != null 
+          ? Map<String, dynamic>.from(json['interactiveActivity'] as Map) 
+          : null,
     );
   }
 
@@ -87,6 +93,7 @@ class StudyPlanModel extends Equatable {
       'textMaterials': textMaterials,
       'videoLinks': videoLinks,
       'quiz': quiz.map((q) => q.toMap()).toList(), 
+      if (interactiveActivity != null) 'interactiveActivity': interactiveActivity,
     };
   }
 
@@ -99,5 +106,6 @@ class StudyPlanModel extends Equatable {
         textMaterials,
         videoLinks,
         quiz,
+        interactiveActivity,
       ];
 }
