@@ -67,8 +67,8 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: 32),
             ],
 
-            const TempAddPsalmsButton(),
-
+            //const TempAddPsalmsButton(), //adding psalms
+ 
             Text(
               'Ukończone lekcje',
               style: theme.textTheme.headlineSmall,
