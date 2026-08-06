@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
+import 'audio_podcast_player_screen.dart';
 
 class PodcastScreen extends StatelessWidget {
 
@@ -103,7 +104,17 @@ class PodcastScreen extends StatelessWidget {
                   ),
                   trailing: const Icon(Icons.play_circle_fill, color: Colors.white, size: 36),
                   onTap: () {
-                    if (collectionName == 'courses') {
+                    if (collectionName == 'psalms' || collectionName == 'podcast') {
+                      final audioUrl = data['audioUrl'] ?? '';
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => AudioPodcastPlayerScreen(
+                            audioUrl: audioUrl,
+                            title: itemTitle,
+                          ),
+                        ),
+                      );
+                    } else if (collectionName == 'courses') {
                       context.push('/courses/details/$docId', extra: itemTitle);
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(

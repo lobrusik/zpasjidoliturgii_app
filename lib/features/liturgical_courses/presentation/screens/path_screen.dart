@@ -263,7 +263,7 @@ class PathScreen extends StatelessWidget {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => const PsalmsMenuScren(),
+                            builder: (context) => const PsalmsMenuScreen(),
                           ),
                         );
                       },
