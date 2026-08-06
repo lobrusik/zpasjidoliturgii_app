@@ -293,6 +293,7 @@ class PathScreen extends StatelessWidget {
           final collectionCourses = courses.where((c) => c.category == 'collection_trunk').toList();
           final collectionBibleCourses = courses.where((c) => c.category == 'collection_bible').toList();
           final collectionSoulCourses = courses.where((c) => c.category == 'collection_soul').toList();
+          final collectionTriduumCourses = courses.where((c) => c.category == 'collection_triduum').toList();
           
 
           return StreamBuilder<DocumentSnapshot>(
@@ -379,6 +380,21 @@ class PathScreen extends StatelessWidget {
                       icon: Icons.handshake,
                       branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
                       courses: collectionSoulCourses,
+                      progressMap: progressMap,
+                      isBranchUnlocked: areAdvancedCollectionUnlocked,
+                    ),
+                    const SizedBox(height: 48),
+
+                    //  COLLECTION BRANCH - Triduum
+                    _buildBranchSection(
+                      context: context,
+                      title: 'Gałąź — Triduum Paschalne (bonus)',
+                      description: areAdvancedCollectionUnlocked
+                          ? 'Kompleksowe przygotowanie do najkrótszego okresu liturgicznego.'
+                          : 'Zablokowane. Ukończono $completedCollectionTrunkLessons/$requiredCollectionLessons podstaw.',
+                      icon: Icons.cloud,
+                      branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
+                      courses: collectionTriduumCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedCollectionUnlocked,
                     ),
