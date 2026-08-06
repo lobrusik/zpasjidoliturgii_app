@@ -11,6 +11,7 @@ class InteractiveQuiz extends StatefulWidget {
     required this.onQuizCompleted,
   });
 
+
   @override
   State<InteractiveQuiz> createState() => _InteractiveQuizState();
 }

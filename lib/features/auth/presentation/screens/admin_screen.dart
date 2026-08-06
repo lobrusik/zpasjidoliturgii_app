@@ -86,11 +86,11 @@ class _AdminScreenState extends State<AdminScreen> {
                     icon: const Icon(Icons.account_tree),
                     label: const Text('Wgraj do Drzewka'),
                   ),
-                  ElevatedButton.icon(
-                    onPressed: () => _uploadData('daily_plans', 'dayId'),
-                    icon: const Icon(Icons.calendar_today),
-                    label: const Text('Wgraj do Planu'),
-                  ),
+                  // ElevatedButton.icon(
+                  //   onPressed: () => _uploadData('daily_plans', 'dayId'),
+                  //   icon: const Icon(Icons.calendar_today),
+                  //   label: const Text('Wgraj do Planu'),
+                  // ),
                 ],
               )
           ],

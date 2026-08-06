@@ -125,10 +125,10 @@ class ProfileScreen extends StatelessWidget {
                       else if (courseId.startsWith('collection_')) {
                         collectionLessons += lessonsCount;
                       }
-                      //daily lessons
-                      else if (courseId.startsWith('day_') || courseId == 'day') {
-                        dailyLessons += lessonsCount;
-                      }
+                      // //daily lessons
+                      // else if (courseId.startsWith('day_') || courseId == 'day') {
+                      //   dailyLessons += lessonsCount;
+                      // }
                     });
                   }
 
