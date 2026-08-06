@@ -142,7 +142,7 @@ class HomeScreen extends StatelessWidget {
               ),
               _buildPathCard(
                 context, 
-                title: 'Ścieżka psauderzysty', 
+                title: 'Ścieżka psałterzysty', 
                 description: 'Poznaj piękno muzyki kościelnej. Chorał, śpiew i schola.', 
                 imagePlaceholder: Icons.library_music_outlined,
                 onTap: () => context.go('/courses')
