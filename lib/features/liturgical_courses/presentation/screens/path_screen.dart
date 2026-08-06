@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../bloc/courses_bloc.dart';
 import '../bloc/courses_state.dart';
 import '../screens/podcast_screen.dart';
+import 'psalms_menu_screen.dart';
 
 class PathScreen extends StatelessWidget {
   const PathScreen({super.key});
@@ -262,10 +263,7 @@ class PathScreen extends StatelessWidget {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => const PodcastScreen(
-                              title: 'Melodie Psalmów',
-                              collectionName: 'psalms',
-                            ),
+                            builder: (context) => const PsalmsMenuScren(),
                           ),
                         );
                       },
