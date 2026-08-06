@@ -292,6 +292,7 @@ class PathScreen extends StatelessWidget {
 
           final collectionCourses = courses.where((c) => c.category == 'collection_trunk').toList();
           final collectionBibleCourses = courses.where((c) => c.category == 'collection_bible').toList();
+          final collectionSoulCourses = courses.where((c) => c.category == 'collection_soul').toList();
           
 
           return StreamBuilder<DocumentSnapshot>(
@@ -363,6 +364,21 @@ class PathScreen extends StatelessWidget {
                       icon: Icons.menu_book,
                       branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
                       courses: collectionBibleCourses,
+                      progressMap: progressMap,
+                      isBranchUnlocked: areAdvancedCollectionUnlocked,
+                    ),
+                    const SizedBox(height: 48),
+
+                    //  COLLECTION BRANCH - SOUL
+                    _buildBranchSection(
+                      context: context,
+                      title: 'Gałąź — Katecheza duchowościowa o liturgii',
+                      description: areAdvancedCollectionUnlocked
+                          ? 'Duchowość a służba.'
+                          : 'Zablokowane. Ukończono $completedCollectionTrunkLessons/$requiredCollectionLessons podstaw.',
+                      icon: Icons.handshake,
+                      branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
+                      courses: collectionSoulCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedCollectionUnlocked,
                     ),

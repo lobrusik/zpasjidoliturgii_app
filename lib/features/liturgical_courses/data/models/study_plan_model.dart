@@ -47,7 +47,7 @@ class StudyPlanModel extends Equatable {
   final String liturgicalContent;
   final String textMaterials;
   final List<String> videoLinks;
-  final List<QuizQuestion> quiz; //NEW FIELD: List of Questions
+  final List<QuizQuestion> quiz;
 
   const StudyPlanModel({
     required this.id,
