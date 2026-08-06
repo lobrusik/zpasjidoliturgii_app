@@ -64,9 +64,10 @@ class PathScreen extends StatelessWidget {
           courses.sort((a, b) => a.order.compareTo(b.order));
 
           final trunkCourses = courses.where((c) => c.category == 'trunk').toList();
-          final massCourses = courses.where((c) => c.category == 'mass').toList();
-          final placeCourses = courses.where((c) => c.category == 'place').toList();
-          final historyCourses = courses.where((c) => c.category == 'history').toList();
+          //final massCourses = courses.where((c) => c.category == 'mass').toList();
+          //final placeCourses = courses.where((c) => c.category == 'place').toList();
+          //final historyCourses = courses.where((c) => c.category == 'history').toList();
+          final liturgyCourses = courses.where((c) => c.category == 'liturgy').toList();
 
           return StreamBuilder<DocumentSnapshot>(
             stream: userId != null 
@@ -126,7 +127,7 @@ class PathScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
 
-                    // branch 1
+                    /* branch 1
                     _buildBranchSection(
                       context: context,
                       title: 'Gałąź - Msza Święta krok oo kroku',
@@ -139,9 +140,9 @@ class PathScreen extends StatelessWidget {
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedBranchesUnlocked,
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 24),*/
 
-                    // branch 2
+                    /* branch 2
                     _buildBranchSection(
                       context: context,
                       title: 'Gałąź — Przewodnik po miejscu świętym',
@@ -154,9 +155,9 @@ class PathScreen extends StatelessWidget {
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedBranchesUnlocked,
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 24),*/
 
-                    // branch 1
+                    /* branch 3
                     _buildBranchSection(
                       context: context,
                       title: 'Gałąź - Historia ministrantury',
@@ -169,7 +170,22 @@ class PathScreen extends StatelessWidget {
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedBranchesUnlocked,
                     ),
-                    const SizedBox(height: 48),
+                    const SizedBox(height: 48),*/
+
+                    //branch - liturgy
+                    _buildBranchSection(
+                      context: context,
+                      title: 'Gałąź - Szkoła Liturgii',
+                      description: areAdvancedBranchesUnlocked
+                          ? 'Chcemy tutaj zgłębiać poszczególne elementy z dziejów liturgii oraz z jej teologii, tak aby jeszcze głębiej w nią wniknąć.'
+                          : 'Zablokowane. Ukończono $completedTrunkLessons/$requiredLessons podstaw.',
+                      icon: Icons.local_fire_department,
+                      branchColor: areAdvancedBranchesUnlocked ? const Color(0xFFFFB300) : Colors.grey.shade800,
+                      courses: liturgyCourses,
+                      progressMap: progressMap,
+                      isBranchUnlocked: areAdvancedBranchesUnlocked,
+                    ),
+                    const SizedBox(height: 24),
                   ],
                 ),
               );
