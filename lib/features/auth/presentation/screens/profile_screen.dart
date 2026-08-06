@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'admin_screen.dart';
+import '../../../liturgical_courses/presentation/widgets/temp_uploader.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -65,6 +66,8 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 32),
             ],
+
+            const TempAddPsalmsButton(),
 
             Text(
               'Ukończone lekcje',
