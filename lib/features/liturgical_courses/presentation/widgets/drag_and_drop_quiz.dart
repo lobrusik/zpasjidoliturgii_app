@@ -72,14 +72,25 @@ class _DragAndDropQuizState extends State<DragAndDropQuiz> {
   Widget _buildDragTarget(String category, ThemeData theme) {
     return DragTarget<Map<String, dynamic>>(
       onWillAcceptWithDetails: (details) {
-        return details.data['correctCategory'] == category;
+        return true;
       },
       onAcceptWithDetails: (details) {
-        setState(() {
-          matchedItems[category]!.add(details.data['text']);
-          remainingItems.remove(details.data);
-          _checkCompletion();
-        });
+        if (details.data['correctCategory'] == category) {
+          setState(() {
+            matchedItems[category]!.add(details.data['text']);
+            remainingItems.remove(details.data);
+            _checkCompletion();
+          });
+        } else {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Pudło! To nie pasuje do tej kategorii. Spróbuj ponownie.'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
       },
       builder: (context, candidateData, rejectedData) {
         final isHovered = candidateData.isNotEmpty;
