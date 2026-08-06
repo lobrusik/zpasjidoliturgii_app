@@ -30,7 +30,7 @@ class PathScreen extends StatelessWidget {
                 labelPadding: EdgeInsets.symmetric(horizontal: 12),
                 tabs: [
                   Tab(icon: Icon(Icons.menu_book), text: 'Liturgia'),
-                  Tab(icon: Icon(Icons.music_note), text: 'Muzyka'),
+                  Tab(icon: Icon(Icons.music_note), text: 'Psauderz'),
                   Tab(icon: Icon(Icons.groups), text: 'E-zbiórka'),
                 ],
               ),
@@ -228,7 +228,7 @@ class PathScreen extends StatelessWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'Ścieżka Muzyczna',
+                            'Ścieżka Psauderzysty',
                             style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -236,7 +236,7 @@ class PathScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Opanuj podstawy muzyki kościelnej, by odblokować zaawansowane gałęzie.',
+                      'Opanuj podstawy psauderzysty, by odblokować zaawansowane gałęzie.',
                       style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey.shade400),
                     ),
                     const SizedBox(height: 32),
@@ -244,7 +244,7 @@ class PathScreen extends StatelessWidget {
                     // MUSICAL TRUNK
                     _buildBranchSection(
                       context: context,
-                      title: 'Pień — Podstawy Muzyki',
+                      title: 'Pień — Podstawy Psauderzysty',
                       description: 'Rytm, nuty i wprowadzenie do śpiewu. Obowiązkowe.',
                       icon: Icons.music_note,
                       branchColor: const Color(0xFF2196F3),

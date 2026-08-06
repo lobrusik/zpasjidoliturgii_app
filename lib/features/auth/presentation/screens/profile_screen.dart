@@ -143,7 +143,7 @@ class ProfileScreen extends StatelessWidget {
                       // _buildStatCard('Miejsce\nświęte', placeLessons, Icons.church, Colors.redAccent.shade200, theme),
                       // _buildStatCard('Historia\nministrantury', historyLessons, Icons.history_edu, Colors.brown.shade400, theme),
                       //musical
-                      _buildStatCard('Ścieżka\nMuzyczna', musicLessons, Icons.music_note, Colors.blue.shade400, theme),
+                      _buildStatCard('Ścieżka\nPsauderzysty', musicLessons, Icons.music_note, Colors.blue.shade400, theme),
                       //e-zbiorki
                       _buildStatCard('E-zbiórki\n(Odprawy)', collectionLessons, Icons.groups, Colors.orange.shade400, theme),
                       //daily
