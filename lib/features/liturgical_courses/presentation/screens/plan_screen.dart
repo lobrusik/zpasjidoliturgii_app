@@ -77,7 +77,7 @@ class PlanScreen extends StatelessWidget {
                 trailing: const Icon(Icons.play_circle_fill, color: Colors.amber, size: 28),
                 onTap: () {
                   context.push(
-                    '/plan/details/${Uri.encodeComponent(day['title']!)}',
+                    '/plan/details',
                     extra: {
                       'title': day['title']!,
                       'url': day['url']!,

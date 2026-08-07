@@ -122,10 +122,10 @@ class AppRoutes {
                 builder: (context, state) => const PlanScreen(),
                 routes: [
                   GoRoute(
-                    path: 'details/:id',
+                    path: 'details',
                     builder: (context, state) {
                       final extraData = state.extra as Map<String, dynamic>? ?? {};
-                      final title = extraData['title'] as String? ?? 'Lekcja';
+                      final title = extraData['title'] as String? ?? 'Kompleta';
                       final youtubeUrl = extraData['url'] as String? ?? '';
 
                       return CompletoriumDayDetailScreen(
