@@ -160,7 +160,7 @@ class HomeScreen extends StatelessWidget {
                 title: 'Kompleta', 
                 description: 'Idealny sposób na zakończenie dnia.', 
                 imagePlaceholder: Icons.calendar_today_outlined, 
-                onTap: () => context.go('/plan')
+                onTap: () => context.go('/completorium')
               ),
 
             const SizedBox(height: 32),

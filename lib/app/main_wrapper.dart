@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:zpasjidoliturgii/features/liturgical_courses/presentation/screens/podcast_screen.dart';
 
 class MainWrapper extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -31,7 +30,10 @@ class MainWrapper extends StatelessWidget {
         ],
       ),
       
-      body: navigationShell,
+      body: Container(
+        color: theme.scaffoldBackgroundColor,
+        child: navigationShell,
+      ),
       
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
