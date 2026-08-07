@@ -9,24 +9,40 @@ class PlanScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final userId = FirebaseAuth.instance.currentUser?.uid;
-
-    if (userId == null) {
-      return Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        body: const Center(
-          child: Padding(
-            padding: EdgeInsets.all(24.0),
-            child: Text(
-              'Musisz być zalogowany, aby widzieć kompletę.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: 16),
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            body: const Center(
+              child: CircularProgressIndicator(color: Colors.amber),
             ),
-          ),
-        ),
-      );
-    }
+          );
+        }
+        final user = snapshot.data;
 
+        if (user == null) {
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            body: const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24.0),
+                child: Text(
+                  'Musisz być zalogowany, aby widzieć kompletę.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+            ),
+          );
+        }
+
+        return _buildCompletoriumContent(context, theme);
+      },
+    );
+  }
+  Widget _buildCompletoriumContent(BuildContext context, ThemeData theme) {
     final String formattedDate = DateFormat('EEEE, d MMMM yyyy', 'pl_PL').format(DateTime.now());
 
     final List<Map<String, String>> completoriumDays = [
@@ -110,7 +126,6 @@ class PlanScreen extends StatelessWidget {
                 ),
               );
             }),
-
             const SizedBox(height: 48),
           ],
         ),
