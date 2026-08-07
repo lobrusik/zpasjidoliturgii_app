@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'completorium_day_detail_screen.dart';
+//import 'completorium_day_detail_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class PlanScreen extends StatelessWidget {
   const PlanScreen({super.key});
@@ -78,15 +79,14 @@ class PlanScreen extends StatelessWidget {
                       ),
                     ),
                     trailing: const Icon(Icons.play_circle_fill, color: Colors.amber, size: 28),
+
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CompletoriumDayDetailScreen(
-                            dayTitle: day['title']!,
-                            youtubeUrl: day['url']!,
-                          ),
-                        ),
+                      context.push(
+                        '/plan/details/${Uri.encodeComponent(day['title']!)}',
+                        extra: {
+                          'title': day['title']!,
+                          'url': day['url']!,
+                        }
                       );
                     },
                   ),
