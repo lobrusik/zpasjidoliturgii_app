@@ -20,75 +20,80 @@ class PlanScreen extends StatelessWidget {
       {'title': 'Niedziela i uroczystości — po II nieszporach', 'url': 'https://youtu.be/c2ABsqVR92M?si=Ja4BJojSVmL8CADK'},
     ];
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Scaffold(
+      backgroundColor: const Color(0xFF1E2026),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('🌙', style: TextStyle(fontSize: 28)),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Kompleta',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+              Row(
+                children: [
+                  const Text('🌙', style: TextStyle(fontSize: 28)),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Kompleta',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                toBeginningOfSentenceCase(formattedDate) ?? formattedDate,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.amber,
+                  letterSpacing: 0.5,
                 ),
               ),
+              const SizedBox(height: 8),
+              Text(
+                'Modlitwa na zakończenie dnia.',
+                style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey.shade400),
+              ),
+              const SizedBox(height: 24),
+              ...completoriumDays.map((day) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2D3039),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFF3B3E4A)),
+                  ),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    title: Text(
+                      day['title']!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                      ),
+                    ),
+                    trailing: const Icon(Icons.play_circle_fill, color: Colors.amber, size: 28),
+                    onTap: () {
+                      context.push(
+                        '/plan/details',
+                        extra: {
+                          'title': day['title']!,
+                          'url': day['url']!,
+                        },
+                      );
+                    },
+                  ),
+                );
+              }),
+              const SizedBox(height: 48),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            toBeginningOfSentenceCase(formattedDate) ?? formattedDate,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.amber,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Modlitwa na zakończenie dnia.',
-            style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey.shade400),
-          ),
-          const SizedBox(height: 24),
-          ...completoriumDays.map((day) {
-            return Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2D3039),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF3B3E4A)),
-              ),
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                title: Text(
-                  day['title']!,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 15,
-                  ),
-                ),
-                trailing: const Icon(Icons.play_circle_fill, color: Colors.amber, size: 28),
-                onTap: () {
-                  context.push(
-                    '/plan/details',
-                    extra: {
-                      'title': day['title']!,
-                      'url': day['url']!,
-                    },
-                  );
-                },
-              ),
-            );
-          }),
-          const SizedBox(height: 48),
-        ],
+        ),
       ),
     );
   }
