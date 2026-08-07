@@ -133,7 +133,7 @@ class AppRoutes {
                       return DailyLessonScreen(
                         planId: planId, 
                         title: title, 
-                        isCompleted: isCompleted,
+                        isCompleted: isCompletedlok                                    ,
                       );
                     },
                   ),

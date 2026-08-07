@@ -12,6 +12,8 @@ class ProfileScreen extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
     final theme = Theme.of(context);
 
+    final bool isAdmin = ['lobrusik@gmail.com', 'administracja@zpasjidoliturgii.pl', 'dawidmakowski28@gmail.com'].contains(user?.email);
+
     final joinDate = user?.metadata.creationTime;
     final dateString = joinDate != null
         ? '${joinDate.day.toString().padLeft(2, '0')}.${joinDate.month.toString().padLeft(2, '0')}.${joinDate.year}'
@@ -48,7 +50,7 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Administrator Panel - visible only to a specific user
-            if (['lobrusik@gmail.com', 'administracja@zpasjidoliturgii.pl'].contains(user?.email)) ...[
+            if (isAdmin) ...[
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom( 
                   backgroundColor: Colors.red.shade900,
@@ -70,7 +72,7 @@ class ProfileScreen extends StatelessWidget {
             //const TempAddPsalmsButton(), //adding psalms
  
             Text(
-              'Ukończone lekcje',
+              'Twoje statystyki',
               style: theme.textTheme.headlineSmall,
               textAlign: TextAlign.center,
             ),
@@ -95,11 +97,12 @@ class ProfileScreen extends StatelessWidget {
                   int collectionLessons = 0;
 
                   //daily lessons
-                  int dailyLessons = 0;
+                  int completoriumStreak = 0;
 
                   // Counting completed lessons if the user's data exists
                   if (snapshot.hasData && snapshot.data!.exists) {
                     final data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
+                    completoriumStreak = data['completoriumStreak'] ?? 0;
                     final progressMap = data['progress'] as Map<String, dynamic>? ?? {};
 
                     progressMap.forEach((courseId, completedLessons) {
@@ -150,7 +153,10 @@ class ProfileScreen extends StatelessWidget {
                       //e-zbiorki
                       _buildStatCard('E-zbiórki\n(Odprawy)', collectionLessons, Icons.groups, Colors.orange.shade400, theme),
                       //daily
-                      _buildStatCard('Codzienne\nlekcje', dailyLessons, Icons.calendar_today, Colors.blue.shade400, theme),
+                      //_buildStatCard('Codzienne\nlekcje', dailyLessons, Icons.calendar_today, Colors.blue.shade400, theme),
+                      //completorium
+                      _buildStatCard('Kompleta', completoriumStreak, Icons.nightlight_round, Colors.amber.shade400, theme),
+                      
                     ],
                   );
                 },
