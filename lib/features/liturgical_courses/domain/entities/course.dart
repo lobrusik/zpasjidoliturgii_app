@@ -18,5 +18,5 @@ class Course extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, title, description, thumbnailUrl, order];
+  List<Object?> get props => [id, title, description, thumbnailUrl, order, category];
 }

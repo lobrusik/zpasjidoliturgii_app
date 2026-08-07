@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../data/repositories/auth_repository.dart';
 import 'register_screen.dart';
@@ -19,7 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   
   bool _isLoading = false;
-  bool _isRegisteringMode = false;
+  bool _obscurePassword = true;
 
   void _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
@@ -168,12 +167,25 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
+                
+                // Password field
                 TextFormField(
                   controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
+                  obscureText: _obscurePassword,
+                  decoration: InputDecoration(
                     labelText: 'Hasło',
-                    prefixIcon: Icon(Icons.lock_outline),
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) return 'Podaj hasło';
@@ -196,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Center(child: CircularProgressIndicator())
                 else ...[
                   ElevatedButton(
-                    onPressed: () => _handleLogin,
+                    onPressed: _handleLogin,
                     child: const Text('Zaloguj się'),
                   ),
                   const SizedBox(height: 16),

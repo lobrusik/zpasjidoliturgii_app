@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../data/repositories/auth_repository.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -9,6 +10,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final _authRepo = AuthRepository();
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -16,6 +18,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   
   bool _isLoading = false;
   String? _errorMessage;
+
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   Future<void> _registerUser() async {
     if (!_formKey.currentState!.validate()) return;
@@ -26,12 +31,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+      await _authRepo.signUpWithEmail(
+        _emailController.text.trim(),
+        _passwordController.text,
       );
-
-      await userCredential.user?.sendEmailVerification();
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -111,7 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Adres e-mail',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.email),
@@ -128,10 +131,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: true,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Hasło',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.lock),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.length < 6) {
@@ -145,10 +159,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     controller: _confirmPasswordController,
                     obscureText: true,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Powtórz hasło',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureConfirmPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureConfirmPassword = !_obscureConfirmPassword;
+                          });
+                        },
+                      ),
                     ),
                     validator: (value) {
                       if (value != _passwordController.text) {

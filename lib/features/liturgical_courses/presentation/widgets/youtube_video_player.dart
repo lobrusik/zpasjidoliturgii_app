@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class YoutubeVideoPlayer extends StatefulWidget {
   final String videoUrl;
@@ -18,7 +17,7 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
   void initState() {
     super.initState();
     // Automatically extract the ID from any YouTube link
-    final videoId = YoutubePlayerController.convertUrlToId(widget.videoUrl) ?? '';
+    final videoId = _extractVideoId(widget.videoUrl) ?? '';
     
     _controller = YoutubePlayerController.fromVideoId(
       videoId: videoId,
@@ -28,6 +27,18 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
         mute: false,
       ),
     );
+  }
+  
+  String? _extractVideoId(String url) {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return null;
+    
+    if (uri.host.contains('youtu.be')) {
+      return uri.pathSegments.isNotEmpty ? uri.pathSegments.first : null;
+    } else if (uri.host.contains('youtube.com')) {
+      return uri.queryParameters['v'];
+    }
+    return null;
   }
 
   @override

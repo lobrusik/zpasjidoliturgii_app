@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:go_router/go_router.dart';
 import 'audio_podcast_player_screen.dart';
+import '../widgets/youtube_video_player.dart';
 
 class PodcastScreen extends StatelessWidget {
-
   final String title;
   final String collectionName;
   final String? category;
@@ -18,12 +17,10 @@ class PodcastScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     Query query = FirebaseFirestore.instance.collection(collectionName);
     if (category != null) {
       query = query.where('category', isEqualTo: category);
     }
-    //query = query.orderBy('order');
 
     return Scaffold(
       appBar: AppBar(
@@ -39,7 +36,7 @@ class PodcastScreen extends StatelessWidget {
           if (snapshot.hasError) {
             return const Center(
               child: Text(
-                'Wystąpił błąd pobierania podcastów.',
+                'Wystąpił błąd pobierania materiałów.',
                 style: TextStyle(color: Colors.red),
               ),
             );
@@ -68,10 +65,12 @@ class PodcastScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             itemCount: podcast.length,
             itemBuilder: (context, index) {
-              final docId = podcast[index].id;
               final data = podcast[index].data() as Map<String, dynamic>;
               final itemTitle = data['title'] ?? 'Brak tytułu';
               final description = data['description'] ?? 'Brak opisu';
+
+              //final videoUrl = data['youtubeUrl'] ?? data['videoUrl'] ?? data['audioUrl'] ?? '';
+              final audioUrl = data['youtubeUrl'] ?? data['videoUrl'] ?? data['audioUrl'] ?? data['audoUrl'] ?? '';
 
               return Card(
                 color: const Color(0xFF2D3039),
@@ -84,7 +83,7 @@ class PodcastScreen extends StatelessWidget {
                   leading: const CircleAvatar(
                     backgroundColor: Color(0xFF141F1C),
                     radius: 24,
-                    child: Icon(Icons.mic, color: Colors.white),
+                    child: Icon(Icons.headphones, color: Colors.white),
                   ),
                   title: Text(
                     itemTitle,
@@ -104,13 +103,78 @@ class PodcastScreen extends StatelessWidget {
                   ),
                   trailing: const Icon(Icons.play_circle_fill, color: Colors.white, size: 36),
                   onTap: () {
-                    context.push('/courses/details/$docId', extra: itemTitle);
+                    if (audioUrl.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AudioPodcastPlayerScreen(
+                            title: itemTitle,
+                            audioUrl: audioUrl,
+                          ),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Brak linku do wideo')),
+                      );
+                    }
                   },
                 ),
               );
             },
           );
         },
+      ),
+    );
+  }
+}
+
+class PodcastVideoScreen extends StatelessWidget {
+  final String title;
+  final String youtubeUrl;
+  final String description;
+
+  const PodcastVideoScreen({
+    super.key,
+    required this.title,
+    required this.youtubeUrl,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            YoutubeVideoPlayer(videoUrl: youtubeUrl),
+            const SizedBox(height: 24),
+            
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 12),
+            
+            Text(
+              description,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+                height: 1.5,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

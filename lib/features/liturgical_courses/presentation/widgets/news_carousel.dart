@@ -10,7 +10,11 @@ class NewsCarousel extends StatelessWidget {
 
   Future<List> fetchNews() async {
     final response = await http.get(Uri.parse('https://zpasjidoliturgii.pl/wp-json/wp/v2/posts?per_page=5'));
-    return json.decode(response.body);
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Błąd pobierania danych');
+    }
   }
 
   Future<void> _launchURL(String url) async {
@@ -47,13 +51,34 @@ class NewsCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final unescape = HtmlUnescape();
 
-    return FutureBuilder(
+    return FutureBuilder<List<dynamic>>(
       future: fetchNews(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-        final posts = snapshot.data as List;
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox(
+            height: 220,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return SizedBox(
+            height: 220,
+            child: Center(
+              child: Text(
+                'Nie udało się pobrać aktualności.',
+                style: TextStyle(color: Colors.grey.shade600),
+              ),
+            ),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        final posts = snapshot.data!;
 
         return CarouselSlider.builder(
           itemCount: posts.length,
@@ -86,12 +111,14 @@ class NewsCarousel extends StatelessWidget {
                       cleanTitle,
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                       maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       cleanExcerpt,
                       style: const TextStyle(color: Colors.grey, fontSize: 12),
                       maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const Spacer(),
                     Align(

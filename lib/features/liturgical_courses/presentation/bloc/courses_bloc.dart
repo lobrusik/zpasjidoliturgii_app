@@ -25,17 +25,13 @@ class CoursesBloc extends Bloc<CoursesEvent, CoursesState> {
         add(CoursesUpdated(coursesList));
       },
       onError: (error) {
-        add(CoursesUpdated(const []));
+        add(const CoursesUpdated([])); 
       },
     );
   }
 
   void _onCoursesUpdated(CoursesUpdated event, Emitter<CoursesState> emit) {
-    if (event.courses.isEmpty) {
-      emit(const CoursesLoaded([]));
-    } else {
-      emit(CoursesLoaded(List<dynamic>.from(event.courses).cast()));
-    }
+    emit(CoursesLoaded(List.from(event.courses)));
   }
 
   @override

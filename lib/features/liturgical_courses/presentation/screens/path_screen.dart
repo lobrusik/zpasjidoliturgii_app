@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../bloc/courses_bloc.dart';
 import '../bloc/courses_state.dart';
-import '../screens/podcast_screen.dart';
 import 'psalms_menu_screen.dart';
 
 class PathScreen extends StatelessWidget {
@@ -78,6 +77,7 @@ class PathScreen extends StatelessWidget {
             builder: (context, snapshot) {
               final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
               final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
+              final bool isAdmin = userData['isAdmin'] ?? false;
 
               int completedTrunkLessons = 0;
               for (var course in trunkCourses) {
@@ -126,6 +126,7 @@ class PathScreen extends StatelessWidget {
                       courses: trunkCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: true,
+                      isAdmin: isAdmin,
                     ),
                     const SizedBox(height: 24),
 
@@ -141,6 +142,7 @@ class PathScreen extends StatelessWidget {
                       courses: massCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedBranchesUnlocked,
+                      isAdmin: isAdmin,
                     ),
                     const SizedBox(height: 24),*/
 
@@ -156,6 +158,7 @@ class PathScreen extends StatelessWidget {
                       courses: placeCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedBranchesUnlocked,
+                      isAdmin: isAdmin,
                     ),
                     const SizedBox(height: 24),*/
 
@@ -171,6 +174,7 @@ class PathScreen extends StatelessWidget {
                       courses: historyCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedBranchesUnlocked,
+                      isAdmin: isAdmin,
                     ),
                     const SizedBox(height: 48),*/
 
@@ -186,6 +190,7 @@ class PathScreen extends StatelessWidget {
                       courses: liturgyCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedBranchesUnlocked,
+                      isAdmin: isAdmin,
                     ),
                     const SizedBox(height: 24),
                   ],
@@ -220,6 +225,7 @@ class PathScreen extends StatelessWidget {
             builder: (context, snapshot) {
               final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
               final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
+              final bool isAdmin = userData['isAdmin'] ?? false;
 
               int completedMusicTrunkLessons = 0;
               for (var course in musicTrunkCourses) {
@@ -321,6 +327,7 @@ class PathScreen extends StatelessWidget {
                       courses: musicTrunkCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: true,
+                      isAdmin: isAdmin,
                     ),
                     const SizedBox(height: 24),
 
@@ -336,6 +343,7 @@ class PathScreen extends StatelessWidget {
                       courses: musicAdvancedCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedMusicUnlocked,
+                      isAdmin: isAdmin,
                     ),
                     const SizedBox(height: 48),
                   ],
@@ -373,6 +381,7 @@ class PathScreen extends StatelessWidget {
             builder: (context, snapshot) {
               final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
               final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
+              final bool isAdmin = userData['isAdmin'] ?? false;
 
               int completedCollectionTrunkLessons = 0;
               for (var course in collectionCourses) {
@@ -422,6 +431,7 @@ class PathScreen extends StatelessWidget {
                       courses: collectionCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: true,
+                      isAdmin: isAdmin,
                     ),
                     const SizedBox(height: 48),
 
@@ -437,6 +447,7 @@ class PathScreen extends StatelessWidget {
                       courses: collectionBibleCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedCollectionUnlocked,
+                      isAdmin: isAdmin,
                     ),
                     const SizedBox(height: 48),
 
@@ -452,6 +463,7 @@ class PathScreen extends StatelessWidget {
                       courses: collectionSoulCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedCollectionUnlocked,
+                      isAdmin: isAdmin,
                     ),
                     const SizedBox(height: 48),
 
@@ -467,6 +479,7 @@ class PathScreen extends StatelessWidget {
                       courses: collectionTriduumCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedCollectionUnlocked,
+                      isAdmin: isAdmin,
                     ),
                     const SizedBox(height: 48),
                   ],
@@ -490,6 +503,7 @@ class PathScreen extends StatelessWidget {
     required List<dynamic> courses,
     required Map<String, dynamic> progressMap,
     required bool isBranchUnlocked,
+    required bool isAdmin,
   }) {
     final theme = Theme.of(context);
 
@@ -539,7 +553,7 @@ class PathScreen extends StatelessWidget {
         else
           ...List.generate(courses.length, (index) {
             final course = courses[index];
-            bool isUnlocked = isBranchUnlocked && (index == 0 || progressMap.containsKey(courses[index - 1].id));
+            bool isUnlocked = isAdmin || (isBranchUnlocked && (index == 0 || progressMap.containsKey(courses[index - 1].id)));
             bool isCompleted = progressMap.containsKey(course.id);
             bool isCurrent = isUnlocked && !isCompleted;
 

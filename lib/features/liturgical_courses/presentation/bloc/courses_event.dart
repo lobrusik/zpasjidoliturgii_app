@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:zpasjidoliturgii/features/liturgical_courses/data/models/course_model.dart';
 
 abstract class CoursesEvent extends Equatable {
   const CoursesEvent();
@@ -12,7 +13,7 @@ class LoadCourses extends CoursesEvent {}
 
 // Internal event – triggered automatically when Firestore sends new data
 class CoursesUpdated extends CoursesEvent {
-  final List<dynamic> courses;
+  final List<CourseModel> courses;
 
   const CoursesUpdated(this.courses);
 

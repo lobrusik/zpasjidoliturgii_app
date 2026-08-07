@@ -21,9 +21,8 @@ class CoursesListScreen extends StatelessWidget {
           if (state is CoursesError) return Center(child: Text(state.message));
 
           if (state is CoursesLoaded) {
-            final courses = state.courses;
-            
-            courses.sort((a, b) => a.order.compareTo(b.order));
+            final mainCourses = state.courses.where((c) => c.category == 'trunk').toList();
+            mainCourses.sort((a, b) => a.order.compareTo(b.order));
 
             return StreamBuilder<DocumentSnapshot>(
               stream: userId != null 
@@ -34,7 +33,7 @@ class CoursesListScreen extends StatelessWidget {
                 final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
 
                 // How many courses has the user started/completed
-                int completedLevels = progressMap.keys.length;
+                int completedLevels = mainCourses.where((course) => progressMap.containsKey(course.id)).length;
 
                 return ListView(
                   padding: const EdgeInsets.all(16.0),
@@ -59,7 +58,7 @@ class CoursesListScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      '$completedLevels / ${courses.length} ukończonych',
+                      '$completedLevels / ${mainCourses.length} ukończonych',
                       style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 24),
@@ -77,10 +76,10 @@ class CoursesListScreen extends StatelessWidget {
                     const SizedBox(height: 24),
 
                     // Generating path blocks
-                    ...List.generate(courses.length, (index) {
-                      final course = courses[index];
+                    ...List.generate(mainCourses.length, (index) {
+                      final course = mainCourses[index];
                       
-                      bool isUnlocked = index == 0 || progressMap.containsKey(courses[index - 1].id);
+                      bool isUnlocked = index == 0 || progressMap.containsKey(mainCourses[index - 1].id);
                       
                       // The current level is marked as completed if the user has made any progress in it
                       bool isCompleted = progressMap.containsKey(course.id);

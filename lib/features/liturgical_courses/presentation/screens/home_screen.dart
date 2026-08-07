@@ -6,7 +6,6 @@ import '../widgets/news_carousel.dart';
 import '../widgets/buy_coffee_button.dart';
 import '../widgets/about_contact_section.dart';
 
-//i need workflow!!!
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -144,7 +143,7 @@ class HomeScreen extends StatelessWidget {
               ),
               _buildPathCard(
                 context, 
-                title: 'Ścieżka psaerzysty', 
+                title: 'Ścieżka psałterzysty', 
                 description: 'Poznaj piękno muzyki kościelnej. Chorał, śpiew i schola.', 
                 imagePlaceholder: Icons.library_music_outlined,
                 onTap: () => context.go('/courses')
@@ -159,7 +158,7 @@ class HomeScreen extends StatelessWidget {
               _buildPathCard(
                 context, 
                 title: 'Kompleta', 
-                description: 'Idealny sposób na zakończene dnia.', 
+                description: 'Idealny sposób na zakończenie dnia.', 
                 imagePlaceholder: Icons.calendar_today_outlined, 
                 onTap: () => context.go('/plan')
               ),

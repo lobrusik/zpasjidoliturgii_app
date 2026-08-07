@@ -22,8 +22,8 @@ class _DragAndDropQuizState extends State<DragAndDropQuiz> {
   @override
   void initState() {
     super.initState();
-    categories = List<String>.from(widget.activityData['categories']);
-    remainingItems = List<Map<String, dynamic>>.from(widget.activityData['itemsToMatch']);
+    categories = List<String>.from(widget.activityData['categories'] ?? []);
+    remainingItems = List<Map<String, dynamic>>.from(widget.activityData['itemsToMatch'] ?? []);
     remainingItems.shuffle();
     
     for (var category in categories) {
