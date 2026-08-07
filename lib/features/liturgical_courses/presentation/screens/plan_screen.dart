@@ -12,10 +12,17 @@ class PlanScreen extends StatelessWidget {
     final userId = FirebaseAuth.instance.currentUser?.uid;
 
     if (userId == null) {
-      return const Center(
-        child: Text(
-          'Musisz być zalogowany, aby widzieć kompletę.',
-          style: TextStyle(color: Colors.white),
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: const Center(
+          child: Padding(
+            padding: EdgeInsets.all(24.0),
+            child: Text(
+              'Musisz być zalogowany, aby widzieć kompletę.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ),
         ),
       );
     }
