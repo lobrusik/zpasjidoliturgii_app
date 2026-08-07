@@ -17,7 +17,7 @@ import '../features/auth/presentation/screens/profile_screen.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/liturgical_courses/data/repositories/progress_repository.dart';
 import '../features/liturgical_courses/presentation/bloc/progress_bloc.dart';
-import '../features/liturgical_courses/presentation/screens/daily_lesson_screen.dart';
+import '../features/liturgical_courses/presentation/screens/completorium_day_detail_screen.dart';
 
 import 'package:zpasjidoliturgii/features/liturgical_courses/presentation/screens/podcast_screen.dart';
 
@@ -124,16 +124,13 @@ class AppRoutes {
                   GoRoute(
                     path: 'details/:id',
                     builder: (context, state) {
-                      final planId = state.pathParameters['id']!;
-                      
                       final extraData = state.extra as Map<String, dynamic>? ?? {};
                       final title = extraData['title'] as String? ?? 'Lekcja';
-                      final isCompleted = extraData['isCompleted'] as bool? ?? false;
+                      final youtubeUrl = extraData['url'] as String? ?? '';
 
-                      return DailyLessonScreen(
-                        planId: planId, 
-                        title: title, 
-                        isCompleted: isCompletedlok                                    ,
+                      return CompletoriumDayDetailScreen(
+                        dayTitle: title, 
+                        youtubeUrl: youtubeUrl,
                       );
                     },
                   ),
