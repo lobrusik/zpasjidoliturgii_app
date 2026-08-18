@@ -10,10 +10,13 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'package:flutter/foundation.dart';
 import 'firebase_options.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await initializeDateFormatting('pl_PL', null);
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
