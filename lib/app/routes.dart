@@ -115,6 +115,7 @@ class AppRoutes {
             ],
           ),
           
+          /*
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -137,7 +138,7 @@ class AppRoutes {
                 ],
               ),
             ],
-          ),
+          ),*/
 
           StatefulShellBranch(
             routes: [

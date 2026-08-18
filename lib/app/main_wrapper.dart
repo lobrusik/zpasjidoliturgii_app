@@ -47,7 +47,7 @@ class MainWrapper extends StatelessWidget {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Start'),
           BottomNavigationBarItem(icon: Icon(Icons.account_tree_outlined), label: 'Ścieżka'),
-          BottomNavigationBarItem(icon: Icon(Icons.nightlight_outlined), label: 'Kompleta'),
+          //BottomNavigationBarItem(icon: Icon(Icons.nightlight_outlined), label: 'Kompleta'),
           BottomNavigationBarItem(icon: Icon(Icons.headset_mic_outlined), label: 'Podcast'),
         ],
         selectedItemColor: theme.colorScheme.primary,
