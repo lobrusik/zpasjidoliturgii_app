@@ -22,6 +22,7 @@ class PathScreen extends StatelessWidget {
 
     // Tabs Management
     return DefaultTabController(
+      key: ValueKey(initialTabIndex),
       initialIndex: initialTabIndex,
       length: 3, 
       child: Scaffold(
