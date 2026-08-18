@@ -10,6 +10,10 @@ import '../widgets/buy_coffee_button.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../widgets/drag_and_drop_quiz.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../data/models/interactive_lesson_model.dart';
+import 'interactive_lesson_screen.dart';
+
 class CourseDetailsScreen extends StatelessWidget {
   final String courseId;
   final String courseTitle;
@@ -24,7 +28,85 @@ class CourseDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // ONLY FOR TRUNK_LITURGY
+    if (courseId.startsWith('trunk_liturgy_')) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(courseTitle),
+          backgroundColor: theme.scaffoldBackgroundColor,
+          elevation: 0,
+        ),
+        body: FutureBuilder<DocumentSnapshot>(
+          future: FirebaseFirestore.instance.collection('interactive_lessons').doc(courseId).get(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
+              return const Center(
+                child: Text(
+                  'Brak danych lekcji interaktywnej.\nUpewnij się, że JSON jest w bazie!', 
+                  textAlign: TextAlign.center, 
+                  style: TextStyle(color: Colors.grey)
+                )
+              );
+            }
 
+            final data = snapshot.data!.data() as Map<String, dynamic>;
+            final lesson = InteractiveLesson.fromJson(data, snapshot.data!.id);
+
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.school, size: 80, color: Colors.amber),
+                    const SizedBox(height: 24),
+                    Text('Szkoła Liturgii', style: theme.textTheme.headlineSmall?.copyWith(color: Colors.amber, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 16),
+                    Text(lesson.title, style: theme.textTheme.titleLarge, textAlign: TextAlign.center),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Ta lekcja ma formę interaktywnej prezentacji. Przesuwaj ekrany, oglądaj materiały i rozwiązuj zadania wewnątrz modułu.', 
+                      textAlign: TextAlign.center, 
+                      style: TextStyle(color: Colors.grey, height: 1.5)
+                    ),
+                    const SizedBox(height: 48),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.colorScheme.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => InteractiveLessonScreen(lesson: lesson)),
+                        ).then((_) {
+                          context.read<ProgressBloc>().add(
+                            ToggleLessonProgress(
+                              courseId: courseId,
+                              planId: lesson.id,
+                              isCompleted: true,
+                            ),
+                          );
+                        });
+                      },
+                      icon: const Icon(Icons.play_arrow),
+                      label: const Text('Rozpocznij lekcję', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    }
+
+    // ALL OTHER BRANCHES
     return Scaffold(
       body: BlocBuilder<StudyPlanBloc, StudyPlanState>(
         builder: (context, state) {
