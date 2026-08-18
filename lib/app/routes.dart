@@ -12,12 +12,10 @@ import '../features/liturgical_courses/presentation/bloc/courses_bloc.dart';
 import '../features/liturgical_courses/presentation/bloc/courses_event.dart';
 import '../features/liturgical_courses/presentation/screens/home_screen.dart';
 import '../features/liturgical_courses/presentation/screens/path_screen.dart'; 
-import '../features/liturgical_courses/presentation/screens/plan_screen.dart';
 import '../features/auth/presentation/screens/profile_screen.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/liturgical_courses/data/repositories/progress_repository.dart';
 import '../features/liturgical_courses/presentation/bloc/progress_bloc.dart';
-import '../features/liturgical_courses/presentation/screens/completorium_day_detail_screen.dart';
 
 import 'package:zpasjidoliturgii/features/liturgical_courses/presentation/screens/podcast_screen.dart';
 
