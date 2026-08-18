@@ -155,13 +155,13 @@ class HomeScreen extends StatelessWidget {
                 imagePlaceholder: Icons.groups,
                 onTap: () => context.go('/courses')
               ),
-              /*_buildPathCard(
+              _buildPathCard(
                 context, 
                 title: 'Kompleta', 
                 description: 'Idealny sposób na zakończenie dnia.', 
                 imagePlaceholder: Icons.calendar_today_outlined, 
-                onTap: () => context.go('/plan')
-              ),*/
+                onTap: () => context.go('/completorium')
+              ),
 
             const SizedBox(height: 32),
 

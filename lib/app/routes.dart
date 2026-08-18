@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:zpasjidoliturgii/features/liturgical_courses/presentation/bloc/study_plan_bloc.dart';
+import 'package:zpasjidoliturgii/features/liturgical_courses/presentation/screens/completorium_screen.dart';
 import 'package:zpasjidoliturgii/features/liturgical_courses/presentation/screens/course_details_screen.dart';
 
 import 'main_wrapper.dart';
@@ -16,6 +17,7 @@ import '../features/auth/presentation/screens/profile_screen.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/liturgical_courses/data/repositories/progress_repository.dart';
 import '../features/liturgical_courses/presentation/bloc/progress_bloc.dart';
+import '../features/liturgical_courses/presentation/screens/completorium_day_detail_screen.dart';
 
 import 'package:zpasjidoliturgii/features/liturgical_courses/presentation/screens/podcast_screen.dart';
 
@@ -113,12 +115,12 @@ class AppRoutes {
             ],
           ),
           
-          /*
+          
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/plan',
-                builder: (context, state) => const PlanScreen(),
+                path: '/completorium',
+                builder: (context, state) => const CompletoriumScreen(),
                 routes: [
                   GoRoute(
                     path: 'details',
@@ -136,7 +138,7 @@ class AppRoutes {
                 ],
               ),
             ],
-          ),*/
+          ),
 
           StatefulShellBranch(
             routes: [
