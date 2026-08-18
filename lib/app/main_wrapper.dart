@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../features/monetization/presentation/widgets/premium_offer_dialog.dart';
 
 class MainWrapper extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -19,6 +20,14 @@ class MainWrapper extends StatelessWidget {
         centerTitle: true,
         backgroundColor: theme.scaffoldBackgroundColor,
         actions: [
+          // Premium offer (temporary)
+          IconButton(
+            icon: const Icon(Icons.workspace_premium, color: Colors.amber, size: 28),
+            onPressed: () {
+              PremiumOfferDialog.show(context);
+            },
+          ),
+
           IconButton(
             icon: const CircleAvatar(
               radius: 16,
@@ -30,9 +39,30 @@ class MainWrapper extends StatelessWidget {
         ],
       ),
       
-      body: Container(
-        color: theme.scaffoldBackgroundColor,
-        child: navigationShell,
+body: Column(
+        children: [
+          // 1. Główna część aplikacji (zajmuje całą dostępną przestrzeń)
+          Expanded(
+            child: Container(
+              color: theme.scaffoldBackgroundColor,
+              child: navigationShell,
+            ),
+          ),
+          
+          // 2. ZAŚLEPKA REKLAMY (Baner na dole)
+          // Zniknie stąd, gdy podepniemy logikę (isPremium == true)
+          Container(
+            height: 50, // Standardowa wysokość banera AdMob
+            width: double.infinity,
+            color: Colors.white, // Jasne tło, by odróżnić reklamę od ciemnej aplikacji
+            child: const Center(
+              child: Text(
+                'Reklama Google (Baner AdMob)',
+                style: TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ],
       ),
       
       bottomNavigationBar: BottomNavigationBar(
