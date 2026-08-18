@@ -68,7 +68,7 @@ class PsalmsListScreen extends StatelessWidget {
               final itemTitle = data['title'] ?? 'Brak tytułu';
               final description = data['description'] ?? '';
               
-              final videoUrl = data['youtubeUrl'] ?? data['videoUrl'] ?? ''; 
+              final videoUrl = data['youtubeUrl'] ?? data['videoUrl'] ?? data['audioUrl'] ?? ''; 
 
               return Card(
                 color: const Color(0xFF2D3039),
