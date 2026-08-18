@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'audio_podcast_player_screen.dart';
-import '../widgets/youtube_video_player.dart';
 
 class PodcastScreen extends StatelessWidget {
   final String title;
@@ -69,7 +68,6 @@ class PodcastScreen extends StatelessWidget {
               final itemTitle = data['title'] ?? 'Brak tytułu';
               final description = data['description'] ?? 'Brak opisu';
 
-              //final videoUrl = data['youtubeUrl'] ?? data['videoUrl'] ?? data['audioUrl'] ?? '';
               final audioUrl = data['youtubeUrl'] ?? data['videoUrl'] ?? data['audioUrl'] ?? data['audoUrl'] ?? '';
 
               return Card(
@@ -124,57 +122,6 @@ class PodcastScreen extends StatelessWidget {
             },
           );
         },
-      ),
-    );
-  }
-}
-
-class PodcastVideoScreen extends StatelessWidget {
-  final String title;
-  final String youtubeUrl;
-  final String description;
-
-  const PodcastVideoScreen({
-    super.key,
-    required this.title,
-    required this.youtubeUrl,
-    required this.description,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            YoutubeVideoPlayer(videoUrl: youtubeUrl),
-            const SizedBox(height: 24),
-            
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 12),
-            
-            Text(
-              description,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-                height: 1.5,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
