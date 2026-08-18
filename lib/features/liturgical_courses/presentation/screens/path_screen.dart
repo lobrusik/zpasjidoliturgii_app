@@ -8,7 +8,12 @@ import '../bloc/courses_state.dart';
 import 'psalms_menu_screen.dart';
 
 class PathScreen extends StatelessWidget {
-  const PathScreen({super.key});
+  final int initialTabIndex;
+
+  const PathScreen({
+    super.key,
+    this.initialTabIndex = 0,
+  });
  
   @override
   Widget build(BuildContext context) {
@@ -17,6 +22,7 @@ class PathScreen extends StatelessWidget {
 
     // Tabs Management
     return DefaultTabController(
+      initialIndex: initialTabIndex,
       length: 3, 
       child: Scaffold(
         body: Column(

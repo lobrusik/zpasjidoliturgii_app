@@ -66,19 +66,20 @@ class AppRoutes {
             routes: [
               GoRoute(
                 path: '/courses',
-                builder: (context, state) => BlocProvider(
-                  create: (context) => CoursesBloc(
-                    courseRepository: CourseRepositoryImpl(),
-                  )..add(LoadCourses()),
-                  child: const PathScreen(), 
-                ),
-
+                builder: (context, state) {
+                  final tabIndex = state.extra as int? ?? 0;
+                  return BlocProvider(
+                    create: (context) => CoursesBloc(
+                      courseRepository: CourseRepositoryImpl(),
+                    )..add(LoadCourses()),
+                    child: PathScreen(initialTabIndex: tabIndex), 
+                  );
+                },
                 routes: [
                   GoRoute(
                     path: 'details/:id',
                     pageBuilder: (context, state) {
                       final courseId = state.pathParameters['id']!;
-                      
                       final courseTitle = state.extra as String? ?? 'Szczegóły kursu';
 
                       return CustomTransitionPage(

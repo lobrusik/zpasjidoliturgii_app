@@ -139,26 +139,26 @@ class HomeScreen extends StatelessWidget {
                 title: 'Drzewko wiedzy', 
                 description: 'Podstawy, Msza Śwęta, miejsce święte, historia ministrantury. Ucz się we własnym tempie.', 
                 imagePlaceholder: Icons.account_tree_outlined, 
-                onTap: () => context.go('/courses')
+                onTap: () => context.go('/courses', extra: 0)
               ),
               _buildPathCard(
                 context, 
                 title: 'Ścieżka psałterzysty', 
                 description: 'Poznaj piękno muzyki kościelnej. Chorał, śpiew i schola.', 
                 imagePlaceholder: Icons.library_music_outlined,
-                onTap: () => context.go('/courses')
+                onTap: () => context.go('/courses', extra: 1)
               ),
               _buildPathCard(
                 context, 
                 title: 'E-zbiórki ministranckie', 
                 description: 'Poznaj najważniejsze zasady i fakty dotyczące służby przy ołtarzu.', 
                 imagePlaceholder: Icons.groups,
-                onTap: () => context.go('/courses')
+                onTap: () => context.go('/courses', extra: 2)
               ),
               _buildPathCard(
                 context, 
                 title: 'Kompleta', 
-                description: 'Idealny sposób na zakończenie dnia.', 
+                description: 'Liturgiczny sposób na zakończenie dnia.', 
                 imagePlaceholder: Icons.calendar_today_outlined, 
                 onTap: () => context.go('/completorium')
               ),
