@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'admin_screen.dart';
 //import '../../../liturgical_courses/presentation/widgets/temp_uploader.dart';
-import '../../../monetization/presentation/widgets/premium_offer_dialog.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -71,49 +70,7 @@ class ProfileScreen extends StatelessWidget {
             ],
 
             //const TempAddPsalmsButton(), //adding psalms
-
-            // temp button premium
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.amber.shade700, Colors.amber.shade400],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.amber.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                icon: const Icon(Icons.workspace_premium, color: Colors.black, size: 28),
-                label: const Text(
-                  'Przejdź na wersję bez reklam',
-                  style: TextStyle(
-                    color: Colors.black, 
-                    fontWeight: FontWeight.bold, 
-                    fontSize: 16
-                  ),
-                ),
-                onPressed: () {
-                  PremiumOfferDialog.show(context);
-                },
-              ),
-            ),
-            const SizedBox(height: 40),
- 
+            
             Text(
               'Twoje statystyki',
               style: theme.textTheme.headlineSmall,
