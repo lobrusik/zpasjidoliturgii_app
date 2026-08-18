@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'podcast_screen.dart';
+import 'psalms_list_screen.dart';
 
 class PsalmsMenuScreen extends StatelessWidget {
   const PsalmsMenuScreen({super.key});
@@ -82,13 +82,13 @@ class PsalmsMenuScreen extends StatelessWidget {
         ),
         trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 18),
         onTap: () {
-          // Otwieramy nasz PodcastScreen, ale mówimy mu: pokaż tylko tę konkretną kategorię!
+          
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => PodcastScreen(
+              builder: (context) => PsalmsListScreen(
                 title: 'Psalmy: $title',
                 collectionName: 'psalms',
-                category: category, // Filtruje po 'advent', 'easter' lub 'ordinary'
+                category: category, //'advent', 'easter', 'ordinary'
               ),
             ),
           );
