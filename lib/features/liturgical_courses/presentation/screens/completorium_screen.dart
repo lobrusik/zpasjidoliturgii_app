@@ -8,7 +8,7 @@ class CompletoriumScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final String formattedDate = DateFormat('EEEE, d MMMM yyyy', 'pl_PL').format(DateTime.now());
+    //final String formattedDate = DateFormat('EEEE, d MMMM yyyy', 'pl_PL').format(DateTime.now());
 
     final List<Map<String, String>> completoriumDays = [
       {'title': 'Poniedziałek', 'url': 'https://youtu.be/I-AN8tAdPuA?si=AeKYepSnbrqaY7Gg'},
@@ -44,7 +44,7 @@ class CompletoriumScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              Text(
+              /*Text(
                 toBeginningOfSentenceCase(formattedDate) ?? formattedDate,
                 style: const TextStyle(
                   fontSize: 14,
@@ -52,7 +52,7 @@ class CompletoriumScreen extends StatelessWidget {
                   color: Colors.amber,
                   letterSpacing: 0.5,
                 ),
-              ),
+              ),*/
               const SizedBox(height: 8),
               Text(
                 'Modlitwa na zakończenie dnia.',
