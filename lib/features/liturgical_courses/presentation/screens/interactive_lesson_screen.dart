@@ -188,7 +188,7 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildSlideHeaderWithImage(slide),
-          const SizedBox(height: 32)
+          const SizedBox(height: 32),
           if (slide.dataList != null)
             ...slide.dataList!.map((item) {
               return Container(
@@ -331,3 +331,4 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
       ),
     );
   }
+}
