@@ -125,10 +125,31 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(slide.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-          if (slide.content != null) ...[
-            const SizedBox(height: 16),
-            Text(slide.content!, style: const TextStyle(color: Colors.grey, fontSize: 16, height: 1.5)),
-          ],
+          const SizedBox(height: 24),
+
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (slide.imageUrl != null) ...[
+                Expanded(
+                  flex: 2,
+                  child: slide.imageUrl!.startsWith('http') 
+                    ? Image.network(slide.imageUrl!, fit: BoxFit.contain)
+                    : Image.asset(slide.imageUrl!, fit: BoxFit.contain),
+                ),
+                const SizedBox(width: 16),
+              ],
+            if (slide.content != null)
+              Expanded(
+                flex: 3,
+                child: Text(
+                  slide.content!,
+                  style: const TextStyle(color: Colors.grey, fontSize: 15, height: 1.5),
+                ),
+              ),
+            ],
+          ),
+
           if (slide.videoUrl != null) ...[
             const SizedBox(height: 24),
             YoutubeVideoPlayer(videoUrl: slide.videoUrl!),
@@ -200,6 +221,8 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
   }
 
   Widget _buildSlideImage(LessonSlide slide) {
+    final String imagePath = slide.content ?? slide.imageUrl ?? '';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -213,7 +236,11 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
             minScale: 1,
             maxScale: 4,
             child: Center(
-              child: Image.network(slide.content ?? 'https://via.placeholder.com/400x300.png?text=Brak+zdjęcia'),
+              child: imagePath.isEmpty
+                ? const Text('Brak obrazu', style: TextStyle(color: Colors.grey))
+                : (imagePath.startsWith('http')
+                  ? Image.network(imagePath)
+                  : Image.asset(imagePath)),
             ),
           ),
         ),

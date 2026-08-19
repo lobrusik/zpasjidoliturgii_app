@@ -30,10 +30,10 @@ class LessonSlide {
   final String type; // 'intro', 'text', 'info_cards', 'image', 'true_false', 'drag_drop', 'summary'
   final String title;
   final String? content;
+  final String? imageUrl;
   final String? videoUrl;
   final String? quote;
   final List<dynamic>? dataList; //True, false
-  
   final List<String>? categories; // Drag & Drop
   final List<Map<String, dynamic>>? itemsToMatch; // Drag & Drop
 
@@ -41,6 +41,7 @@ class LessonSlide {
     required this.type,
     required this.title,
     this.content,
+    this.imageUrl,
     this.videoUrl,
     this.quote,
     this.dataList,
@@ -53,6 +54,7 @@ class LessonSlide {
       type: json['type'] ?? 'text',
       title: json['title'] ?? '',
       content: json['content'],
+      imageUrl: json['imageUrl'],
       videoUrl: json['videoUrl'],
       quote: json['quote'],
       dataList: json['dataList'],
