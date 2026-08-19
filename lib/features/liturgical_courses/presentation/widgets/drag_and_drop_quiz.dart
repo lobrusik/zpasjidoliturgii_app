@@ -44,11 +44,6 @@ class _DragAndDropQuizState extends State<DragAndDropQuiz> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          widget.activityData['instruction'] ?? 'Dopasuj elementy:',
-          style: theme.textTheme.titleMedium?.copyWith(color: Colors.white70),
-        ),
-        const SizedBox(height: 24),
         
         // CATEGORIES (Drop-off Locations)
         ...categories.map((category) => _buildDragTarget(category, theme)),

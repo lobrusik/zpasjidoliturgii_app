@@ -112,6 +112,7 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
                     case 'image': return _buildSlideImage(slide);
                     case 'true_false': return _buildSlideTrueFalse(slide, index);
                     case 'drag_drop': return _buildSlideDragDrop(slide, index);
+                    case 'open_questions': return _buildSlideOpenQuestions(slide, index);
                     case 'summary': return _buildSlideSummary(slide);
                     default: return const Center(child: Text('Nieznany typ slajdu'));
                   }
