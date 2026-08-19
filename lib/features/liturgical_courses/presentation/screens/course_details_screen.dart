@@ -84,14 +84,16 @@ class CourseDetailsScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => InteractiveLessonScreen(lesson: lesson)),
-                        ).then((_) {
-                          context.read<ProgressBloc>().add(
-                            ToggleLessonProgress(
-                              courseId: courseId,
-                              planId: lesson.id,
-                              isCompleted: true,
-                            ),
-                          );
+                        ).then((isCompleted) {
+                          if (isCompleted == true) {
+                            context.read<ProgressBloc>().add(
+                              ToggleLessonProgress(
+                                courseId: courseId,
+                                planId: lesson.id,
+                                isCompleted: true,
+                              ),
+                            );
+                          }
                         });
                       },
                       icon: const Icon(Icons.play_arrow),

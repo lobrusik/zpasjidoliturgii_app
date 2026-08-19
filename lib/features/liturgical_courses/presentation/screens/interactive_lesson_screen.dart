@@ -21,6 +21,24 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
+  Set<int> requiredSlides = {};
+  Set<int> completedSlides = {};
+  Map<int, Map<int, String>> openAnswers = {};
+
+  @override
+  void initState() {
+    super.initState();
+    for (int i = 0; i < widget.lesson.slides.length; i++) {
+      final type = widget.lesson.slides[i].type;
+      if (type == 'true_false' || type == 'drag_drop' || type == 'open_questions') {
+        requiredSlides.add(i);
+      }
+      if (type == 'open_questions') {
+        openAnswers[i] = {};
+      }
+    }
+  }
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -30,14 +48,23 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
   void _nextPage() {
     if (_currentPage < widget.lesson.slides.length - 1) {
       _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-    } else {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Lekcja ukończona! Gratulacje! 🎉'),
-          backgroundColor: Colors.green,
-        )
-      );
+    } else{
+      if (completedSlides.length < requiredSlides.length) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Musisz rozwiązać wszystkie zadania, aby ukończyć lekcję!'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Lekcja ukończona! Gratulacje! 🎉'),
+            backgroundColor: Colors.green,
+          )
+        );
+      }
     }
   }
 
@@ -348,8 +375,66 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
     );
   }
 
+  // open questions 
+  Widget _buildSlideOpenQuestions(LessonSlide slide, int slideIndex) {
+    final questions = slide.dataList ?? [];
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSlideHeaderWithImage(slide),
+          const SizedBox(height: 32),
+          
+          ...List.generate(questions.length, (qIndex) {
+            final q = questions[qIndex]['q'] as String;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(q, style: const TextStyle(color: Colors.white, fontSize: 16)),
+                  const SizedBox(height: 12),
+                  TextField(
+                    style: const TextStyle(color: Colors.white),
+                    maxLines: 4,
+                    decoration: InputDecoration(
+                      hintText: 'Zapisz swoje przemyślenia...',
+                      hintStyle: TextStyle(color: Colors.grey.shade600),
+                      filled: true,
+                      fillColor: const Color(0xFF2D3039),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    ),
+                    onChanged: (value) {
+                      openAnswers[slideIndex]![qIndex] = value;
+                      
+                      bool allAnswered = true;
+                      for (int i = 0; i < questions.length; i++) {
+                        if ((openAnswers[slideIndex]![i] ?? '').trim().isEmpty) {
+                          allAnswered = false;
+                          break;
+                        }
+                      }
+                      
+                      if (allAnswered) {
+                        setState(() => completedSlides.add(slideIndex));
+                      } else {
+                        setState(() => completedSlides.remove(slideIndex));
+                      }
+                    },
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSlideSummary(LessonSlide slide) {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
