@@ -24,7 +24,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await MobileAds.instance.initialize();
+  //await MobileAds.instance.initialize();
 
   if (!kIsWeb) {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
