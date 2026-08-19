@@ -117,28 +117,24 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
   }
 
   // SLIDE GENERATORS
-
-  Widget _buildSlideIntro(LessonSlide slide) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(slide.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-          const SizedBox(height: 24),
-
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (slide.imageUrl != null) ...[
-                Expanded(
-                  flex: 2,
-                  child: slide.imageUrl!.startsWith('http') 
-                    ? Image.network(slide.imageUrl!, fit: BoxFit.contain)
-                    : Image.asset(slide.imageUrl!, fit: BoxFit.contain),
-                ),
-                const SizedBox(width: 16),
-              ],
+  Widget _buildSlideHeaderWithImage(LessonSlide slide) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(slide.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+        const SizedBox(height: 24),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (slide.imageUrl != null) ...[
+              Expanded(
+                flex: 2,
+                child: slide.imageUrl!.startsWith('http') 
+                  ? Image.network(slide.imageUrl!, fit: BoxFit.contain)
+                  : Image.asset(slide.imageUrl!, fit: BoxFit.contain),
+              ),
+              const SizedBox(width: 16),
+            ],
             if (slide.content != null)
               Expanded(
                 flex: 3,
@@ -147,15 +143,26 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
                   style: const TextStyle(color: Colors.grey, fontSize: 15, height: 1.5),
                 ),
               ),
-            ],
-          ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSlideIntro(LessonSlide slide) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSlideHeaderWithImage(slide),
 
           if (slide.videoUrl != null) ...[
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
             YoutubeVideoPlayer(videoUrl: slide.videoUrl!),
           ],
           if (slide.quote != null) ...[
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(color: const Color(0xFF2D3039), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.amber.withOpacity(0.3))),
@@ -170,14 +177,7 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
   Widget _buildSlideText(LessonSlide slide) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(slide.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-          const SizedBox(height: 16),
-          Text(slide.content ?? '', style: const TextStyle(color: Colors.grey, fontSize: 16, height: 1.5)),
-        ],
-      ),
+      child: _buildSlideHeaderWithImage(slide),
     );
   }
 
@@ -187,10 +187,8 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(slide.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-          const SizedBox(height: 16),
-          if (slide.content != null) Text(slide.content!, style: const TextStyle(color: Colors.grey, fontSize: 16, height: 1.5)),
-          const SizedBox(height: 24),
+          _buildSlideHeaderWithImage(slide),
+          const SizedBox(height: 32)
           if (slide.dataList != null)
             ...slide.dataList!.map((item) {
               return Container(
@@ -257,12 +255,7 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(slide.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-          if (slide.content != null) 
-            Padding(
-              padding: const EdgeInsets.only(top: 8), 
-              child: Text(slide.content!, style: const TextStyle(color: Colors.grey))
-            ),
+          _buildSlideHeaderWithImage(slide),
           const SizedBox(height: 32),
           
           TrueFalseQuiz(
@@ -296,8 +289,8 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(slide.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-          const SizedBox(height: 24),
+          _buildSlideHeaderWithImage(slide),
+          const SizedBox(height: 32),
           
           DragAndDropQuiz(
             key: ValueKey('drag_drop_$slideIndex'),
@@ -325,11 +318,7 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
         children: [
           const Icon(Icons.check_circle_outline, size: 100, color: Colors.amber),
           const SizedBox(height: 24),
-          Text(slide.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-          if (slide.content != null) ...[
-            const SizedBox(height: 16),
-            Text(slide.content!, textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey, fontSize: 16, height: 1.5)),
-          ],
+          _buildSlideHeaderWithImage(slide),
           if (slide.quote != null) ...[
             const SizedBox(height: 48),
             Container(
@@ -342,4 +331,3 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
       ),
     );
   }
-}
