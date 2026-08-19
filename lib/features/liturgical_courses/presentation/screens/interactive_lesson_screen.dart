@@ -219,24 +219,46 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
   Widget _buildSlideIntro(LessonSlide slide) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSlideHeaderWithImage(slide),
-
-          if (slide.videoUrl != null) ...[
-            const SizedBox(height: 32),
-            YoutubeVideoPlayer(videoUrl: slide.videoUrl!),
-          ],
-          if (slide.quote != null) ...[
-            const SizedBox(height: 32),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: const Color(0xFF2D3039), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.amber.withOpacity(0.3))),
-              child: Text(slide.quote!, style: const TextStyle(color: Colors.white70, fontStyle: FontStyle.italic, height: 1.5)),
-            ),
-          ],
-        ],
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSlideHeaderWithImage(slide),
+              
+              if (slide.videoUrl != null) ...[
+                const SizedBox(height: 20),
+                AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: YoutubeVideoPlayer(videoUrl: slide.videoUrl!),
+                  ),
+                ),
+              ],
+              
+              if (slide.quote != null) ...[
+                const SizedBox(height: 20),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2D3039), 
+                    borderRadius: BorderRadius.circular(12), 
+                    border: Border.all(color: Colors.amber.withOpacity(0.3))
+                  ),
+                  child: Text(
+                    slide.quote!, 
+                    style: const TextStyle(color: Colors.white70, fontStyle: FontStyle.italic, height: 1.5)
+                  ),
+                ),
+              ],
+              
+              const SizedBox(height: 40),
+            ],
+          ),
+        ),
       ),
     );
   }

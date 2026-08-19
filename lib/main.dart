@@ -54,55 +54,16 @@ class LiturgicalApp extends StatelessWidget {
         AppRoutes.router.refresh();
 
         return MaterialApp.router(
+          debugShowCheckedModeBanner: false,
           title: 'Liturgical App',
           theme: AppTheme.darkTheme,
           routerConfig: AppRoutes.router,
 
           builder: (context, child) {
-            return StreamBuilder<List<ConnectivityResult>>(
-              stream: Connectivity().onConnectivityChanged,
-              builder: (context, connectivitySnapshot) {
-                // make sure the device does NOT have network access
-                final isOffline = connectivitySnapshot.hasData &&
-                                  connectivitySnapshot.data!.contains(ConnectivityResult.none);
-                return Stack(
-                  children: [
-                    if (child != null) child,
-                    // If offline, display an animated red warning bar at the very top
-                    AnimatedPositioned(
-                      duration: const Duration(milliseconds: 300),
-                      top: isOffline ? 0 : -50,
-                      left: 0,
-                      right: 0,
-                      child: Material(
-                        color: Colors.redAccent,
-                        child: SafeArea(
-                          bottom: false,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.wifi_off, color: Colors.white, size: 16),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Brak połączenia z siecią. Przeglądasz pobrane materiały.',
-                                  style: TextStyle(color: Colors.white, fontSize: 12),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
+            return child ?? const SizedBox.shrink();
           },
         );
       },
     );
   }
 }
-//start test

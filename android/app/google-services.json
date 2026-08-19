@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1038776967097-ld3eb74dct9oi22qptjp1mrqt6dt5dci.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.zpasjidoliturgii",
+            "certificate_hash": "dfe501cc938adf2995c08009553611ee4f1dbc3f"
+          }
+        },
+        {
           "client_id": "1038776967097-3hk6apt3h9v2ic7es19so5snc6qdh8oq.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,6 +37,13 @@
             {
               "client_id": "1038776967097-3hk6apt3h9v2ic7es19so5snc6qdh8oq.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "1038776967097-mnirnghlgfhe3bvk4la90jva12senug7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.zpasjidoliturgii"
+              }
             }
           ]
         }

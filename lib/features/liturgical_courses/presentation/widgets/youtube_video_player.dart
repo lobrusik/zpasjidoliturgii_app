@@ -64,9 +64,12 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: YoutubePlayer(
-            controller: _controller,
-            aspectRatio: 16 / 9,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque, 
+            child: YoutubePlayer(
+              controller: _controller,
+              aspectRatio: 16 / 9,
+            ),
           ),
         ),
       );
