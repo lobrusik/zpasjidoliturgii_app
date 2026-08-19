@@ -4,6 +4,7 @@ import '../../data/models/interactive_lesson_model.dart';
 import '../widgets/true_false_quiz.dart';
 import '../widgets/drag_and_drop_quiz.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import '../widgets/banner_ad_widget.dart';
 
 class InteractiveLessonScreen extends StatefulWidget {
   final InteractiveLesson lesson;
@@ -450,9 +451,11 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
               decoration: BoxDecoration(color: const Color(0xFF2D3039), borderRadius: BorderRadius.circular(12)),
               child: Text('„${slide.quote!}”', textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontStyle: FontStyle.italic)),
             )
-          ]
+          ],
+          const BannerAdWidget(),
         ],
       ),
     );
   }
+
 }
