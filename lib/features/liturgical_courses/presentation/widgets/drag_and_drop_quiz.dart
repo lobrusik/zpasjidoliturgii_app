@@ -114,7 +114,7 @@ class _DragAndDropQuizState extends State<DragAndDropQuiz> {
               ),
               const SizedBox(height: 8),
               if (matchedItems[category]!.isEmpty)
-                Text('Przeciągnij tutaj pasujące opisy...', style: TextStyle(color: Colors.grey.shade500, fontStyle: FontStyle.italic)),
+                Text('Przeciągnij tutaj pasujący opis... albo opisy.', style: TextStyle(color: Colors.grey.shade500, fontStyle: FontStyle.italic)),
               ...matchedItems[category]!.map((text) => Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Row(
