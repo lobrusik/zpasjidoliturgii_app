@@ -118,33 +118,60 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
 
   // SLIDE GENERATORS
   Widget _buildSlideHeaderWithImage(LessonSlide slide) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+    Widget? imageWidget;
+    if (slide.imageUrl != null) {
+      imageWidget = slide.imageUrl!.startsWith('http') 
+          ? Image.network(slide.imageUrl!, fit: BoxFit.contain)
+          : Image.asset(slide.imageUrl!, fit: BoxFit.contain);
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(slide.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
         const SizedBox(height: 24),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (slide.imageUrl != null) ...[
-              Expanded(
-                flex: 2,
-                child: slide.imageUrl!.startsWith('http') 
-                  ? Image.network(slide.imageUrl!, fit: BoxFit.contain)
-                  : Image.asset(slide.imageUrl!, fit: BoxFit.contain),
+
+        if (isMobile) ...[
+          // PHONE SYSTEM
+          if (imageWidget != null) ...[
+            Center(
+              child: SizedBox(
+                height: 220,
+                child: imageWidget,
               ),
-              const SizedBox(width: 16),
-            ],
-            if (slide.content != null)
-              Expanded(
-                flex: 3,
-                child: Text(
-                  slide.content!,
-                  style: const TextStyle(color: Colors.grey, fontSize: 15, height: 1.5),
-                ),
-              ),
+            ),
+            const SizedBox(height: 24),
           ],
-        ),
+          if (slide.content != null)
+            Text(
+              slide.content!,
+              style: const TextStyle(color: Colors.grey, fontSize: 16, height: 1.5),
+            ),
+        ] else ...[
+        // SYSTEM FOR COMPUTERS, TABLETS
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (slide.imageUrl != null) ...[
+                Expanded(
+                  flex: 2,
+                  child: slide.imageUrl!.startsWith('http') 
+                    ? Image.network(slide.imageUrl!, fit: BoxFit.contain)
+                    : Image.asset(slide.imageUrl!, fit: BoxFit.contain),
+                ),
+                const SizedBox(width: 16),
+              ],
+              if (slide.content != null)
+                Expanded(
+                  flex: 3,
+                  child: Text(
+                    slide.content!,
+                    style: const TextStyle(color: Colors.grey, fontSize: 15, height: 1.5),
+                  ),
+                ),
+            ],
+          ),
+        ],
       ],
     );
   }
