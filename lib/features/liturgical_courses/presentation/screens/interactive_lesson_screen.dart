@@ -3,6 +3,7 @@ import '../widgets/youtube_video_player.dart';
 import '../../data/models/interactive_lesson_model.dart';
 import '../widgets/true_false_quiz.dart';
 import '../widgets/drag_and_drop_quiz.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class InteractiveLessonScreen extends StatefulWidget {
   final InteractiveLesson lesson;
@@ -125,6 +126,16 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
           ? Image.network(slide.imageUrl!, fit: BoxFit.contain)
           : Image.asset(slide.imageUrl!, fit: BoxFit.contain);
     }
+
+    final markdownStyle = MarkdownStyleSheet(
+      p: const TextStyle(color: Colors.grey, fontSize: 16, height: 1.5),
+      strong: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      em: const TextStyle(color: Colors.white70, fontStyle: FontStyle.italic),
+      horizontalRuleDecoration: BoxDecoration(
+        border: Border(top: BorderSide(width: 1.0, color: Colors.grey.shade700)),
+      ),
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -143,9 +154,9 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
             const SizedBox(height: 24),
           ],
           if (slide.content != null)
-            Text(
-              slide.content!,
-              style: const TextStyle(color: Colors.grey, fontSize: 16, height: 1.5),
+            MarkdownBody(
+              data: slide.content!,
+              styleSheet: markdownStyle,
             ),
         ] else ...[
         // SYSTEM FOR COMPUTERS, TABLETS
@@ -164,9 +175,9 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
               if (slide.content != null)
                 Expanded(
                   flex: 3,
-                  child: Text(
-                    slide.content!,
-                    style: const TextStyle(color: Colors.grey, fontSize: 15, height: 1.5),
+                  child: MarkdownBody(
+                    data: slide.content!,
+                    styleSheet: markdownStyle,
                   ),
                 ),
             ],
