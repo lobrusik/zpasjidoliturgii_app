@@ -12,6 +12,7 @@ import 'package:flutter/foundation.dart';
 import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:flutter/foundation.dart';
 
 
 
@@ -24,9 +25,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  //await MobileAds.instance.initialize();
-
   if (!kIsWeb) {
+    await MobileAds.instance.initialize();
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     PlatformDispatcher.instance.onError = (error, stack) {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
