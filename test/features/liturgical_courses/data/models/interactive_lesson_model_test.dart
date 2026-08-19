@@ -37,12 +37,9 @@ void main() {
     });
 
     test('Nie wywala błędu przy brakujących polach (Null Safety)', () {
+      final Map<String, dynamic> emptySlide = <String, dynamic>{};
       final Map<String, dynamic> emptyJson = {
-        'slides': [
-          {
-            Map<String, dynamic>.from({})
-          }
-        ]
+        'slides': [emptySlide]
       };
 
       final lesson = InteractiveLesson.fromJson(emptyJson, 'doc_empty');
