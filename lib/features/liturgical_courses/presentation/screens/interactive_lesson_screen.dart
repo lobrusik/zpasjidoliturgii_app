@@ -217,6 +217,8 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
   }
 
   Widget _buildSlideIntro(LessonSlide slide) {
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
       child: Center(
@@ -229,13 +231,66 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
               
               if (slide.videoUrl != null) ...[
                 const SizedBox(height: 20),
-                AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: YoutubeVideoPlayer(videoUrl: slide.videoUrl!),
+
+                if (isLandscape)
+                  Center(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.redAccent,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      icon: const Icon(Icons.play_circle_fill, size: 28),
+                      label: const Text('Odtwórz materiał wideo', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (context) => Scaffold(
+                              backgroundColor: Colors.black,
+                              appBar: AppBar(
+                                backgroundColor: Colors.black,
+                                elevation: 0,
+                                leading: IconButton(
+                                  icon: const Icon(Icons.close, color: Colors.white, size: 32),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                              ),
+                              body: SafeArea(
+                                child: Center(
+                                  child: AspectRatio(
+                                    aspectRatio: 16 / 9,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: YoutubeVideoPlayer(videoUrl: slide.videoUrl!),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  )
+                else
+                  Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 500,
+                        maxHeight: 280, 
+                      ),
+                      child: AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: YoutubeVideoPlayer(videoUrl: slide.videoUrl!),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
               ],
               
               if (slide.quote != null) ...[

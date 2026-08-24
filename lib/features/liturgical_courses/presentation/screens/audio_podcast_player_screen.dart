@@ -81,71 +81,60 @@ class _AudioPodcastPlayerScreenState extends State<AudioPodcastPlayerScreen> {
       ),
       body: Stack(
         children: [
-          // Real player
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 150, 
+          Offstage(
+            offstage: true,
             child: YoutubePlayer(controller: _controller),
           ),
 
-          // Background cover
-          Container(
-            color: theme.scaffoldBackgroundColor,
-            width: double.infinity,
-            height: double.infinity,
-          ),
-
-          // Right audio interface
-          SizedBox(
-            width: double.infinity, // <--- TO NAPRAWIA PROBLEM (Wymusza pełną szerokość)
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center, // <--- Środek w poziomie
-                children: [
-                  const CircleAvatar(
-                    radius: 60,
-                    backgroundColor: Color(0xFF2D3039),
-                    child: Icon(Icons.headphones, size: 60, color: Colors.amber),
-                  ),
-                  const SizedBox(height: 32),
-                  
-                  Text(
-                    widget.title,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+          Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const CircleAvatar(
+                      radius: 60,
+                      backgroundColor: Color(0xFF2D3039),
+                      child: Icon(Icons.headphones, size: 60, color: Colors.amber),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  
-                  Text(
-                    _isReady ? 'Odtwarzanie audio z YouTube' : 'Ładowanie nagrania...',
-                    style: const TextStyle(color: Colors.grey, fontSize: 14),
-                  ),
-                  const SizedBox(height: 48),
-
-                  if (!_isReady)
-                    const CircularProgressIndicator(color: Colors.amber)
-                  else
-                    IconButton(
-                      iconSize: 72,
-                      color: Colors.amber,
-                      icon: Icon(_isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled),
-                      onPressed: () {
-                        if (_isPlaying) {
-                          _controller.pauseVideo();
-                        } else {
-                          _controller.playVideo();
-                        }
-                      },
+                    const SizedBox(height: 32),
+                    
+                    Text(
+                      widget.title,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                ],
+                    const SizedBox(height: 12),
+                    
+                    Text(
+                      _isReady ? 'Odtwarzanie audio z YouTube' : 'Ładowanie nagrania...',
+                      style: const TextStyle(color: Colors.grey, fontSize: 14),
+                    ),
+                    const SizedBox(height: 48),
+
+                    if (!_isReady)
+                      const CircularProgressIndicator(color: Colors.amber)
+                    else
+                      IconButton(
+                        iconSize: 72,
+                        color: Colors.amber,
+                        icon: Icon(_isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled),
+                        onPressed: () {
+                          if (_isPlaying) {
+                            _controller.pauseVideo();
+                          } else {
+                            _controller.playVideo();
+                          }
+                        },
+                      ),
+                  ],
+                ),
               ),
             ),
           ),    

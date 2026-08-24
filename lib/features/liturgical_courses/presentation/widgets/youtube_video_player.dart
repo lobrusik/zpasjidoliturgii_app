@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class YoutubeVideoPlayer extends StatefulWidget {
   final String videoUrl;
@@ -16,7 +17,6 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
   @override
   void initState() {
     super.initState();
-    // Automatically extract the ID from any YouTube link
     final videoId = _extractVideoId(widget.videoUrl) ?? '';
     
     _controller = YoutubePlayerController.fromVideoId(
@@ -41,6 +41,13 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
     return null;
   }
 
+  Future<void> _launchYouTube() async {
+    final Uri url = Uri.parse(widget.videoUrl);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    }
+  }
+
   @override
   void dispose() {
     _controller.close();
@@ -49,29 +56,68 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          color: Colors.black,
-          borderRadius: BorderRadius.circular(12),
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque, 
-            child: YoutubePlayer(
-              controller: _controller,
-              aspectRatio: 16 / 9,
-            ),
+    // horizontally
+    if (isLandscape) {
+      return InkWell(
+        onTap: _launchYouTube,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          height: 180,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: const Color(0xFF1F242D),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.redAccent.withOpacity(0.5), width: 1.5),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: const BoxDecoration(
+                  color: Colors.redAccent,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 32),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Odtwórz wideo w aplikacji YouTube',
+                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Kliknij, aby otworzyć w trybie poziomym',
+                style: TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+            ],
           ),
         ),
       );
+    }
+
+    // vertically
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: YoutubePlayer(
+          controller: _controller,
+          aspectRatio: 16 / 9,
+        ),
+      ),
+    );
   }
 }
