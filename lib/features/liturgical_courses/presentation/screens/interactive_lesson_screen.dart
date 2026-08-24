@@ -5,6 +5,8 @@ import '../widgets/true_false_quiz.dart';
 import '../widgets/drag_and_drop_quiz.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../widgets/banner_ad_widget.dart';
+import '../../data/models/study_plan_model.dart';
+import '../widgets/interactive_quiz.dart';
 
 class InteractiveLessonScreen extends StatefulWidget {
   final InteractiveLesson lesson;
@@ -115,6 +117,7 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
                     case 'drag_drop': return _buildSlideDragDrop(slide, index);
                     case 'open_questions': return _buildSlideOpenQuestions(slide, index);
                     case 'summary': return _buildSlideSummary(slide);
+                    case 'quiz': return _buildSlideQuiz(slide, index);
                     default: return const Center(child: Text('Nieznany typ slajdu'));
                   }
                 },
@@ -507,6 +510,47 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
               ),
             );
           }),
+        ],
+      ),
+    );
+  }
+
+  // quiz abcd
+  Widget _buildSlideQuiz(LessonSlide slide, int slideIndex) {
+    final List<QuizQuestion> questions = (slide.dataList ?? []).map((qMap) {
+      return QuizQuestion(
+        question: qMap['question'] ?? '',
+        options: List<String>.from(qMap['options'] ?? []),
+        correctAnswerIndex: qMap['correctAnswerIndex'] ?? 0,
+        explanation: qMap['explanation'] ?? '',
+      );
+    }).toList();
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSlideHeaderWithImage(slide),
+          const SizedBox(height: 32),
+          
+          InteractiveQuiz(
+            key: ValueKey('quiz_$slideIndex'),
+            questions: questions,
+            onQuizCompleted: () {
+              setState(() {
+                completedSlides.add(slideIndex);
+              });
+              
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Świetnie! Quiz ukończony pomyślnie! 🎉'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
