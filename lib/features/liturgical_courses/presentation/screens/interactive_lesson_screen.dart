@@ -515,7 +515,7 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
     );
   }
 
-  // quiz abcd
+  // abcd quiz
   Widget _buildSlideQuiz(LessonSlide slide, int slideIndex) {
     final List<QuizQuestion> questions = (slide.dataList ?? []).map((qMap) {
       return QuizQuestion(
