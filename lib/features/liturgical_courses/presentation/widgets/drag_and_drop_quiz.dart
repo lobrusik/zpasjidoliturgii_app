@@ -37,6 +37,33 @@ class _DragAndDropQuizState extends State<DragAndDropQuiz> {
     }
   }
 
+  bool _isItemValidForCategory(Map<String, dynamic> item, String category) {
+    // Sprawdzamy pole z wieloma kategoriami (jeśli istnieje)
+    if (item.containsKey('correctCategories')) {
+      final list = item['correctCategories'] as List;
+      return list.contains(category);
+    }
+    // Sprawdzamy standardowe pole z pojedynczą kategorią
+    if (item.containsKey('correctCategory')) {
+      return item['correctCategory'] == category;
+    }
+    return false;
+  }
+
+  bool _isFullyMatched(Map<String, dynamic> item) {
+    if (item.containsKey('correctCategories')) {
+      final targetCategories = List<String>.from(item['correctCategories']);
+      int matchedCount = 0;
+      for (var cat in targetCategories) {
+        if (matchedItems[cat]!.contains(item['text'])) {
+          matchedCount++;
+        }
+      }
+      return matchedCount >= targetCategories.length;
+    }
+    return true; 
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -70,10 +97,17 @@ class _DragAndDropQuizState extends State<DragAndDropQuiz> {
         return true;
       },
       onAcceptWithDetails: (details) {
-        if (details.data['correctCategory'] == category) {
+        final item = details.data;
+        if (_isItemValidForCategory(item, category)) {
           setState(() {
-            matchedItems[category]!.add(details.data['text']);
-            remainingItems.remove(details.data);
+            if (!matchedItems[category]!.contains(item['text'])) {
+              matchedItems[category]!.add(item['text']);
+            }
+            
+            if (_isFullyMatched(item)) {
+              remainingItems.removeWhere((element) => element['text'] == item['text']);
+            }
+            
             _checkCompletion();
           });
         } else {
