@@ -144,7 +144,7 @@ class CourseDetailsScreen extends StatelessWidget {
                 '1. ZOBACZ (Opcjonalnie)\n'
                 'Jeśli na samej górze widzisz okienko wideo, kliknij w nie, aby obejrzeć film wprowadzający.\n\n'
                 '2. ZROZUM\n'
-                'Przewiń ekran w dół i przeczytaj tekst lekcji. Zrób to uważnie – to właśnie z tego tekstu będzie test na końcu!\n\n'
+                'Przewiń ekran w dół i przeczytaj tekst lekcji oraz artukuł rozszerzający temat lekcji. Zrób to uważnie – to właśnie z tego tekstu będzie test na końcu!\n\n'
                 '3. SPRAWDŹ SIĘ (Wymagane)\n'
                 'Zjedź na sam dół ekranu. Znajdziesz tam quiz (zaznaczanie poprawnych odpowiedzi) lub układankę (przeciąganie kafelków). Rozwiąż to zadanie.\n\n'
                 'JAK UZYSKAĆ ZALICZYCZENIE?\n'
@@ -413,7 +413,7 @@ void showInstructionDialog(BuildContext context, String title, String instructio
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Zrozumiałem', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: const Text('Zrozumiałe!', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
