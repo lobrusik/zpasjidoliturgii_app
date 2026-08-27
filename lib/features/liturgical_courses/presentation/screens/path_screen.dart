@@ -76,6 +76,7 @@ class PathScreen extends StatelessWidget {
           //final placeCourses = courses.where((c) => c.category == 'place').toList();
           //final historyCourses = courses.where((c) => c.category == 'history').toList();
           final liturgyCourses = courses.where((c) => c.category == 'liturgy').toList();
+          final guideMassCourses = courses.where((c) => c.category == 'guide').toList();
 
           return StreamBuilder<DocumentSnapshot>(
             stream: userId != null 
@@ -169,22 +170,6 @@ class PathScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),*/
 
-                    /* branch 3
-                    _buildBranchSection(
-                      context: context,
-                      title: 'Gałąź - Historia ministrantury',
-                      description: areAdvancedBranchesUnlocked
-                          ? 'Opis gałęzi History.'
-                          : 'Zablokowane. Ukończono $completedTrunkLessons/$requiredLessons podstaw.',
-                      icon: Icons.local_fire_department,
-                      branchColor: areAdvancedBranchesUnlocked ? const Color(0xFFFFB300) : Colors.grey.shade800,
-                      courses: historyCourses,
-                      progressMap: progressMap,
-                      isBranchUnlocked: areAdvancedBranchesUnlocked,
-                      isAdmin: isAdmin,
-                    ),
-                    const SizedBox(height: 48),*/
-
                     //branch - liturgy
                     _buildBranchSection(
                       context: context,
@@ -195,6 +180,23 @@ class PathScreen extends StatelessWidget {
                       icon: Icons.local_fire_department,
                       branchColor: areAdvancedBranchesUnlocked ? const Color(0xFFFFB300) : Colors.grey.shade800,
                       courses: liturgyCourses,
+                      progressMap: progressMap,
+                      isBranchUnlocked: areAdvancedBranchesUnlocked,
+                      isAdmin: isAdmin,
+                    ),
+                    const SizedBox(height: 24),
+
+                    
+                    // branch - guide to the Mass
+                    _buildBranchSection(
+                      context: context,
+                      title: 'Gałąź - Przewodnik po Mszy Świętej',
+                      description: areAdvancedBranchesUnlocked
+                          ? 'Opis gałęzi.'
+                          : 'Zablokowane. Ukończono $completedTrunkLessons/$requiredLessons podstaw.',
+                      icon: Icons.local_fire_department,
+                      branchColor: areAdvancedBranchesUnlocked ? const Color(0xFFFFB300) : Colors.grey.shade800,
+                      courses: guideMassCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedBranchesUnlocked,
                       isAdmin: isAdmin,
