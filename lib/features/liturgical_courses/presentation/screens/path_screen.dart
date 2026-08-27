@@ -72,9 +72,6 @@ class PathScreen extends StatelessWidget {
           courses.sort((a, b) => a.order.compareTo(b.order));
 
           final trunkCourses = courses.where((c) => c.category == 'trunk').toList();
-          //final massCourses = courses.where((c) => c.category == 'mass').toList();
-          //final placeCourses = courses.where((c) => c.category == 'place').toList();
-          //final historyCourses = courses.where((c) => c.category == 'history').toList();
           final liturgyCourses = courses.where((c) => c.category == 'liturgy').toList();
           final guideMassCourses = courses.where((c) => c.category == 'guide').toList();
 

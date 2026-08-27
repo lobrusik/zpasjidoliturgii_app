@@ -35,6 +35,24 @@ class CourseDetailsScreen extends StatelessWidget {
           title: Text(courseTitle),
           backgroundColor: theme.scaffoldBackgroundColor,
           elevation: 0,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.help_outline),
+              tooltip: 'Instrukcja',
+              onPressed: () {
+                showInstructionDialog(
+                  context,
+                  'Jak zaliczyć tę lekcję?',
+                  'KROK PO KROKU:\n\n'
+                  '1. Kliknij duży przycisk "Rozpocznij lekcję" na środku ekranu.\n\n'
+                  '2. Ekran zmieni się w prezentację. Aby przejść do kolejnej strony, po prostu klikaj przyciski "Dalej" lub "Wstecz".\n\n'
+                  '3. Uważnie objejrzyj lekcję i przeczytaj umieszczony pod filmikiem tekst. Możesz również zajrzeć do źródeł pomocniczych, podanych na 1 slajdzie lub wstępie do zadań. Robienie notatek - wskazane!.\n\n'
+                  '4. W trakcie prezentacji trafisz na zadania i minigry. Przeczytaj polecenie na ekranie i rozwiąż je poprawnie.\n\n'
+                  '5. Przejdź do samego końca prezentacji. Gdy wykonasz wszystkie zadania, lekcja zaliczy się automatycznie, a Ty będziesz bliżej do uzyskania osiągnicia.',
+                );
+              },
+            ),
+          ],
         ),
         body: FutureBuilder<DocumentSnapshot>(
           future: FirebaseFirestore.instance.collection('interactive_lessons').doc(courseId).get(),
@@ -110,6 +128,31 @@ class CourseDetailsScreen extends StatelessWidget {
 
     // ALL OTHER BRANCHES
     return Scaffold(
+      appBar: AppBar(
+        title: Text(courseTitle),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            tooltip: 'Instrukcja do lekcji',
+            onPressed: () {
+              showInstructionDialog(
+                context,
+                'Co musisz tutaj zrobić?',
+                'Każda taka lekcja składa się z 3 prostych części:\n\n'
+                '1. ZOBACZ (Opcjonalnie)\n'
+                'Jeśli na samej górze widzisz okienko wideo, kliknij w nie, aby obejrzeć film wprowadzający.\n\n'
+                '2. ZROZUM\n'
+                'Przewiń ekran w dół i przeczytaj tekst lekcji. Zrób to uważnie – to właśnie z tego tekstu będzie test na końcu!\n\n'
+                '3. SPRAWDŹ SIĘ (Wymagane)\n'
+                'Zjedź na sam dół ekranu. Znajdziesz tam quiz (zaznaczanie poprawnych odpowiedzi) lub układankę (przeciąganie kafelków). Rozwiąż to zadanie.\n\n'
+                'JAK UZYSKAĆ ZALICZYCZENIE?\n'
+                'Gdy bezbłędnie wykonasz zadanie, na ekranie pojawi się wielki zielony napis "Brawo!", a system sam odblokuje Ci kolejną lekcję w drzewku.',);
+            },
+          ),
+        ],
+      ),
       body: BlocBuilder<StudyPlanBloc, StudyPlanState>(
         builder: (context, state) {
           if (state is StudyPlanLoading) return const Center(child: CircularProgressIndicator());
@@ -151,27 +194,21 @@ class CourseDetailsScreen extends StatelessWidget {
                   MarkdownBody(
                     data: plan.liturgicalContent,
                     styleSheet: MarkdownStyleSheet(
-                      // Main text (paragraphs)
                       p: theme.textTheme.bodyLarge?.copyWith(
                         color: theme.colorScheme.onSurface,
                         height: 1.6,
                       ),
-                      // Bold
                       strong: TextStyle(
                         fontWeight: FontWeight.bold, 
                         color: theme.colorScheme.onSurface,
                       ),
-                      // Headings
                       h1: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                       h2: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                       h3: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                      // Dots in List
                       listBullet: TextStyle(color: theme.colorScheme.primary, fontSize: 18),
                     ),
                   ),
-                  //const SizedBox(height: 24),
 
-                  //Creating a clickable link
                   if (plan.textMaterials.trim().isNotEmpty) ... [
                     const SizedBox(height: 24),
                     GestureDetector(
@@ -184,8 +221,8 @@ class CourseDetailsScreen extends StatelessWidget {
                         } catch (e){
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Błąd: Nie można otworzyć strony. Upewnij się, że przeglądarka nie blokuje wyskakujących okienek.', style: const TextStyle(color: Colors.white)), 
+                              const SnackBar(
+                                content: Text('Błąd: Nie można otworzyć strony. Upewnij się, że przeglądarka nie blokuje wyskakujących okienek.', style: TextStyle(color: Colors.white)), 
                                 backgroundColor: Colors.red,
                               ),
                             );
@@ -328,4 +365,60 @@ class CourseDetailsScreen extends StatelessWidget {
        label: const Text('Oznacz jako przeczytane'),
      );
   }
+}
+
+void showInstructionDialog(BuildContext context, String title, String instructionText) {
+  showDialog(
+    context: context,
+    barrierDismissible: true, 
+    builder: (BuildContext context) {
+      return Dialog(
+        backgroundColor: const Color(0xFF1F242D), 
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min, 
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.info_outline, color: Colors.blueAccent, size: 28),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Text(
+                    instructionText,
+                    style: TextStyle(color: Colors.grey.shade300, fontSize: 15, height: 1.5),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Zrozumiałem', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }
