@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../features/monetization/presentation/widgets/premium_offer_dialog.dart';
+import '../features/monetization/presentation/widgets/smart_ad_banner.dart';
 
 class MainWrapper extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -49,17 +50,7 @@ body: Column(
             ),
           ),
 
-          Container(
-            height: 50,
-            width: double.infinity,
-            color: Colors.white, 
-            child: const Center(
-              child: Text(
-                'Reklama Google (Baner AdMob)',
-                style: TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
+          const SmartAdBanner(),
         ],
       ),
       
