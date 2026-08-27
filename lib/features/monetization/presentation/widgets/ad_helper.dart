@@ -4,7 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdHelper {
-  static const String _interstitialAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
+  static const String bannerAdUnitId = 'ca-app-pub-5441445790355006/1579097517'; //small banner
+  static const String _interstitialAdUnitId = 'ca-app-pub-5441445790355006/2836338866';//big banner
 
   static Future<void> showInterstitialAd(BuildContext context, {required VoidCallback onComplete}) async {
     final user = FirebaseAuth.instance.currentUser;

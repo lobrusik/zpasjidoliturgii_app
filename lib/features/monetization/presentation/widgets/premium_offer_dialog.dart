@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 class PremiumOfferDialog extends StatefulWidget {
   const PremiumOfferDialog({super.key});
@@ -22,9 +24,14 @@ class _PremiumOfferDialogState extends State<PremiumOfferDialog> {
   Future<void> _buyAdFreeMonth() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Musisz być zalogowany, aby dokonać zakupu.'), backgroundColor: Colors.red),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Musisz być zalogowany, aby dokonać zakupu.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
       return;
     }
 
@@ -33,26 +40,62 @@ class _PremiumOfferDialogState extends State<PremiumOfferDialog> {
     });
 
     try {
-      final expirationDate = DateTime.now().add(const Duration(days: 30));
+      Offerings offerings = await Purchases.getOfferings();
 
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-        'adsFreeUntil': Timestamp.fromDate(expirationDate),
-      }, SetOptions(merge: true));
+      if (offerings.current == null || offerings.current!.availablePackages.isEmpty) {
+        throw 'Brak dostępnych ofert subskrypcji w sklepie. Sprawdź konfigurację w RevenueCat.';
+      }
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Dziękujemy! Reklamy zostały ukryte na 30 dni. 🎉'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 4),
-          ),
-        );
-        Navigator.of(context).pop();
+      Package packageToBuy = offerings.current!.availablePackages.first;
+
+      PurchaseResult purchaseResult = await Purchases.purchase(
+        PurchaseParams.package(packageToBuy),
+      );
+
+      CustomerInfo customerInfo = purchaseResult.customerInfo;
+
+      final entitlement = customerInfo.entitlements.all['premium'];
+      bool isPro = entitlement != null && entitlement.isActive;
+
+      if (isPro) {
+        final expirationDate = DateTime.now().add(const Duration(days: 30));
+
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'adsFreeUntil': Timestamp.fromDate(expirationDate),
+        }, SetOptions(merge: true));
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Dziękujemy! Reklamy zostały usunięte. 🎉'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 4),
+            ),
+          );
+          Navigator.of(context).pop();
+        }
+      }
+    } on PlatformException catch (e) {
+      var errorCode = PurchasesErrorHelper.getErrorCode(e);
+      if (errorCode == PurchasesErrorCode.purchaseCancelledError) {
+        debugPrint('Użytkownik anulował płatność.');
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Wystąpił błąd płatności: ${e.message}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Wystąpił błąd: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text('Wystąpił błąd: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
@@ -143,16 +186,15 @@ class _PremiumOfferDialogState extends State<PremiumOfferDialog> {
                 ),
                 onPressed: _isLoading ? null : () async {
                   await _buyAdFreeMonth();
-                  
                 },
                 child: _isLoading 
                     ? const SizedBox(
                         height: 20, 
                         width: 20, 
-                        child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2)
+                        child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2),
                       )
                     : const Text(
-                        'Usuń reklamy (TEST)',
+                        'Usuń reklamy',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
               ),

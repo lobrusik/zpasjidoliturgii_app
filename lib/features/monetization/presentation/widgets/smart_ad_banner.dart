@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import 'ad_helper.dart';
+
 class SmartAdBanner extends StatelessWidget {
   const SmartAdBanner({super.key});
 
@@ -43,8 +45,6 @@ class _RealBannerAdState extends State<_RealBannerAd> {
   BannerAd? _bannerAd;
   bool _isLoaded = false;
 
-  final String _testAdUnitId = 'ca-app-pub-3940256099942544/6300978111';
-
   @override
   void initState() {
     super.initState();
@@ -53,7 +53,7 @@ class _RealBannerAdState extends State<_RealBannerAd> {
 
   void _loadAd() {
     _bannerAd = BannerAd(
-      adUnitId: _testAdUnitId,
+      adUnitId: AdHelper.bannerAdUnitId,
       request: const AdRequest(),
       size: AdSize.banner,
       listener: BannerAdListener(

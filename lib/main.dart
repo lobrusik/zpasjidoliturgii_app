@@ -14,7 +14,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/foundation.dart';
 
-
+import 'package:purchases_flutter/purchases_flutter.dart';
+import 'dart:io' show Platform;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +27,11 @@ void main() async {
   );
 
   await MobileAds.instance.initialize();
+  if (Platform.isAndroid) {
+    await Purchases.configure(PurchasesConfiguration('goog_eNzvAdoXecUbQnyFJzAcRNXcZHn'));
+  } else if (Platform.isIOS) {
+    await Purchases.configure(PurchasesConfiguration('KLUCZ_API_IOS_TUTAJ'));
+  }
 
   FirebaseAuth.instance.setSettings(appVerificationDisabledForTesting: true);
 
