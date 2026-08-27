@@ -466,7 +466,7 @@ class PathScreen extends StatelessWidget {
                       description: areAdvancedCollectionUnlocked
                           ? 'Duchowość a służba.'
                           : 'Zablokowane. Ukończono $completedCollectionTrunkLessons/$requiredCollectionLessons podstaw.',
-                      icon: Icons.account_balance,
+                      icon: Icons.handshake,
                       branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
                       courses: collectionSoulCourses,
                       progressMap: progressMap,
@@ -482,7 +482,7 @@ class PathScreen extends StatelessWidget {
                       description: areAdvancedCollectionUnlocked
                           ? 'Skąd się wzięli ministranci?'
                           : 'Zablokowane. Ukończono $completedCollectionTrunkLessons/$requiredCollectionLessons podstaw.',
-                      icon: Icons.handshake,
+                      icon: Icons.account_balance,
                       branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
                       courses: collectionHistoryCourses,
                       progressMap: progressMap,
