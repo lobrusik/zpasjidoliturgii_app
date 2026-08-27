@@ -25,6 +25,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  await MobileAds.instance.initialize();
+
   FirebaseAuth.instance.setSettings(appVerificationDisabledForTesting: true);
 
   if (!kIsWeb) {
