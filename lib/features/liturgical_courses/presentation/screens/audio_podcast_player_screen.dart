@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
+import '../../../monetization/presentation/widgets/ad_helper.dart';
+
 class AudioPodcastPlayerScreen extends StatefulWidget {
   final String audioUrl;
   final String title;
@@ -52,8 +54,14 @@ class _AudioPodcastPlayerScreenState extends State<AudioPodcastPlayerScreen> {
         if (mounted) {
           setState(() {
             _isPlaying = false;
-            _currentPosition = 0.0; // Reset po zakończeniu
+            _currentPosition = 0.0; 
           });
+          
+          AdHelper.showInterstitialAd(
+            context,
+            onComplete: () {
+            },
+          );
         }
         _stopTimer();
       }

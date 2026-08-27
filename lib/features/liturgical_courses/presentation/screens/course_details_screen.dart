@@ -14,6 +14,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../data/models/interactive_lesson_model.dart';
 import 'interactive_lesson_screen.dart';
 
+import '../../../monetization/presentation/widgets/ad_helper.dart';
+
 class CourseDetailsScreen extends StatelessWidget {
   final String courseId;
   final String courseTitle;
@@ -339,7 +341,14 @@ class CourseDetailsScreen extends StatelessWidget {
           const Text('Ukończyłeś ten etap.', style: TextStyle(color: Colors.grey)),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () => context.pop(),
+            onPressed: () {
+              AdHelper.showInterstitialAd(
+                context,
+                onComplete: () {
+                  context.pop();
+                },
+              );
+            },
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2E7D32), minimumSize: const Size(double.infinity, 50)),
             child: const Text('Wróć do mapy kursów'),
           ),

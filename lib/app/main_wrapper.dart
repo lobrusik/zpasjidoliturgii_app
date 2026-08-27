@@ -49,17 +49,17 @@ body: Column(
             ),
           ),
 
-          // Container(
-          //   height: 50,
-          //   width: double.infinity,
-          //   color: Colors.white, 
-          //   child: const Center(
-          //     child: Text(
-          //       'Reklama Google (Baner AdMob)',
-          //       style: TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold),
-          //     ),
-          //   ),
-          // ),
+          Container(
+            height: 50,
+            width: double.infinity,
+            color: Colors.white, 
+            child: const Center(
+              child: Text(
+                'Reklama Google (Baner AdMob)',
+                style: TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
         ],
       ),
       

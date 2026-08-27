@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class PremiumOfferDialog extends StatelessWidget {
+class PremiumOfferDialog extends StatefulWidget {
   const PremiumOfferDialog({super.key});
 
   static void show(BuildContext context) {
@@ -8,6 +10,58 @@ class PremiumOfferDialog extends StatelessWidget {
       context: context,
       builder: (context) => const PremiumOfferDialog(),
     );
+  }
+
+  @override
+  State<PremiumOfferDialog> createState() => _PremiumOfferDialogState();
+}
+
+class _PremiumOfferDialogState extends State<PremiumOfferDialog> {
+  bool _isLoading = false;
+
+  Future<void> _buyAdFreeMonth() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Musisz być zalogowany, aby dokonać zakupu.'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final expirationDate = DateTime.now().add(const Duration(days: 30));
+
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'adsFreeUntil': Timestamp.fromDate(expirationDate),
+      }, SetOptions(merge: true));
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Dziękujemy! Reklamy zostały ukryte na 30 dni. 🎉'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 4),
+          ),
+        );
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Wystąpił błąd: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -51,7 +105,6 @@ class PremiumOfferDialog extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Cena
             Container(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
               decoration: BoxDecoration(
@@ -88,24 +141,27 @@ class PremiumOfferDialog extends StatelessWidget {
                   ),
                   elevation: 0,
                 ),
-                onPressed: () {
-                  // HERE IN THE FUTURE, WE'LL INTEGRATE REVENUECAT (Google Play Payments)
-                  Navigator.pop(context); // Close window
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Funkcja płatności zostanie wkrótce podłączona!')),
-                  );
+                onPressed: _isLoading ? null : () async {
+                  await _buyAdFreeMonth();
+                  
                 },
-                child: const Text(
-                  'Usuń reklamy',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+                child: _isLoading 
+                    ? const SizedBox(
+                        height: 20, 
+                        width: 20, 
+                        child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2)
+                      )
+                    : const Text(
+                        'Usuń reklamy (TEST)',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
               ),
             ),
             const SizedBox(height: 12),
 
             // No, thanks button
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: _isLoading ? null : () => Navigator.pop(context),
               child: const Text(
                 'Nie, dziękuję, zostaję przy darmowej wersji',
                 style: TextStyle(color: Colors.grey, fontSize: 12),
