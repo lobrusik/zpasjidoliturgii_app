@@ -1,70 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdHelper {
+  static const String _interstitialAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
+
   static Future<void> showInterstitialAd(BuildContext context, {required VoidCallback onComplete}) async {
     final user = FirebaseAuth.instance.currentUser;
     
-    if (user == null) {
-      _showAdMock(context, onComplete);
-      return;
-    }
+    if (user != null) {
+      try {
+        final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+        if (doc.exists) {
+          final data = doc.data() as Map<String, dynamic>;
+          final Timestamp? adsFreeUntil = data['adsFreeUntil'];
 
-    try {
-      final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-      if (doc.exists) {
-        final data = doc.data() as Map<String, dynamic>;
-        final Timestamp? adsFreeUntil = data['adsFreeUntil'];
-
-        if (adsFreeUntil != null && adsFreeUntil.toDate().isAfter(DateTime.now())) {
-          onComplete();
-          return;
+          if (adsFreeUntil != null && adsFreeUntil.toDate().isAfter(DateTime.now())) {
+            onComplete(); 
+            return;
+          }
         }
+      } catch (e) {
+        debugPrint('Błąd sprawdzania statusu premium: $e');
       }
-      
-      if (context.mounted) _showAdMock(context, onComplete);
-      
-    } catch (e) {
-      onComplete();
     }
+
+    _loadAndShowAd(onComplete);
   }
 
-  static void _showAdMock(BuildContext context, VoidCallback onComplete) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.black,
-          insetPadding: EdgeInsets.zero,
-          child: SizedBox(
-            width: double.infinity,
-            height: double.infinity,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                const Text(
-                  'REKLAMA\n(Tu w przyszłości będzie wideo\nlub duży baner AdMob)',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                Positioned(
-                  top: 40,
-                  right: 20,
-                  child: IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white, size: 36),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      onComplete();
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+  static void _loadAndShowAd(VoidCallback onComplete) {
+    InterstitialAd.load(
+      adUnitId: _interstitialAdUnitId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (InterstitialAd ad) {
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (InterstitialAd ad) {
+              ad.dispose();
+              onComplete();
+            },
+            onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+              ad.dispose();
+              onComplete();
+            },
+          );
+          
+          ad.show();
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          debugPrint('Błąd ładowania reklamy pełnoekranowej: ${error.message}');
+          onComplete(); 
+        },
+      ),
     );
   }
 }
