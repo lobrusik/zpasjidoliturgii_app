@@ -20,10 +20,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await initializeDateFormatting('pl_PL', null);
-
+  
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  FirebaseAuth.instance.setSettings(appVerificationDisabledForTesting: true);
 
   if (!kIsWeb) {
     await MobileAds.instance.initialize();

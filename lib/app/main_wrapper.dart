@@ -48,20 +48,18 @@ body: Column(
               child: navigationShell,
             ),
           ),
-          
-          // 2. ZAŚLEPKA REKLAMY (Baner na dole)
-          // Zniknie stąd, gdy podepniemy logikę (isPremium == true)
-          Container(
-            height: 50, // Standardowa wysokość banera AdMob
-            width: double.infinity,
-            color: Colors.white, // Jasne tło, by odróżnić reklamę od ciemnej aplikacji
-            child: const Center(
-              child: Text(
-                'Reklama Google (Baner AdMob)',
-                style: TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
+
+          // Container(
+          //   height: 50,
+          //   width: double.infinity,
+          //   color: Colors.white, 
+          //   child: const Center(
+          //     child: Text(
+          //       'Reklama Google (Baner AdMob)',
+          //       style: TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
       

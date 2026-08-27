@@ -18,6 +18,7 @@ import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/liturgical_courses/data/repositories/progress_repository.dart';
 import '../features/liturgical_courses/presentation/bloc/progress_bloc.dart';
 import '../features/liturgical_courses/presentation/screens/completorium_day_detail_screen.dart';
+import '../features/auth/presentation/screens/register_screen.dart';
 
 import 'package:zpasjidoliturgii/features/liturgical_courses/presentation/screens/podcast_screen.dart';
 
@@ -31,9 +32,12 @@ class AppRoutes {
     redirect: (context, state) {
       final isLoggedIn = FirebaseAuth.instance.currentUser != null;
       final isLoggingIn = state.matchedLocation == '/login';
+      final isRegistering = state.matchedLocation == '/register';
 
-      if (!isLoggedIn && !isLoggingIn) return '/login';
-      if (isLoggedIn && isLoggingIn) return '/home';
+      if (!isLoggedIn && !isLoggingIn && !isRegistering) return '/login';
+      
+      final isEmailVerified = FirebaseAuth.instance.currentUser?.emailVerified ?? false;
+      if (isLoggedIn && (isLoggingIn || isRegistering) && isEmailVerified) return '/home';
 
       return null;
     },
@@ -41,6 +45,11 @@ class AppRoutes {
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
+      ),
+
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterScreen(),
       ),
       
       GoRoute(

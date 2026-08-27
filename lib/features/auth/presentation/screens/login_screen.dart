@@ -27,6 +27,9 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await _authRepo.signInWithEmail(_emailController.text.trim(), _passwordController.text);
       
+      if (mounted){
+        Navigator.pushReplacementNamed(context, '/home');
+      }
     } on FirebaseAuthException catch (e) {
       String errorMsg = 'Wystąpił błąd.';
       if (e.code == 'email-not-verified') {

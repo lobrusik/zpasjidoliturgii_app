@@ -8,7 +8,7 @@ class PsalmsMenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Melodie Psalmów'),
+        title: const Text('Melodie Psalmów... i nie tylko'),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
@@ -40,6 +40,33 @@ class PsalmsMenuScreen extends StatelessWidget {
             subtitle: 'Psalmy na okres zwykły',
             icon: Icons.calendar_today,
             category: 'ordinary',
+          ),
+
+          //SEQUENCES
+          _buildPeriodCard(
+            context,
+            title: 'Sekwencje',
+            subtitle: 'Melodie sekwencji',
+            icon: Icons.local_attraction,
+            category: 'sequences',
+          ),
+
+          //ALLLELUJA
+          _buildPeriodCard(
+            context,
+            title: 'Alleluja',
+            subtitle: 'Melodie aklamacji „Alleluja”',
+            icon: Icons.insert_emoticon,
+            category: 'alleluja',
+          ),
+
+          //TRIDUUM
+          _buildPeriodCard(
+            context,
+            title: 'Triduum',
+            subtitle: 'Melodie na Triduum Paschalne',
+            icon: Icons.cloud,
+            category: 'triduum',
           ),
         ],
       ),

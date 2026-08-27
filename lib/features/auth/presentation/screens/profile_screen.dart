@@ -176,7 +176,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // Function that draws a square statistics tile
+// Function that draws a square statistics tile
   Widget _buildStatCard(String title, int count, IconData icon, Color iconColor, ThemeData theme) {
     return Card(
       elevation: 2,
@@ -186,22 +186,32 @@ class ProfileScreen extends StatelessWidget {
         side: BorderSide(color: theme.colorScheme.outline.withOpacity(0.2)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 12.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(icon, size: 36, color: iconColor),
-            const Spacer(),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            Icon(icon, size: 32, color: iconColor),
+            Expanded(
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 13, 
+                      fontWeight: FontWeight.w500, 
+                      height: 1.1,
+                    ),
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(height: 8),
+            
             Text(
               '$count',
               style: TextStyle(
-                fontSize: 28, 
+                fontSize: 24, 
                 fontWeight: FontWeight.bold, 
                 color: iconColor,
               ),

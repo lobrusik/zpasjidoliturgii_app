@@ -12,10 +12,16 @@ class AuthRepository {
     UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
       email: email, 
       password: password,
+    ).timeout(
+      const Duration(seconds: 10),
+      onTimeout: () => throw Exception('Błąd: Przekroczono czas oczekiwania na rejestrację (Auth).'),
     );
 
     if (userCredential.user != null && !userCredential.user!.emailVerified) {
-      await userCredential.user!.sendEmailVerification();
+      await userCredential.user!.sendEmailVerification().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () => throw Exception('Błąd: Przekroczono czas oczekiwania na wysłanie e-maila.'),
+      );
     }
 
     if (userCredential.user != null) {
@@ -25,8 +31,12 @@ class AuthRepository {
         'completoriumStreak': 0, 
         'lastCompletoriumDate': null,
         'isAdmin': false,
-      });
+      }).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => throw Exception('Błąd: Przekroczono czas zapisu do bazy danych (Firestore). Sprawdź połączenie z internetem!'),
+      );
     }
+    await _auth.signOut();
 
     return userCredential;
   }

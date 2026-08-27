@@ -25,16 +25,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _registerUser() async {
     if (!_formKey.currentState!.validate()) return;
 
+    print('--- 1. START REJESTRACJI ---');
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
+      print('--- 2. WYSYŁAM ZAPYTANIE DO FIREBASE ---'); 
       await _authRepo.signUpWithEmail(
         _emailController.text.trim(),
         _passwordController.text,
       );
+      
+      print('--- 3. REJESTRACJA I ZAPIS W BAZIE SUKCES! ---');
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -42,12 +47,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
             content: Text('Konto utworzone! Sprawdź e-mail, aby kliknąć w link aktywacyjny.'),
             backgroundColor: Colors.green,
             duration: Duration(seconds: 5),
-            ),
+          ),
         );
-        Navigator.of(context).pop();
+        if (Navigator.canPop(context)) {
+          Navigator.of(context).pop();
+        }
       }
       
     } on FirebaseAuthException catch (e) {
+      print('--- 4. ZŁAPANO BŁĄD FIREBASE: ${e.code} ---');
       setState(() {
         if (e.code == 'weak-password') {
           _errorMessage = 'Podane hasło jest zbyt słabe.';
@@ -58,10 +66,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         }
       });
     } catch (e) {
+       print('--- 5. ZŁAPANO INNY BŁĄD: $e ---'); 
        setState(() {
          _errorMessage = 'Wystąpił błąd: $e';
        });
     } finally {
+      print('--- 6. FINALLY: WYŁĄCZAM ŁADOWANIE ---');
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -130,7 +140,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   TextFormField(
                     controller: _passwordController,
-                    obscureText: true,
+                    obscureText: _obscurePassword,
                     decoration: InputDecoration(
                       labelText: 'Hasło',
                       border: OutlineInputBorder(),
@@ -158,7 +168,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   TextFormField(
                     controller: _confirmPasswordController,
-                    obscureText: true,
+                    obscureText: _obscureConfirmPassword,
                     decoration: InputDecoration(
                       labelText: 'Powtórz hasło',
                       border: OutlineInputBorder(),

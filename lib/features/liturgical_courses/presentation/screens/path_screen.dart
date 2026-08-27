@@ -378,7 +378,8 @@ class PathScreen extends StatelessWidget {
           final collectionCourses = courses.where((c) => c.category == 'collection_trunk').toList();
           final collectionBibleCourses = courses.where((c) => c.category == 'collection_bible').toList();
           final collectionSoulCourses = courses.where((c) => c.category == 'collection_soul').toList();
-          final collectionTriduumCourses = courses.where((c) => c.category == 'collection_triduum').toList();
+          final collectionHistoryCourses = courses.where((c) => c.category == 'collection_history').toList();
+          //final collectionTriduumCourses = courses.where((c) => c.category == 'collection_triduum').toList();
           
 
           return StreamBuilder<DocumentSnapshot>(
@@ -465,7 +466,7 @@ class PathScreen extends StatelessWidget {
                       description: areAdvancedCollectionUnlocked
                           ? 'Duchowość a służba.'
                           : 'Zablokowane. Ukończono $completedCollectionTrunkLessons/$requiredCollectionLessons podstaw.',
-                      icon: Icons.handshake,
+                      icon: Icons.account_balance,
                       branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
                       courses: collectionSoulCourses,
                       progressMap: progressMap,
@@ -474,20 +475,36 @@ class PathScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 48),
 
-                    //  COLLECTION BRANCH - Triduum
+                    //  COLLECTION BRANCH - The History of Altar Servers
                     _buildBranchSection(
                       context: context,
-                      title: 'Gałąź — Triduum Paschalne (bonus)',
+                      title: 'Gałąź — Historia ministrantury',
                       description: areAdvancedCollectionUnlocked
-                          ? 'Kompleksowe przygotowanie do najkrótszego okresu liturgicznego.'
+                          ? 'Skąd się wzięli ministranci?'
                           : 'Zablokowane. Ukończono $completedCollectionTrunkLessons/$requiredCollectionLessons podstaw.',
-                      icon: Icons.cloud,
+                      icon: Icons.handshake,
                       branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
-                      courses: collectionTriduumCourses,
+                      courses: collectionHistoryCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedCollectionUnlocked,
                       isAdmin: isAdmin,
                     ),
+                    const SizedBox(height: 48),
+
+                    //  COLLECTION BRANCH - Triduum - unlock 10.02.2027
+                    // _buildBranchSection(
+                    //   context: context,
+                    //   title: 'Gałąź — Triduum Paschalne (bonus)',
+                    //   description: areAdvancedCollectionUnlocked
+                    //       ? 'Kompleksowe przygotowanie do najkrótszego okresu liturgicznego.'
+                    //       : 'Zablokowane. Ukończono $completedCollectionTrunkLessons/$requiredCollectionLessons podstaw.',
+                    //   icon: Icons.cloud,
+                    //   branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
+                    //   courses: collectionTriduumCourses,
+                    //   progressMap: progressMap,
+                    //   isBranchUnlocked: areAdvancedCollectionUnlocked,
+                    //   isAdmin: isAdmin,
+                    // ),
                     const SizedBox(height: 48),
                   ],
                 ),
