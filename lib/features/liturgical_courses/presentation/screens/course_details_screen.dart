@@ -14,8 +14,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../data/models/interactive_lesson_model.dart';
 import 'interactive_lesson_screen.dart';
 
-import '../../../monetization/presentation/widgets/ad_helper.dart';
-
 class CourseDetailsScreen extends StatelessWidget {
   final String courseId;
   final String courseTitle;
@@ -30,8 +28,8 @@ class CourseDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // ONLY FOR TRUNK_LITURGY
-    if (courseId.startsWith('trunk_liturgy_')) {
+    // INTERACTIVE LESSONS
+    if (courseId.startsWith('trunk_liturgy_') || courseId.startsWith('history_') || courseId.startsWith('reflection_') || courseId.startsWith('trunk_guide_')) {
       return Scaffold(
         appBar: AppBar(
           title: Text(courseTitle),
@@ -57,7 +55,10 @@ class CourseDetailsScreen extends StatelessWidget {
           ],
         ),
         body: FutureBuilder<DocumentSnapshot>(
-          future: FirebaseFirestore.instance.collection('interactive_lessons').doc(courseId).get(),
+          future: () {
+            print('🔍 POBIERAM Z INTERACTIVE_LESSONS DOKUMENT O ID: "$courseId"');
+            return FirebaseFirestore.instance.collection('interactive_lessons').doc(courseId).get();
+          }(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -83,7 +84,16 @@ class CourseDetailsScreen extends StatelessWidget {
                   children: [
                     const Icon(Icons.school, size: 80, color: Colors.amber),
                     const SizedBox(height: 24),
-                    Text('Szkoła Liturgii', style: theme.textTheme.headlineSmall?.copyWith(color: Colors.amber, fontWeight: FontWeight.bold)),
+                    Text(
+                      courseId.startsWith('history_') 
+                          ? 'Ruch Liturgiczny' 
+                          : (courseId.startsWith('reflection_') 
+                              ? 'Rozważania o liturgii' 
+                              : (courseId.startsWith('trunk_guide_') 
+                                  ? 'Przewodnik po Mszy Świętej' 
+                                  : 'Szkoła Liturgii')), 
+                      style: theme.textTheme.headlineSmall?.copyWith(color: Colors.amber, fontWeight: FontWeight.bold)
+                    ),
                     const SizedBox(height: 16),
                     Text(lesson.title, style: theme.textTheme.titleLarge, textAlign: TextAlign.center),
                     const SizedBox(height: 16),
@@ -93,6 +103,7 @@ class CourseDetailsScreen extends StatelessWidget {
                       style: TextStyle(color: Colors.grey, height: 1.5)
                     ),
                     const SizedBox(height: 48),
+
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.colorScheme.primary,
@@ -101,8 +112,7 @@ class CourseDetailsScreen extends StatelessWidget {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       onPressed: () {
-                        Navigator.push(
-                          context,
+                        Navigator.of(context, rootNavigator: true).push(
                           MaterialPageRoute(builder: (_) => InteractiveLessonScreen(lesson: lesson)),
                         ).then((isCompleted) {
                           if (isCompleted == true) {
@@ -342,13 +352,8 @@ class CourseDetailsScreen extends StatelessWidget {
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: () {
-              AdHelper.showInterstitialAd(
-                context,
-                onComplete: () {
-                  context.pop();
-                },
-              );
-            },
+              context.pop();
+              },
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2E7D32), minimumSize: const Size(double.infinity, 50)),
             child: const Text('Wróć do mapy kursów'),
           ),

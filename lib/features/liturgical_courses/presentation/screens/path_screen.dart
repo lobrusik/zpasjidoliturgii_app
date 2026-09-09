@@ -6,51 +6,66 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../bloc/courses_bloc.dart';
 import '../bloc/courses_state.dart';
 import 'psalms_menu_screen.dart';
+import 'timeline_screen.dart'; 
+// import '../../../monetization/presentation/widgets/ad_manager.dart'; 
 
-class PathScreen extends StatelessWidget {
+class PathScreen extends StatefulWidget {
   final int initialTabIndex;
 
   const PathScreen({
     super.key,
     this.initialTabIndex = 0,
   });
- 
+
+  @override
+  State<PathScreen> createState() => _PathScreenState();
+}
+
+class _PathScreenState extends State<PathScreen> {
+  
+  @override
+  void initState() {
+    super.initState();
+    //InterstitialAdManager.loadAd();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final userId = FirebaseAuth.instance.currentUser?.uid;
 
-    // Tabs Management
     return DefaultTabController(
-      key: ValueKey(initialTabIndex),
-      initialIndex: initialTabIndex,
-      length: 3, 
+      key: ValueKey(widget.initialTabIndex),
+      initialIndex: widget.initialTabIndex,
+      length: 5, 
       child: Scaffold(
         body: Column(
           children: [
-            // Tabs bar at the top of the screen
             Container(
               color: theme.scaffoldBackgroundColor,
               child: const TabBar(
+                isScrollable: true,
                 indicatorColor: Color(0xFF00965E),
                 labelColor: Color(0xFF00965E),
                 unselectedLabelColor: Colors.grey,
-                labelPadding: EdgeInsets.symmetric(horizontal: 12),
+                labelPadding: EdgeInsets.symmetric(horizontal: 16),
                 tabs: [
                   Tab(icon: Icon(Icons.menu_book), text: 'Liturgia'),
                   Tab(icon: Icon(Icons.music_note), text: 'Psałterz'),
                   Tab(icon: Icon(Icons.groups), text: 'E-zbiórka'),
+                  Tab(icon: Icon(Icons.history), text: 'Ruch liturgiczny'),
+                  Tab(icon: Icon(Icons.psychology), text: 'Rozważania'),
                 ],
               ),
             ),
-
-            // Tabs Contents
             Expanded(
               child: TabBarView(
                 children: [
-                  _buildLiturgyTree(context, theme, userId), //liturgical tree
-                  _buildMusicTree(context, theme, userId), // musical tree
-                  _buildCollectionTree(context, theme, userId), //e-zbiorka
+                  _buildLiturgyTree(context, theme, userId), 
+                  _buildMusicTree(context, theme, userId), 
+                  _buildCollectionTree(context, theme, userId), 
+                  _buildHistoryTree(context, theme, userId), 
+                  _buildReflectionsTree(context, theme, userId), 
                 ] 
               ),
             ),
@@ -60,7 +75,42 @@ class PathScreen extends StatelessWidget {
     );
   }
 
-  //LITURGICAL TREE
+  void _showLockedDialog(BuildContext context, String sectionName) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF2D3039),
+        title: const Text('Sekcja zablokowana', style: TextStyle(color: Colors.amber)),
+        content: Text(
+          'Aby odblokować moduł "$sectionName", musisz najpierw ukończyć WSZYSTKIE lekcje z Teologii Liturgii (główne drzewko)!',
+          style: const TextStyle(color: Colors.white70, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Rozumiem', style: TextStyle(color: Colors.amber)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool _checkIfTrunkCompleted(List<dynamic> trunkCourses, Map<String, dynamic> progressMap) {
+    if (trunkCourses.isEmpty) return false;
+    int totalTrunkLessons = trunkCourses.length;
+    int completedTrunkLessons = 0;
+    for (var course in trunkCourses) {
+      if (progressMap.containsKey(course.id)) {
+        final courseProgress = progressMap[course.id];
+        if (courseProgress is List && courseProgress.isNotEmpty) {
+          completedTrunkLessons++;
+        }
+      }
+    }
+    return completedTrunkLessons >= totalTrunkLessons;
+  }
+
+  // === 1. LITURGICAL TREE === //
   Widget _buildLiturgyTree(BuildContext context, ThemeData theme, String? userId) {
     return BlocBuilder<CoursesBloc, CoursesState>(
       builder: (context, state) {
@@ -73,7 +123,7 @@ class PathScreen extends StatelessWidget {
 
           final trunkCourses = courses.where((c) => c.category == 'trunk').toList();
           final liturgyCourses = courses.where((c) => c.category == 'liturgy').toList();
-          final guideMassCourses = courses.where((c) => c.category == 'guide').toList();
+          final guideMassCourses = courses.where((c) => c.category == 'trunk_guide').toList();
 
           return StreamBuilder<DocumentSnapshot>(
             stream: userId != null 
@@ -121,7 +171,6 @@ class PathScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 32),
 
-                    // TRUNK
                     _buildBranchSection(
                       context: context,
                       title: 'Teologia Liturgii',
@@ -135,44 +184,11 @@ class PathScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
 
-                    /* branch 1
-                    _buildBranchSection(
-                      context: context,
-                      title: 'Gałąź - Msza Święta krok oo kroku',
-                      description: areAdvancedBranchesUnlocked
-                          ? 'Opis gałęzi Mass.'
-                          : 'Zablokowane. Ukończono $completedTrunkLessons/$requiredLessons podstaw.',
-                      icon: Icons.local_fire_department,
-                      branchColor: areAdvancedBranchesUnlocked ? const Color(0xFFFFB300) : Colors.grey.shade800,
-                      courses: massCourses,
-                      progressMap: progressMap,
-                      isBranchUnlocked: areAdvancedBranchesUnlocked,
-                      isAdmin: isAdmin,
-                    ),
-                    const SizedBox(height: 24),*/
-
-                    /* branch 2
-                    _buildBranchSection(
-                      context: context,
-                      title: 'Gałąź — Przewodnik po miejscu świętym',
-                      description: areAdvancedBranchesUnlocked
-                          ? 'Opis gałęzi Place.'
-                          : 'Zablokowane. Ukończono $completedTrunkLessons/$requiredLessons podstaw.',
-                      icon: Icons.air,
-                      branchColor: areAdvancedBranchesUnlocked ? const Color(0xFFAB47BC) : Colors.grey.shade800,
-                      courses: placeCourses,
-                      progressMap: progressMap,
-                      isBranchUnlocked: areAdvancedBranchesUnlocked,
-                      isAdmin: isAdmin,
-                    ),
-                    const SizedBox(height: 24),*/
-
-                    //branch - liturgy
                     _buildBranchSection(
                       context: context,
                       title: 'Gałąź - Szkoła Liturgii',
                       description: areAdvancedBranchesUnlocked
-                          ? 'Chcemy tutaj zgłębiać poszczególne elementy z dziejów liturgii oraz z jej teologii, tak aby jeszcze głębiej w nią wniknąć.'
+                          ? 'Chcemy tutaj zgłębiać poszczególne elementy z dziejów liturgii.'
                           : 'Zablokowane. Ukończono $completedTrunkLessons/$requiredLessons podstaw.',
                       icon: Icons.local_fire_department,
                       branchColor: areAdvancedBranchesUnlocked ? const Color(0xFFFFB300) : Colors.grey.shade800,
@@ -183,13 +199,11 @@ class PathScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
 
-                    
-                    // branch - guide to the Mass
                     _buildBranchSection(
                       context: context,
                       title: 'Gałąź - Przewodnik po Mszy Świętej',
                       description: areAdvancedBranchesUnlocked
-                          ? 'Opis gałęzi.'
+                          ? 'Każdy element Mszy Świętej ma ogromne znaczeni - i właśnie je chcemy tu poznawać.'
                           : 'Zablokowane. Ukończono $completedTrunkLessons/$requiredLessons podstaw.',
                       icon: Icons.local_fire_department,
                       branchColor: areAdvancedBranchesUnlocked ? const Color(0xFFFFB300) : Colors.grey.shade800,
@@ -198,7 +212,6 @@ class PathScreen extends StatelessWidget {
                       isBranchUnlocked: areAdvancedBranchesUnlocked,
                       isAdmin: isAdmin,
                     ),
-                    const SizedBox(height: 24),
                   ],
                 ),
               );
@@ -210,7 +223,7 @@ class PathScreen extends StatelessWidget {
     );
   }
 
-  //MUSICAL TREE
+   // === 2. MUSICAL TREE === //
   Widget _buildMusicTree(BuildContext context, ThemeData theme, String? userId) {
     return BlocBuilder<CoursesBloc, CoursesState>(
       builder: (context, state) {
@@ -221,8 +234,9 @@ class PathScreen extends StatelessWidget {
           final courses = state.courses;
           courses.sort((a, b) => a.order.compareTo(b.order));
 
+          final trunkCourses = courses.where((c) => c.category == 'trunk').toList();
           final musicTrunkCourses = courses.where((c) => c.category == 'music_trunk').toList();
-          final musicAdvancedCourses = courses.where((c) => c.category == 'music_choir').toList(); // other categories
+          final musicAdvancedCourses = courses.where((c) => c.category == 'music_choir').toList();
 
           return StreamBuilder<DocumentSnapshot>(
             stream: userId != null 
@@ -232,6 +246,8 @@ class PathScreen extends StatelessWidget {
               final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
               final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
               final bool isAdmin = userData['isAdmin'] ?? false;
+
+              bool isMusicBranchesUnlocked = isAdmin || _checkIfTrunkCompleted(trunkCourses, progressMap);
 
               int completedMusicTrunkLessons = 0;
               for (var course in musicTrunkCourses) {
@@ -243,7 +259,6 @@ class PathScreen extends StatelessWidget {
                 }
               }
 
-              // 5 lesson - you can move on
               final int requiredMusicLessons = 5; 
               bool areAdvancedMusicUnlocked = completedMusicTrunkLessons >= requiredMusicLessons;
 
@@ -266,18 +281,19 @@ class PathScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Opanuj podstawy psałterzysty, by odblokować zaawansowane gałęzie.',
+                      'Nagrania psalmów są zawsze dostępne. Lekcje wymagają Teologii Liturgii.',
                       style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey.shade400),
                     ),
                     const SizedBox(height: 32),
 
                     GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
+                      onTap: () async {
+                        await Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const PsalmsMenuScreen(),
                           ),
                         );
+                        //if (mounted) InterstitialAdManager.showAd(() {});
                       },
                       child: Container(
                         padding: const EdgeInsets.all(20),
@@ -323,34 +339,63 @@ class PathScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 48),
 
-                    // MUSICAL TRUNK
-                    _buildBranchSection(
-                      context: context,
-                      title: 'Pień — Podstawy Psałterzysty',
-                      description: 'Rytm, nuty i wprowadzenie do śpiewu. Obowiązkowe.',
-                      icon: Icons.music_note,
-                      branchColor: const Color(0xFF2196F3),
-                      courses: musicTrunkCourses,
-                      progressMap: progressMap,
-                      isBranchUnlocked: true,
-                      isAdmin: isAdmin,
-                    ),
-                    const SizedBox(height: 24),
-
-                    //  MUSIC BRANCH
-                    _buildBranchSection(
-                      context: context,
-                      title: 'Gałąź — Tu będzie nazwa gałęzi',
-                      description: areAdvancedMusicUnlocked
-                          ? 'Tu będzie opis gałęzi.'
-                          : 'Zablokowane. Ukończono $completedMusicTrunkLessons/$requiredMusicLessons podstaw.',
-                      icon: Icons.record_voice_over,
-                      branchColor: areAdvancedMusicUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
-                      courses: musicAdvancedCourses,
-                      progressMap: progressMap,
-                      isBranchUnlocked: areAdvancedMusicUnlocked,
-                      isAdmin: isAdmin,
-                    ),
+                    if (!isMusicBranchesUnlocked) ...[
+                      GestureDetector(
+                        onTap: () => _showLockedDialog(context, 'Ścieżka Psałterzysty (Lekcje)'),
+                        child: Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade900,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
+                          ),
+                          child: Row(
+                            children: const [
+                              CircleAvatar(
+                                backgroundColor: Colors.white12,
+                                radius: 30,
+                                child: Icon(Icons.lock, color: Colors.redAccent, size: 32),
+                              ),
+                              SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Lekcje zablokowane', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                                    SizedBox(height: 6),
+                                    Text('Ukończ najpierw wszystkie lekcje z Teologii Liturgii.', style: TextStyle(fontSize: 13, color: Colors.white70)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ] else ...[
+                      _buildBranchSection(
+                        context: context,
+                        title: 'Pień — Podstawy Psałterzysty',
+                        description: 'Rytm, nuty i wprowadzenie do śpiewu. Obowiązkowe.',
+                        icon: Icons.music_note,
+                        branchColor: const Color(0xFF2196F3),
+                        courses: musicTrunkCourses,
+                        progressMap: progressMap,
+                        isBranchUnlocked: true,
+                        isAdmin: isAdmin,
+                      ),
+                    //   const SizedBox(height: 24),
+                    //   _buildBranchSection(
+                    //     context: context,
+                    //     title: 'Gałąź — Zaawansowane',
+                    //     description: areAdvancedMusicUnlocked ? 'Opis gałęzi.' : 'Zablokowane.',
+                    //     icon: Icons.record_voice_over,
+                    //     branchColor: areAdvancedMusicUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
+                    //     courses: musicAdvancedCourses,
+                    //     progressMap: progressMap,
+                    //     isBranchUnlocked: areAdvancedMusicUnlocked,
+                    //     isAdmin: isAdmin,
+                    //   ),
+                    ],
                     const SizedBox(height: 48),
                   ],
                 ),
@@ -363,7 +408,7 @@ class PathScreen extends StatelessWidget {
     );
   }
 
-  //E-ZBIÓRKA
+  // === 3. E-ZBIÓRKA === //
   Widget _buildCollectionTree(BuildContext context, ThemeData theme, String? userId) {
     return BlocBuilder<CoursesBloc, CoursesState>(
       builder: (context, state) {
@@ -372,14 +417,11 @@ class PathScreen extends StatelessWidget {
 
         if (state is CoursesLoaded) {
           final courses = state.courses;
-          courses.sort((a, b) => a.order.compareTo(b.order));
-
+          final trunkCourses = courses.where((c) => c.category == 'trunk').toList();
           final collectionCourses = courses.where((c) => c.category == 'collection_trunk').toList();
           final collectionBibleCourses = courses.where((c) => c.category == 'collection_bible').toList();
           final collectionSoulCourses = courses.where((c) => c.category == 'collection_soul').toList();
           final collectionHistoryCourses = courses.where((c) => c.category == 'collection_history').toList();
-          //final collectionTriduumCourses = courses.where((c) => c.category == 'collection_triduum').toList();
-          
 
           return StreamBuilder<DocumentSnapshot>(
             stream: userId != null 
@@ -389,6 +431,8 @@ class PathScreen extends StatelessWidget {
               final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
               final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
               final bool isAdmin = userData['isAdmin'] ?? false;
+
+              bool isUnlocked = isAdmin || _checkIfTrunkCompleted(trunkCourses, progressMap);
 
               int completedCollectionTrunkLessons = 0;
               for (var course in collectionCourses) {
@@ -400,7 +444,6 @@ class PathScreen extends StatelessWidget {
                 }
               }
 
-              // 4 lesson - you can move on
               final int requiredCollectionLessons = 4; 
               bool areAdvancedCollectionUnlocked = completedCollectionTrunkLessons >= requiredCollectionLessons;
 
@@ -423,88 +466,94 @@ class PathScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Formacja LSO, podział funkcji i spotkania online.',
-                      style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey.shade400),
+                      isUnlocked ? 'Formacja LSO i podział funkcji.' : '🔒 Zablokowane przez Teologię Liturgii.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: isUnlocked ? Colors.grey.shade400 : Colors.redAccent.shade100,
+                      ),
                     ),
                     const SizedBox(height: 32),
 
-                    //TRUNK
-                    _buildBranchSection(
-                      context: context,
-                      title: 'Podstawy liturgii',
-                      description: 'Obowiązkowe dla wszystkich',
-                      icon: Icons.groups,
-                      branchColor: const Color(0xFFFF9800),
-                      courses: collectionCourses,
-                      progressMap: progressMap,
-                      isBranchUnlocked: true,
-                      isAdmin: isAdmin,
-                    ),
-                    const SizedBox(height: 48),
-
-                    //  COLLECTION BRANCH - BIBLE
-                    _buildBranchSection(
-                      context: context,
-                      title: 'Gałąź — Wprowadzenie do Pisma Świętego',
-                      description: areAdvancedCollectionUnlocked
-                          ? 'Co wspólnego ma Pismo Święte z Eucharystią.'
-                          : 'Zablokowane. Ukończono $completedCollectionTrunkLessons/$requiredCollectionLessons podstaw.',
-                      icon: Icons.menu_book,
-                      branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
-                      courses: collectionBibleCourses,
-                      progressMap: progressMap,
-                      isBranchUnlocked: areAdvancedCollectionUnlocked,
-                      isAdmin: isAdmin,
-                    ),
-                    const SizedBox(height: 48),
-
-                    //  COLLECTION BRANCH - SOUL
-                    _buildBranchSection(
-                      context: context,
-                      title: 'Gałąź — Katecheza duchowościowa o liturgii',
-                      description: areAdvancedCollectionUnlocked
-                          ? 'Duchowość a służba.'
-                          : 'Zablokowane. Ukończono $completedCollectionTrunkLessons/$requiredCollectionLessons podstaw.',
-                      icon: Icons.handshake,
-                      branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
-                      courses: collectionSoulCourses,
-                      progressMap: progressMap,
-                      isBranchUnlocked: areAdvancedCollectionUnlocked,
-                      isAdmin: isAdmin,
-                    ),
-                    const SizedBox(height: 48),
-
-                    //  COLLECTION BRANCH - The History of Altar Servers
-                    _buildBranchSection(
-                      context: context,
-                      title: 'Gałąź — Historia ministrantury',
-                      description: areAdvancedCollectionUnlocked
-                          ? 'Skąd się wzięli ministranci?'
-                          : 'Zablokowane. Ukończono $completedCollectionTrunkLessons/$requiredCollectionLessons podstaw.',
-                      icon: Icons.account_balance,
-                      branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
-                      courses: collectionHistoryCourses,
-                      progressMap: progressMap,
-                      isBranchUnlocked: areAdvancedCollectionUnlocked,
-                      isAdmin: isAdmin,
-                    ),
-                    const SizedBox(height: 48),
-
-                    //  COLLECTION BRANCH - Triduum - unlock 10.02.2027
-                    // _buildBranchSection(
-                    //   context: context,
-                    //   title: 'Gałąź — Triduum Paschalne (bonus)',
-                    //   description: areAdvancedCollectionUnlocked
-                    //       ? 'Kompleksowe przygotowanie do najkrótszego okresu liturgicznego.'
-                    //       : 'Zablokowane. Ukończono $completedCollectionTrunkLessons/$requiredCollectionLessons podstaw.',
-                    //   icon: Icons.cloud,
-                    //   branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
-                    //   courses: collectionTriduumCourses,
-                    //   progressMap: progressMap,
-                    //   isBranchUnlocked: areAdvancedCollectionUnlocked,
-                    //   isAdmin: isAdmin,
-                    // ),
-                    const SizedBox(height: 48),
+                    if (!isUnlocked) ...[
+                      GestureDetector(
+                        onTap: () => _showLockedDialog(context, 'E-zbiórka'),
+                        child: Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade900,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
+                          ),
+                          child: Row(
+                            children: const [
+                              CircleAvatar(
+                                backgroundColor: Colors.white12,
+                                radius: 30,
+                                child: Icon(Icons.lock, color: Colors.redAccent, size: 32),
+                              ),
+                              SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Moduł zablokowany', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                                    SizedBox(height: 6),
+                                    Text('Ukończ najpierw wszystkie lekcje z Teologii Liturgii.', style: TextStyle(fontSize: 13, color: Colors.white70)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ] else ...[
+                      _buildBranchSection(
+                        context: context,
+                        title: 'Podstawy liturgii',
+                        description: 'Obowiązkowe dla wszystkich',
+                        icon: Icons.groups,
+                        branchColor: const Color(0xFFFF9800),
+                        courses: collectionCourses,
+                        progressMap: progressMap,
+                        isBranchUnlocked: true,
+                        isAdmin: isAdmin,
+                      ),
+                      const SizedBox(height: 48),
+                      _buildBranchSection(
+                        context: context,
+                        title: 'Gałąź — Wprowadzenie do Pisma Świętego',
+                        description: areAdvancedCollectionUnlocked ? 'Opis.' : 'Zablokowane.',
+                        icon: Icons.menu_book,
+                        branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
+                        courses: collectionBibleCourses,
+                        progressMap: progressMap,
+                        isBranchUnlocked: areAdvancedCollectionUnlocked,
+                        isAdmin: isAdmin,
+                      ),
+                      const SizedBox(height: 48),
+                      _buildBranchSection(
+                        context: context,
+                        title: 'Gałąź — Katecheza duchowościowa',
+                        description: areAdvancedCollectionUnlocked ? 'Opis.' : 'Zablokowane.',
+                        icon: Icons.handshake,
+                        branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
+                        courses: collectionSoulCourses,
+                        progressMap: progressMap,
+                        isBranchUnlocked: areAdvancedCollectionUnlocked,
+                        isAdmin: isAdmin,
+                      ),
+                      const SizedBox(height: 48),
+                      _buildBranchSection(
+                        context: context,
+                        title: 'Gałąź — Historia ministrantury',
+                        description: areAdvancedCollectionUnlocked ? 'Opis.' : 'Zablokowane.',
+                        icon: Icons.account_balance,
+                        branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
+                        courses: collectionHistoryCourses,
+                        progressMap: progressMap,
+                        isBranchUnlocked: areAdvancedCollectionUnlocked,
+                        isAdmin: isAdmin,
+                      ),
+                    ],
                   ],
                 ),
               );
@@ -515,8 +564,239 @@ class PathScreen extends StatelessWidget {
       },
     );
   }
+
+  // === 4. HISTORICAL TREE === //
+  Widget _buildHistoryTree(BuildContext context, ThemeData theme, String? userId) {
+    return BlocBuilder<CoursesBloc, CoursesState>(
+      builder: (context, state) {
+        if (state is CoursesLoading) return const Center(child: CircularProgressIndicator());
+        if (state is CoursesError) return Center(child: Text(state.message));
+
+        if (state is CoursesLoaded) {
+          final courses = state.courses;
+          final trunkCourses = courses.where((c) => c.category == 'trunk').toList();
+
+          return StreamBuilder<DocumentSnapshot>(
+            stream: userId != null 
+              ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
+              : const Stream.empty(),
+            builder: (context, snapshot) {
+              final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
+              final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
+              final bool isAdmin = userData['isAdmin'] ?? false;
+
+              bool isHistoryUnlocked = isAdmin || _checkIfTrunkCompleted(trunkCourses, progressMap);
+
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Text('📜', style: TextStyle(fontSize: 28)),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Ruch liturgiczny',
+                            style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Zanim dokonano reformy liturgicznej, jej idea rozwijała się przez wiele dekad...',
+                      style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey.shade400),
+                    ),
+                    const SizedBox(height: 32),
+
+                    GestureDetector(
+                      onTap: () async {
+                        if (!isHistoryUnlocked) {
+                          _showLockedDialog(context, 'Ruch liturgiczny (Oś czasu) - postacie');
+                          return;
+                        }
+
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const LiturgicalTimelineScreen(), 
+                          ),
+                        );
+                        //if (mounted) InterstitialAdManager.showAd(() {});
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: isHistoryUnlocked 
+                              ? [const Color(0xFF8D6E63), const Color(0xFF4E342E)]
+                              : [Colors.grey.shade800, Colors.grey.shade900],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 5)),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              backgroundColor: Colors.white24,
+                              radius: 30,
+                              child: Icon(
+                                isHistoryUnlocked ? Icons.timeline : Icons.lock, 
+                                color: Colors.white, 
+                                size: 32
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    isHistoryUnlocked ? 'Oś czasu' : 'Oś czasu (Zablokowane)',
+                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    isHistoryUnlocked 
+                                      ? 'Prześledź postacie odnowy liturgicznej\nod XIX wieku po dzisiejsze czasy.'
+                                      : 'Ukończ najpierw Teologię Liturgii, aby odblokować ten moduł.',
+                                    style: const TextStyle(fontSize: 13, color: Colors.white70),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              isHistoryUnlocked ? Icons.arrow_forward_ios : Icons.lock_outline, 
+                              color: Colors.white54
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  // === 5. REFLECTIONS TREE === //
+  Widget _buildReflectionsTree(BuildContext context, ThemeData theme, String? userId) {
+    return BlocBuilder<CoursesBloc, CoursesState>(
+      builder: (context, state) {
+        if (state is CoursesLoading) return const Center(child: CircularProgressIndicator());
+        if (state is CoursesError) return Center(child: Text(state.message));
+
+        if (state is CoursesLoaded) {
+          final courses = state.courses;
+          final trunkCourses = courses.where((c) => c.category == 'trunk').toList();
+          final reflectionCourses = courses.where((c) => c.category == 'reflection_trunk' || c.category == 'reflection').toList();
+
+          return StreamBuilder<DocumentSnapshot>(
+            stream: userId != null 
+              ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
+              : const Stream.empty(),
+            builder: (context, snapshot) {
+              final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
+              final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
+              final bool isAdmin = userData['isAdmin'] ?? false;
+
+              bool isUnlocked = isAdmin || _checkIfTrunkCompleted(trunkCourses, progressMap);
+
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Text('💡', style: TextStyle(fontSize: 28)),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Rozważania',
+                            style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      isUnlocked ? 'Głębsze refleksje duchowe i lekcje formacyjne.' : '🔒 Zablokowane. Wymagane ukończenie wszystkich lekcji z Teologii Liturgii.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: isUnlocked ? Colors.grey.shade400 : Colors.redAccent.shade100,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    if (!isUnlocked) ...[
+                      GestureDetector(
+                        onTap: () => _showLockedDialog(context, 'Rozważania'),
+                        child: Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade900,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
+                          ),
+                          child: Row(
+                            children: const [
+                              CircleAvatar(
+                                backgroundColor: Colors.white12,
+                                radius: 30,
+                                child: Icon(Icons.lock, color: Colors.redAccent, size: 32),
+                              ),
+                              SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Moduł zablokowany', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                                    SizedBox(height: 6),
+                                    Text('Ukończ wszystkie lekcje z Teologii Liturgii, aby odblokować ten materiał.', style: TextStyle(fontSize: 13, color: Colors.white70)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ] else ...[
+                      _buildBranchSection(
+                        context: context,
+                        title: 'Rozważania Duchowe',
+                        description: 'Interaktywne materiały formacyjne.',
+                        icon: Icons.psychology,
+                        branchColor: const Color(0xFF00965E),
+                        courses: reflectionCourses,
+                        progressMap: progressMap,
+                        isBranchUnlocked: true,
+                        isAdmin: isAdmin,
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            },
+          );
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+ 
   
-  //VIEW HELPERS
+  // === VIEW HELPERS === //
   Widget _buildBranchSection({
     required BuildContext context,
     required String title,
@@ -643,18 +923,23 @@ class PathScreen extends StatelessWidget {
           ),
         ),
         trailing: trailingWidget,
-        onTap: () {
+        
+        onTap: () async {
           if (isUnlocked) {
-            context.push('/courses/details/$courseId', extra: title);
-          } else {
+            await context.push('/courses/details/$courseId', extra: title);
+            
+          //   if (mounted) {
+          //     InterstitialAdManager.showAd(() {});
+          //   }
+          // } else {
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     const SnackBar(content: Text('Zablokowane. Opanuj wymagane podstawy!')),
+          //   );
+          // }
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Zablokowane. Opanuj wymagane podstawy!')),
-            );
-          }
         },
       ),
     );
   }
-  
-
 }

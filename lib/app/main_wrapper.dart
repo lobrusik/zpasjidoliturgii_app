@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../features/monetization/presentation/widgets/premium_offer_dialog.dart';
-import '../features/monetization/presentation/widgets/smart_ad_banner.dart';
 
 class MainWrapper extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -40,38 +39,34 @@ class MainWrapper extends StatelessWidget {
         ],
       ),
       
-body: Column(
-        children: [
-          // 1. Główna część aplikacji (zajmuje całą dostępną przestrzeń)
-          Expanded(
-            child: Container(
-              color: theme.scaffoldBackgroundColor,
-              child: navigationShell,
-            ),
-          ),
-
-          const SmartAdBanner(),
-        ],
+      body: Container(
+        color: theme.scaffoldBackgroundColor,
+        child: navigationShell,
       ),
-      
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: navigationShell.currentIndex,
-        onTap: (index) {
-          navigationShell.goBranch(
-            index,
-            initialLocation: index == navigationShell.currentIndex,
-          );
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Start'),
-          BottomNavigationBarItem(icon: Icon(Icons.account_tree_outlined), label: 'Ścieżka'),
-          BottomNavigationBarItem(icon: Icon(Icons.nightlight_outlined), label: 'Kompleta'),
-          BottomNavigationBarItem(icon: Icon(Icons.headset_mic_outlined), label: 'Podcast'),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          
+          BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            currentIndex: navigationShell.currentIndex,
+            onTap: (index) {
+              navigationShell.goBranch(
+                index,
+                initialLocation: index == navigationShell.currentIndex,
+              );
+            },
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Start'),
+              BottomNavigationBarItem(icon: Icon(Icons.account_tree_outlined), label: 'Ścieżka'),
+              BottomNavigationBarItem(icon: Icon(Icons.nightlight_outlined), label: 'Kompleta'),
+              BottomNavigationBarItem(icon: Icon(Icons.headset_mic_outlined), label: 'Podcast'),
+            ],
+            selectedItemColor: theme.colorScheme.primary,
+            unselectedItemColor: Colors.grey,
+            backgroundColor: theme.colorScheme.surface,
+          ),
         ],
-        selectedItemColor: theme.colorScheme.primary,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: theme.colorScheme.surface,
       ),
     );
   }

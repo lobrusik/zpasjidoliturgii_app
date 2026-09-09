@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'audio_podcast_player_screen.dart';
 
-class PodcastScreen extends StatelessWidget {
+// import '../../../monetization/presentation/widgets/ad_manager.dart'; 
+
+class PodcastScreen extends StatefulWidget {
   final String title;
   final String collectionName;
   final String? category;
@@ -15,15 +17,27 @@ class PodcastScreen extends StatelessWidget {
   });
 
   @override
+  State<PodcastScreen> createState() => _PodcastScreenState();
+}
+
+class _PodcastScreenState extends State<PodcastScreen> {
+  
+  @override
+  void initState() {
+    super.initState();
+    //InterstitialAdManager.loadAd();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Query query = FirebaseFirestore.instance.collection(collectionName);
-    if (category != null) {
-      query = query.where('category', isEqualTo: category);
+    Query query = FirebaseFirestore.instance.collection(widget.collectionName);
+    if (widget.category != null) {
+      query = query.where('category', isEqualTo: widget.category);
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(widget.title),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: query.snapshots(),
@@ -44,8 +58,9 @@ class PodcastScreen extends StatelessWidget {
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return Center(
               child: Text(
-                'Brak dostępnych nagrań w sekcji:\n$title',
-                style: TextStyle(color: Colors.white, fontSize: 16),
+                'Brak dostępnych nagrań w sekcji:\n${widget.title}',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+                textAlign: TextAlign.center,
               ),
             );
           }
@@ -67,7 +82,6 @@ class PodcastScreen extends StatelessWidget {
               final data = podcast[index].data() as Map<String, dynamic>;
               final itemTitle = data['title'] ?? 'Brak tytułu';
               final description = data['description'] ?? 'Brak opisu';
-
               final audioUrl = data['youtubeUrl'] ?? data['videoUrl'] ?? data['audioUrl'] ?? data['audoUrl'] ?? '';
 
               return Card(
@@ -100,9 +114,10 @@ class PodcastScreen extends StatelessWidget {
                     ),
                   ),
                   trailing: const Icon(Icons.play_circle_fill, color: Colors.white, size: 36),
-                  onTap: () {
+                  
+                  onTap: () async {
                     if (audioUrl.isNotEmpty) {
-                      Navigator.push(
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => AudioPodcastPlayerScreen(
@@ -111,11 +126,19 @@ class PodcastScreen extends StatelessWidget {
                           ),
                         ),
                       );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Brak linku do wideo')),
-                      );
-                    }
+                      
+                    //   if (mounted) {
+                    //     InterstitialAdManager.showAd(() {
+                    //     });
+                    //   }
+                      
+                    // } else {
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     const SnackBar(content: Text('Brak linku do wideo')),
+                    //   );
+                    // }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Brak linku do wideo')),
                   },
                 ),
               );

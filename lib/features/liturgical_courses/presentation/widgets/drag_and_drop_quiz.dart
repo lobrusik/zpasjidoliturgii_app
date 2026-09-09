@@ -19,6 +19,10 @@ class _DragAndDropQuizState extends State<DragAndDropQuiz> {
   late List<Map<String, dynamic>> remainingItems;
   Map<String, List<String>> matchedItems = {};
 
+  bool _isDragging = false;
+  bool _isAutoScrolling = false;
+  double _currentDragY = 0.0;
+
   @override
   void initState() {
     super.initState();
@@ -31,6 +35,33 @@ class _DragAndDropQuizState extends State<DragAndDropQuiz> {
     }
   }
 
+  void _startAutoScrollCheck() async {
+    if (_isAutoScrolling) return;
+    _isAutoScrolling = true;
+
+    while (_isDragging) {
+      if (!mounted) break;
+      
+      final scrollable = Scrollable.maybeOf(context);
+      if (scrollable != null) {
+        final position = scrollable.position;
+        final screenHeight = MediaQuery.of(context).size.height;
+        
+        const edgeSize = 150.0;
+        const scrollStep = 10.0;
+        
+        if (_currentDragY < edgeSize && position.pixels > position.minScrollExtent) {
+          position.moveTo((position.pixels - scrollStep).clamp(position.minScrollExtent, position.maxScrollExtent));
+        } else if (_currentDragY > screenHeight - edgeSize && position.pixels < position.maxScrollExtent) {
+          position.moveTo((position.pixels + scrollStep).clamp(position.minScrollExtent, position.maxScrollExtent));
+        }
+      }
+      await Future.delayed(const Duration(milliseconds: 20)); 
+    }
+    
+    _isAutoScrolling = false;
+  }
+
   void _checkCompletion() {
     if (remainingItems.isEmpty) {
       widget.onCompleted();
@@ -38,12 +69,10 @@ class _DragAndDropQuizState extends State<DragAndDropQuiz> {
   }
 
   bool _isItemValidForCategory(Map<String, dynamic> item, String category) {
-    // Sprawdzamy pole z wieloma kategoriami (jeśli istnieje)
     if (item.containsKey('correctCategories')) {
       final list = item['correctCategories'] as List;
       return list.contains(category);
     }
-    // Sprawdzamy standardowe pole z pojedynczą kategorią
     if (item.containsKey('correctCategory')) {
       return item['correctCategory'] == category;
     }
@@ -166,6 +195,18 @@ class _DragAndDropQuizState extends State<DragAndDropQuiz> {
 
     return Draggable<Map<String, dynamic>>(
       data: item,
+
+      onDragStarted: () {
+        _isDragging = true;
+        _startAutoScrollCheck();
+      },
+      onDragUpdate: (details) {
+        _currentDragY = details.globalPosition.dy;
+      },
+      onDragEnd: (details) {
+        _isDragging = false;
+      },
+
       feedback: Material(
         color: Colors.transparent,
         child: Container(

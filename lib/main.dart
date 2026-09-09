@@ -2,20 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:universal_html/html.dart';
 import 'app/theme.dart';
 import 'app/routes.dart';
 import 'dart:ui';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
+//import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'package:flutter/foundation.dart';
 import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:flutter/foundation.dart';
+//import 'package:flutter/foundation.dart';
 
 import 'package:purchases_flutter/purchases_flutter.dart';
-import 'dart:io' show Platform;
+import 'dart:io' as io;
+
+import 'app/settings_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,17 +28,19 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await MobileAds.instance.initialize();
-  if (Platform.isAndroid) {
-    await Purchases.configure(PurchasesConfiguration('goog_eNzvAdoXecUbQnyFJzAcRNXcZHn'));
-  } else if (Platform.isIOS) {
-    await Purchases.configure(PurchasesConfiguration('KLUCZ_API_IOS_TUTAJ'));
+  //await Purchases.setLogLevel(LogLevel.debug);
+  if (!kIsWeb) {
+    if (io.Platform.isAndroid) {
+      await Purchases.configure(PurchasesConfiguration('goog_eNzvAdoXecUbQnyFJzAcRNXcZHn'));
+    } else if (io.Platform.isIOS) {
+      await Purchases.configure(PurchasesConfiguration('KEY_API_IOS_HERE'));
+    }
+    await SubscriptionManager.checkSubscriptionStatus();
   }
 
   FirebaseAuth.instance.setSettings(appVerificationDisabledForTesting: true);
 
   if (!kIsWeb) {
-    await MobileAds.instance.initialize();
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     PlatformDispatcher.instance.onError = (error, stack) {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
@@ -48,7 +52,6 @@ void main() async {
       cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
     );
   }
-
 
   runApp(const LiturgicalApp());
 }
@@ -63,17 +66,45 @@ class LiturgicalApp extends StatelessWidget {
       builder: (context, authSnapshot) {
         AppRoutes.router.refresh();
 
-        return MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          title: 'Liturgical App',
-          theme: AppTheme.darkTheme,
-          routerConfig: AppRoutes.router,
+        return ValueListenableBuilder<bool>(
+          valueListenable: SettingsManager.isHighContrast,
+          builder: (context, isHighContrast, _) {
+            return MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              title: 'Liturgical App',
 
-          builder: (context, child) {
-            return child ?? const SizedBox.shrink();
+              theme: isHighContrast 
+                  ? AppTheme.darkTheme.copyWith(
+                      textTheme: AppTheme.darkTheme.textTheme.apply(
+                        bodyColor: Colors.yellowAccent,
+                        displayColor: Colors.yellowAccent,
+                        decorationColor: Colors.yellowAccent,
+                      ),
+                      primaryTextTheme: AppTheme.darkTheme.primaryTextTheme.apply(
+                        bodyColor: Colors.yellowAccent,
+                        displayColor: Colors.yellowAccent,
+                      ),
+                      appBarTheme: AppTheme.darkTheme.appBarTheme.copyWith(
+                        foregroundColor: Colors.yellowAccent,
+                        iconTheme: const IconThemeData(color: Colors.yellowAccent),
+                        titleTextStyle: const TextStyle(
+                          color: Colors.yellowAccent, 
+                          fontSize: 20, 
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      listTileTheme: const ListTileThemeData(
+                        textColor: Colors.yellowAccent,
+                        iconColor: Colors.yellowAccent,
+                      ),
+                      iconTheme: const IconThemeData(color: Colors.yellowAccent),
+                    )
+                  : AppTheme.darkTheme,
+            routerConfig: AppRoutes.router,
+            );
           },
         );
-      },
+      }, 
     );
   }
 }

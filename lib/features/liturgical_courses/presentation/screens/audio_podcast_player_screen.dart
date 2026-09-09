@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
-import '../../../monetization/presentation/widgets/ad_helper.dart';
+//import '../../../monetization/presentation/widgets/ad_helper.dart';
 
 class AudioPodcastPlayerScreen extends StatefulWidget {
   final String audioUrl;
@@ -25,7 +25,7 @@ class _AudioPodcastPlayerScreenState extends State<AudioPodcastPlayerScreen> {
 
   double _currentPosition = 0.0;
   double _totalDuration = 0.0;
-  bool _isDragging = false; // Zapobiega skakaniu suwaka, gdy użytkownik go przesuwa
+  bool _isDragging = false;
   Timer? _timer;
 
   @override
@@ -57,11 +57,11 @@ class _AudioPodcastPlayerScreenState extends State<AudioPodcastPlayerScreen> {
             _currentPosition = 0.0; 
           });
           
-          AdHelper.showInterstitialAd(
-            context,
-            onComplete: () {
-            },
-          );
+          // AdHelper.showInterstitialAd(
+          //   context,
+          //   onComplete: () {
+          //   },
+          // );
         }
         _stopTimer();
       }

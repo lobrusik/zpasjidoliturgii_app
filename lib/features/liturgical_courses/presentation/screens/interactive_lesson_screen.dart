@@ -1,12 +1,18 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../widgets/youtube_video_player.dart';
 import '../../data/models/interactive_lesson_model.dart';
 import '../widgets/true_false_quiz.dart';
 import '../widgets/drag_and_drop_quiz.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
-import '../widgets/banner_ad_widget.dart';
 import '../../data/models/study_plan_model.dart';
 import '../widgets/interactive_quiz.dart';
+// import '../../../monetization/presentation/widgets/ad_manager.dart';
 
 class InteractiveLessonScreen extends StatefulWidget {
   final InteractiveLesson lesson;
@@ -31,15 +37,19 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
   @override
   void initState() {
     super.initState();
+    //InterstitialAdManager.loadAd();
+
     for (int i = 0; i < widget.lesson.slides.length; i++) {
       final type = widget.lesson.slides[i].type;
-      if (type == 'true_false' || type == 'drag_drop' || type == 'open_questions') {
+      if (type == 'true_false' || type == 'drag_drop' || type == 'open_questions' || type == 'quiz') {
         requiredSlides.add(i);
       }
       if (type == 'open_questions') {
         openAnswers[i] = {};
       }
     }
+
+    _loadLocalProgress();
   }
 
   @override
@@ -48,10 +58,56 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
     super.dispose();
   }
 
-  void _nextPage() {
+  Future<void> _loadLocalProgress() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedData = prefs.getString('lesson_progress_${widget.lesson.courseId}');
+      
+      if (savedData != null) {
+        final Map<String, dynamic> data = jsonDecode(savedData);
+        setState(() {
+          if (data['completedSlides'] != null) {
+            completedSlides = Set<int>.from(data['completedSlides']);
+          }
+          if (data['openAnswers'] != null) {
+            final loadedAnswers = data['openAnswers'] as Map<String, dynamic>;
+            loadedAnswers.forEach((key, value) {
+              int slideIndex = int.parse(key);
+              openAnswers[slideIndex] = Map<int, String>.from((value as Map<String, dynamic>).map(
+                (k, v) => MapEntry(int.parse(k), v.toString()),
+              ));
+            });
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint('Błąd wczytywania postępu: $e');
+    }
+  }
+
+  Future<void> _saveLocalProgress() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final Map<String, dynamic> answersToSave = {};
+      
+      openAnswers.forEach((slideIndex, answers) {
+        answersToSave[slideIndex.toString()] = answers.map((k, v) => MapEntry(k.toString(), v));
+      });
+
+      final data = {
+        'completedSlides': completedSlides.toList(),
+        'openAnswers': answersToSave,
+      };
+      await prefs.setString('lesson_progress_${widget.lesson.courseId}', jsonEncode(data));
+    } catch (e) {
+      debugPrint('Błąd zapisywania postępu: $e');
+    }
+  }
+
+  void _nextPage() async {
     if (_currentPage < widget.lesson.slides.length - 1) {
       _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-    } else{
+    } else {
       if (completedSlides.length < requiredSlides.length) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -60,13 +116,28 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
           ),
         );
       } else {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Lekcja ukończona! Gratulacje! 🎉'),
-            backgroundColor: Colors.green,
-          )
-        );
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          String lessonId = widget.lesson.courseId;
+
+          await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+            'progress': {
+              lessonId: completedSlides.toList() 
+            }
+          }, SetOptions(merge: true));
+        }
+
+        // InterstitialAdManager.showAd(() {
+        //   if (mounted) {
+        //     Navigator.pop(context);
+        //     ScaffoldMessenger.of(context).showSnackBar(
+        //       const SnackBar(
+        //         content: Text('Lekcja ukończona! Gratulacje!'),
+        //         backgroundColor: Colors.green,
+        //       )
+        //     );
+        //   }
+        // });
       }
     }
   }
@@ -149,6 +220,26 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
     );
   }
 
+  Widget _buildCompletedBadge(int slideIndex) {
+    if (!completedSlides.contains(slideIndex)) return const SizedBox.shrink();
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.green.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.green.withOpacity(0.5)),
+      ),
+      child: Row(
+        children: const [
+          Icon(Icons.check_circle, color: Colors.green),
+          SizedBox(width: 12),
+          Text('Zadanie zostało już ukończone', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
   // SLIDE GENERATORS
   Widget _buildSlideHeaderWithImage(LessonSlide slide) {
     final isMobile = MediaQuery.of(context).size.width < 600;
@@ -175,7 +266,6 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
         const SizedBox(height: 24),
 
         if (isMobile) ...[
-          // PHONE SYSTEM
           if (imageWidget != null) ...[
             Center(
               child: SizedBox(
@@ -189,9 +279,25 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
             MarkdownBody(
               data: slide.content!,
               styleSheet: markdownStyle,
+              onTapLink: (text, href, title) async {
+                if (href != null) {
+                  final url = Uri.parse(href);
+                  try {
+                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Nie udało się otworzyć linku.'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
+                }
+              },
             ),
         ] else ...[
-        // SYSTEM FOR COMPUTERS, TABLETS
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -208,9 +314,26 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
                 Expanded(
                   flex: 3,
                   child: MarkdownBody(
-                    data: slide.content!,
-                    styleSheet: markdownStyle,
-                  ),
+              data: slide.content!,
+              styleSheet: markdownStyle,
+              onTapLink: (text, href, title) async {
+                if (href != null) {
+                  final url = Uri.parse(href);
+                  try {
+                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Nie udało się otworzyć linku.'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
+                }
+              },
+            ),
                 ),
             ],
           ),
@@ -234,7 +357,6 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
               
               if (slide.videoUrl != null) ...[
                 const SizedBox(height: 20),
-
                 if (isLandscape)
                   Center(
                     child: ElevatedButton.icon(
@@ -312,7 +434,6 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
                   ),
                 ),
               ],
-              
               const SizedBox(height: 40),
             ],
           ),
@@ -405,10 +526,14 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
           _buildSlideHeaderWithImage(slide),
           const SizedBox(height: 32),
           
+          _buildCompletedBadge(slideIndex),
+          
           TrueFalseQuiz(
             key: ValueKey('tf_$slideIndex'),
             questions: questions,
             onCompleted: () {
+              setState(() => completedSlides.add(slideIndex));
+              _saveLocalProgress();
               ScaffoldMessenger.of(context).clearSnackBars();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -438,11 +563,15 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
         children: [
           _buildSlideHeaderWithImage(slide),
           const SizedBox(height: 32),
+
+          _buildCompletedBadge(slideIndex),
           
           DragAndDropQuiz(
             key: ValueKey('drag_drop_$slideIndex'),
             activityData: activityData,
             onCompleted: () {
+              setState(() => completedSlides.add(slideIndex));
+              _saveLocalProgress();
               ScaffoldMessenger.of(context).clearSnackBars();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -457,7 +586,7 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
     );
   }
 
-  // open questions 
+  // Open questions 
   Widget _buildSlideOpenQuestions(LessonSlide slide, int slideIndex) {
     final questions = slide.dataList ?? [];
 
@@ -468,6 +597,8 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
         children: [
           _buildSlideHeaderWithImage(slide),
           const SizedBox(height: 32),
+
+          _buildCompletedBadge(slideIndex),
           
           ...List.generate(questions.length, (qIndex) {
             final q = questions[qIndex]['q'] as String;
@@ -478,7 +609,9 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
                 children: [
                   Text(q, style: const TextStyle(color: Colors.white, fontSize: 16)),
                   const SizedBox(height: 12),
-                  TextField(
+                  // Używamy TextFormField by poprawnie czytać wartość początkową z SharedPreferences
+                  TextFormField(
+                    initialValue: openAnswers[slideIndex]?[qIndex] ?? '',
                     style: const TextStyle(color: Colors.white),
                     maxLines: 4,
                     decoration: InputDecoration(
@@ -504,6 +637,8 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
                       } else {
                         setState(() => completedSlides.remove(slideIndex));
                       }
+                      
+                      _saveLocalProgress(); 
                     },
                   ),
                 ],
@@ -515,7 +650,7 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
     );
   }
 
-  // abcd quiz
+  // ABCD quiz
   Widget _buildSlideQuiz(LessonSlide slide, int slideIndex) {
     final List<QuizQuestion> questions = (slide.dataList ?? []).map((qMap) {
       return QuizQuestion(
@@ -533,14 +668,15 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
         children: [
           _buildSlideHeaderWithImage(slide),
           const SizedBox(height: 32),
+
+          _buildCompletedBadge(slideIndex),
           
           InteractiveQuiz(
             key: ValueKey('quiz_$slideIndex'),
             questions: questions,
             onQuizCompleted: () {
-              setState(() {
-                completedSlides.add(slideIndex);
-              });
+              setState(() => completedSlides.add(slideIndex));
+              _saveLocalProgress();
               
               ScaffoldMessenger.of(context).clearSnackBars();
               ScaffoldMessenger.of(context).showSnackBar(
@@ -573,10 +709,8 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
               child: Text('„${slide.quote!}”', textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontStyle: FontStyle.italic)),
             )
           ],
-          const BannerAdWidget(),
         ],
       ),
     );
   }
-
 }

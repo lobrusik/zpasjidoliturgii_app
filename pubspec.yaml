@@ -1,11 +1,10 @@
 name: zpasjidoliturgii
 description: "A mobile application for liturgical learning and study plans."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.0.0+1
+version: 1.0.0+15
 
 environment:
   sdk: '>=3.12.2 <4.0.0'
-
 dependencies:
   flutter:
     sdk: flutter
@@ -25,6 +24,7 @@ dependencies:
   # UI and Adds
   google_fonts: ^6.2.0
   cached_network_image: ^3.4.1
+  google_mobile_ads: ^9.1.0
 
   go_router: ^14.0.0
 
@@ -41,8 +41,9 @@ dependencies:
   flutter_markdown: ^0.6.18
 
   intl: ^0.19.0
-  google_mobile_ads: ^9.1.0
+  
   purchases_flutter: ^10.10.0
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:
@@ -59,8 +60,12 @@ flutter:
   assets:
     - assets/images/
     - assets/images/tarsycjusz/
+    - assets/images/ksawery/
 
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/images/icon_app.png"
+  image_path: "assets/images/logo-app.png"
+
+  adaptive_icon_background: "#141F1C"
+  adaptive_icon_foreground: "assets/images/logo-app.png"

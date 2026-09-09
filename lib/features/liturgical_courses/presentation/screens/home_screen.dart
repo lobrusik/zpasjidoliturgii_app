@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/news_carousel.dart';
 import '../widgets/buy_coffee_button.dart';
 import '../widgets/about_contact_section.dart';
-
+import '../../../game/liturgical_hangman.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -136,24 +136,10 @@ class HomeScreen extends StatelessWidget {
 
               _buildPathCard(
                 context, 
-                title: 'Drzewko wiedzy', 
-                description: 'Podstawy, Msza Śwęta, miejsce święte, historia ministrantury. Ucz się we własnym tempie.', 
+                title: 'Drzewka wiedzy', 
+                description: 'Podstawy, Msza Święta, miejsce święte, historia, psałterz, formacja. Ucz się we własnym tempie.', 
                 imagePlaceholder: Icons.account_tree_outlined, 
                 onTap: () => context.go('/courses', extra: 0)
-              ),
-              _buildPathCard(
-                context, 
-                title: 'Ścieżka psałterzysty', 
-                description: 'Poznaj piękno muzyki kościelnej. Chorał, śpiew i schola.', 
-                imagePlaceholder: Icons.library_music_outlined,
-                onTap: () => context.go('/courses', extra: 1)
-              ),
-              _buildPathCard(
-                context, 
-                title: 'E-zbiórki ministranckie', 
-                description: 'Poznaj najważniejsze zasady i fakty dotyczące służby przy ołtarzu.', 
-                imagePlaceholder: Icons.groups,
-                onTap: () => context.go('/courses', extra: 2)
               ),
               _buildPathCard(
                 context, 
@@ -161,6 +147,25 @@ class HomeScreen extends StatelessWidget {
                 description: 'Liturgiczny sposób na zakończenie dnia.', 
                 imagePlaceholder: Icons.calendar_today_outlined, 
                 onTap: () => context.go('/completorium')
+              ),
+              _buildPathCard(
+                context, 
+                title: 'Podcasty', 
+                description: 'Mądrego to aż miło posłuchać.', 
+                imagePlaceholder: Icons.calendar_today_outlined, 
+                onTap: () => context.go('/podcast')
+              ),
+              _buildPathCard(
+                context, 
+                title: 'Czy znasz te liturgiczne terminy?', 
+                description: 'Sprawdź swoją wiedzę w grze i odgaduj ukryte hasła.', 
+                imagePlaceholder: Icons.spellcheck, 
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LiturgicalHangman()),
+                  );
+                }
               ),
 
             const SizedBox(height: 32),

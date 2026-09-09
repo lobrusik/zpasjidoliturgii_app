@@ -6,7 +6,7 @@ class AboutAndContactSection extends StatelessWidget {
 
   // A function that opens the default email app on your phone
   Future<void> _sendEmail() async {
-    const String emails = 'administracja@zpasjidoliturgii.pl, lobrusik@gmail.com';
+    const String emails = 'administracja@zpasjidoliturgii.pl, aplikacja@zpasjidoliturgii.pl';
     final String subject = Uri.encodeComponent('Kontakt z aplikacji Z Pasji do Liturgii');
 
     final Uri emailLaunchUri = Uri.parse('mailto:$emails?subject=$subject');

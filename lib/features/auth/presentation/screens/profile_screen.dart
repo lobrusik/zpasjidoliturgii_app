@@ -2,17 +2,76 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'admin_screen.dart';
-//import '../../../liturgical_courses/presentation/widgets/temp_uploader.dart';
+import '../../../../app/settings_manager.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
+  Future<void> _showDeleteAccountDialog(BuildContext context, User user) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Usuń konto'),
+          content: const Text(
+            'Czy na pewno chcesz trwale usunąć swoje konto oraz wszystkie postępy? Tej operacji nie można cofnąć.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Anuluj'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Usuń trwale', style: TextStyle(color: Colors.red)),
+              onPressed: () async {
+                try {
+                  await FirebaseFirestore.instance.collection('users').doc(user.uid).delete();
+                  await user.delete();
+                  
+                  if (context.mounted) {
+                    Navigator.of(dialogContext).pop();
+                  }
+                } on FirebaseAuthException catch (e) {
+                  if (context.mounted) {
+                    Navigator.of(dialogContext).pop();
+                    
+                    String errorMessage = 'Wystąpił błąd: ${e.message}';
+                    if (e.code == 'requires-recent-login') {
+                      errorMessage = 'Ze względów bezpieczeństwa musisz wylogować się i zalogować ponownie, aby usunąć konto.';
+                    }
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(errorMessage),
+                        backgroundColor: Colors.red,
+                        duration: const Duration(seconds: 5),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    Navigator.of(dialogContext).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Błąd: $e'), backgroundColor: Colors.red),
+                    );
+                  }
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     final theme = Theme.of(context);
 
-    final bool isAdmin = ['lobrusik@gmail.com', 'administracja@zpasjidoliturgii.pl', 'dawidmakowski28@gmail.com'].contains(user?.email);
+    final bool isAdmin = ['lobrusik@gmail.com', 'administracja@zpasjidoliturgii.pl', 'dawidmakowski28@gmail.com', 'lobrusik.rekrutacja@op.pl'].contains(user?.email);
 
     final joinDate = user?.metadata.creationTime;
     final dateString = joinDate != null
@@ -68,8 +127,6 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 32),
             ],
-
-            //const TempAddPsalmsButton(), //adding psalms
             
             Text(
               'Twoje statystyki',
@@ -86,9 +143,6 @@ class ProfileScreen extends StatelessWidget {
 
                   //liturgical tree
                   int liturgicalLessons = 0;
-                  // int massLessons = 0;
-                  // int placeLessons = 0;
-                  // int historyLessons = 0;
 
                   //musical tree
                   int musicLessons = 0;
@@ -96,13 +150,26 @@ class ProfileScreen extends StatelessWidget {
                   //e-zbiorka tree
                   int collectionLessons = 0;
 
+                  //history tree
+                  int historyLessons = 0;
+                  
+                  //reflection
+                  int reflectionLessons = 0;
+
                   //daily lessons
                   int completoriumStreak = 0;
+                  
+                  //hangman game
+                  int hangmanLevelsCompleted = 0; 
 
                   // Counting completed lessons if the user's data exists
                   if (snapshot.hasData && snapshot.data!.exists) {
                     final data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
                     completoriumStreak = data['completoriumStreak'] ?? 0;
+                    
+                    // Appeal of the Game Result
+                    hangmanLevelsCompleted = data['hangmanLevelsCompleted'] ?? 0; 
+
                     final progressMap = data['progress'] as Map<String, dynamic>? ?? {};
 
                     progressMap.forEach((courseId, completedLessons) {
@@ -112,14 +179,6 @@ class ProfileScreen extends StatelessWidget {
                       if (courseId.startsWith('trunk_')) {
                         liturgicalLessons += lessonsCount;
                       }
-                      // else if (courseId.startsWith('mass_')) {
-                      //   massLessons += lessonsCount;
-                      // } else if (courseId.startsWith('place_')) {
-                      //   placeLessons += lessonsCount;
-                      // }else if (courseId.startsWith('history_')) {
-                      //   historyLessons += lessonsCount;
-                      // } 
-
                       //music tree
                       else if (courseId.startsWith('music_')) {
                         musicLessons += lessonsCount;
@@ -128,10 +187,14 @@ class ProfileScreen extends StatelessWidget {
                       else if (courseId.startsWith('collection_')) {
                         collectionLessons += lessonsCount;
                       }
-                      // //daily lessons
-                      // else if (courseId.startsWith('day_') || courseId == 'day') {
-                      //   dailyLessons += lessonsCount;
-                      // }
+                      //history tree
+                      else if (courseId.startsWith('history_')) {
+                        historyLessons += lessonsCount;
+                      }
+                      //reflection tree
+                      else if (courseId.startsWith('reflection_')) {
+                        reflectionLessons += lessonsCount;
+                      }
                     });
                   }
 
@@ -145,24 +208,53 @@ class ProfileScreen extends StatelessWidget {
                     children: [
                       //liturgical
                       _buildStatCard('Teologia\nliturgii', liturgicalLessons, Icons.park, Colors.brown.shade400, theme),
-                      // _buildStatCard('Msza św.\nkrok po kroku', massLessons, Icons.spa, Colors.green.shade400, theme),
-                      // _buildStatCard('Miejsce\nświęte', placeLessons, Icons.church, Colors.redAccent.shade200, theme),
-                      // _buildStatCard('Historia\nministrantury', historyLessons, Icons.history_edu, Colors.brown.shade400, theme),
                       //musical
                       _buildStatCard('Ścieżka\nPsałterzysty', musicLessons, Icons.music_note, Colors.blue.shade400, theme),
                       //e-zbiorki
                       _buildStatCard('E-zbiórki\n(Odprawy)', collectionLessons, Icons.groups, Colors.orange.shade400, theme),
-                      //daily
-                      //_buildStatCard('Codzienne\nlekcje', dailyLessons, Icons.calendar_today, Colors.blue.shade400, theme),
+                      //history 
+                      _buildStatCard('Ruch\nliturgiczny', historyLessons, Icons.timeline, Colors.teal.shade400, theme),
+                      //reflection
+                      _buildStatCard('Rozważania\no liturgii', reflectionLessons, Icons.psychology, Colors.pink.shade400, theme),
                       //completorium
                       _buildStatCard('Kompleta', completoriumStreak, Icons.nightlight_round, Colors.amber.shade400, theme),
-                      
+                      //hangman game 
+                      _buildStatCard('Odgadnięte\nterminy', hangmanLevelsCompleted, Icons.spellcheck, Colors.purple.shade300, theme),
                     ],
                   );
                 },
               ),
 
             const SizedBox(height: 32),
+
+            const Divider(color: Colors.white24),
+            ValueListenableBuilder<bool>(
+              valueListenable: SettingsManager.isHighContrast,
+              builder: (context, isHighContrast, _) {
+                return SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text(
+                    'Wysoki kontrast',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: const Text(
+                    'Zmienia kolor tekstów na żółty (dla osób słabowidzących)',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  value: isHighContrast,
+                  activeColor: Colors.amber,
+                  secondary: Icon(
+                    Icons.visibility,
+                    color: isHighContrast ? Colors.amber : Colors.grey,
+                  ),
+                  onChanged: (bool value) {
+                    SettingsManager.isHighContrast.value = value;
+                  },
+                );
+              },
+            ),
+            const Divider(color: Colors.white24),
+            const SizedBox(height: 16),
             
             // Join date retrieved from the Google/Firebase account
             Text(
@@ -170,6 +262,19 @@ class ProfileScreen extends StatelessWidget {
               style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
               textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 24),
+
+            if (user != null)
+              TextButton.icon(
+                onPressed: () => _showDeleteAccountDialog(context, user),
+                icon: const Icon(Icons.delete_forever, color: Colors.redAccent),
+                label: const Text(
+                  'Usuń konto',
+                  style: TextStyle(color: Colors.redAccent),
+                ),
+              ),
+              
+            const SizedBox(height: 16),
           ],
         ),
       ),
