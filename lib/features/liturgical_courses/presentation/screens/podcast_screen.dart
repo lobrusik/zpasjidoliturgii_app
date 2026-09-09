@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'audio_podcast_player_screen.dart';
 
-// import '../../../monetization/presentation/widgets/ad_manager.dart'; 
-
 class PodcastScreen extends StatefulWidget {
   final String title;
   final String collectionName;
@@ -21,13 +19,6 @@ class PodcastScreen extends StatefulWidget {
 }
 
 class _PodcastScreenState extends State<PodcastScreen> {
-  
-  @override
-  void initState() {
-    super.initState();
-    //InterstitialAdManager.loadAd();
-  }
-
   @override
   Widget build(BuildContext context) {
     Query query = FirebaseFirestore.instance.collection(widget.collectionName);
@@ -114,7 +105,6 @@ class _PodcastScreenState extends State<PodcastScreen> {
                     ),
                   ),
                   trailing: const Icon(Icons.play_circle_fill, color: Colors.white, size: 36),
-                  
                   onTap: () async {
                     if (audioUrl.isNotEmpty) {
                       await Navigator.push(
@@ -126,19 +116,13 @@ class _PodcastScreenState extends State<PodcastScreen> {
                           ),
                         ),
                       );
-                      
-                    //   if (mounted) {
-                    //     InterstitialAdManager.showAd(() {
-                    //     });
-                    //   }
-                      
-                    // } else {
-                    //   ScaffoldMessenger.of(context).showSnackBar(
-                    //     const SnackBar(content: Text('Brak linku do wideo')),
-                    //   );
-                    // }
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Brak linku do wideo')),
+                    } else {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Brak linku do wideo')),
+                        );
+                      }
+                    }
                   },
                 ),
               );
