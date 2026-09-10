@@ -58,6 +58,7 @@ flutter:
     - assets/images/
     - assets/images/tarsycjusz/
     - assets/images/ksawery/
+    - assets/images/xpawel/
 
 flutter_launcher_icons:
   android: "launcher_icon"
