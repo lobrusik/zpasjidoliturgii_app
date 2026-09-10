@@ -24,6 +24,9 @@ class CoursesListScreen extends StatelessWidget {
             final mainCourses = state.courses.where((c) => c.category == 'trunk').toList();
             mainCourses.sort((a, b) => a.order.compareTo(b.order));
 
+            final reflectionCourses = state.courses.where((c) => c.category == 'reflection').toList();
+            reflectionCourses.sort((a, b) => a.order.compareTo(b.order));
+
             return StreamBuilder<DocumentSnapshot>(
               stream: userId != null 
                 ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
@@ -32,13 +35,14 @@ class CoursesListScreen extends StatelessWidget {
                 final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
                 final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
 
-                // How many courses has the user started/completed
                 int completedLevels = mainCourses.where((course) => progressMap.containsKey(course.id)).length;
+                
+                bool areAllTrunkCoursesCompleted = mainCourses.isNotEmpty && 
+                    mainCourses.every((course) => progressMap.containsKey(course.id));
 
                 return ListView(
                   padding: const EdgeInsets.all(16.0),
                   children: [
-                    // Map heading
                     Row(
                       children: [
                         const Icon(Icons.menu_book, color: Colors.blueAccent),
@@ -53,7 +57,7 @@ class CoursesListScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Przejdź wszystkie poziomy. Każdy zawiera film, tekst i quiz.',
+                      'Przejdź wszystkie poziomy. Każdy zawiera materiały i zadania sprawdzające wiedzę.',
                       style: theme.textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 16),
@@ -63,7 +67,6 @@ class CoursesListScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
 
-                    // Path visualization
                     ClipRRect(
                       borderRadius: BorderRadius.circular(16),
                       child: Image.asset(
@@ -75,16 +78,10 @@ class CoursesListScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
 
-                    // Generating path blocks
                     ...List.generate(mainCourses.length, (index) {
                       final course = mainCourses[index];
-                      
                       bool isUnlocked = index == 0 || progressMap.containsKey(mainCourses[index - 1].id);
-                      
-                      // The current level is marked as completed if the user has made any progress in it
                       bool isCompleted = progressMap.containsKey(course.id);
-                      
-                      // If a level is unlocked but not started, that means it's the “Current” one
                       bool isCurrent = isUnlocked && !isCompleted;
 
                       return _buildLevelNode(
@@ -96,11 +93,60 @@ class CoursesListScreen extends StatelessWidget {
                         isCompleted: isCompleted,
                         isCurrent: isCurrent,
                         isUnlocked: isUnlocked,
+                        lockedMessage: 'Ukończ poprzedni poziom, aby odblokować ten.',
                       );
                     }),
+
+                    if (reflectionCourses.isNotEmpty) ...[
+                      const SizedBox(height: 40),
+                      const Divider(color: Colors.white24, thickness: 1),
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          const Icon(Icons.psychology, color: Colors.amber),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Rozważania o liturgii',
+                              style: theme.textTheme.titleMedium?.copyWith(color: Colors.amber, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        areAllTrunkCoursesCompleted
+                            ? 'Wszystkie rozważania odblokowane! Możesz je przechodzić w dowolnej kolejności.'
+                            : 'Ukończ wszystkie poziomy Teologii liturgii powyżej, aby odblokować tę sekcję.',
+                        style: TextStyle(
+                          color: areAllTrunkCoursesCompleted ? Colors.white70 : Colors.grey,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      ...List.generate(reflectionCourses.length, (index) {
+                        final course = reflectionCourses[index];
+                        bool isUnlocked = areAllTrunkCoursesCompleted;
+                        bool isCompleted = progressMap.containsKey(course.id);
+                        bool isCurrent = isUnlocked && !isCompleted;
+
+                        return _buildLevelNode(
+                          context: context,
+                          courseId: course.id,
+                          title: course.title,
+                          subtitle: course.description,
+                          levelNumber: index + 1,
+                          isCompleted: isCompleted,
+                          isCurrent: isCurrent,
+                          isUnlocked: isUnlocked,
+                          lockedMessage: 'Najpierw ukończ wszystkie poziomy z głównego pnia (Teologia liturgii)!',
+                        );
+                      }),
+                    ],
                   ],
                 );
-              }
+              },
             );
           }
           return const SizedBox.shrink();
@@ -109,7 +155,6 @@ class CoursesListScreen extends StatelessWidget {
     );
   }
 
-  //  Draws a single tile on map
   Widget _buildLevelNode({
     required BuildContext context,
     required String courseId,
@@ -119,37 +164,35 @@ class CoursesListScreen extends StatelessWidget {
     required bool isCompleted,
     required bool isCurrent,
     required bool isUnlocked,
+    required String lockedMessage,
   }) {
     final theme = Theme.of(context);
     
-    // Variables that control the appearance based on state
     Color nodeColor;
     Widget leadingIcon;
 
     if (isCompleted) {
-      nodeColor = const Color(0xFF2E7D32); // Green (check)
+      nodeColor = const Color(0xFF2E7D32); // Zielony (ukończone)
       leadingIcon = const Icon(Icons.check, color: Colors.white);
     } else if (isCurrent) {
-      nodeColor = theme.colorScheme.primary; // Orange (To-do now)
+      nodeColor = theme.colorScheme.primary; // Kolor główny (do zrobienia)
       leadingIcon = Text('$levelNumber', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18));
     } else {
-      nodeColor = const Color(0xFF2D3039); // Dark grey (blocked)
+      nodeColor = const Color(0xFF2D3039); // Ciemnoszary (zablokowane)
       leadingIcon = const Icon(Icons.lock, color: Colors.grey, size: 20);
     }
 
     return Opacity(
-      // Fading of Locked Elements
       opacity: isUnlocked ? 1.0 : 0.5, 
       child: GestureDetector(
         onTap: () {
           if (isUnlocked) {
             context.go('/courses/details/$courseId', extra: title);
           } else {
-            // Reaction to clicking a locked tile
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Ukończ poprzedni poziom, aby odblokować ten.'),
-                duration: Duration(seconds: 2),
+              SnackBar(
+                content: Text(lockedMessage),
+                duration: const Duration(seconds: 3),
               ),
             );
           }
@@ -160,14 +203,12 @@ class CoursesListScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            // Subtle backlighting of the frame to indicate the current level
             border: isCurrent 
               ? Border.all(color: theme.colorScheme.primary, width: 1) 
               : Border.all(color: const Color(0xFF2D3039), width: 1),
           ),
           child: Row(
             children: [
-              // State icon
               Container(
                 width: 48,
                 height: 48,
@@ -178,8 +219,6 @@ class CoursesListScreen extends StatelessWidget {
                 child: Center(child: leadingIcon),
               ),
               const SizedBox(width: 16),
-              
-              // texts
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,8 +239,6 @@ class CoursesListScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              
-              // Navigation arrow
               Icon(
                 Icons.arrow_forward_rounded,
                 color: isUnlocked ? theme.colorScheme.primary : Colors.grey,
