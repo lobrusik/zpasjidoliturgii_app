@@ -2,20 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:universal_html/html.dart';
 import 'app/theme.dart';
 import 'app/routes.dart';
 import 'dart:ui';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-//import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'package:flutter/foundation.dart';
 import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
-//import 'package:flutter/foundation.dart';
-
-import 'package:purchases_flutter/purchases_flutter.dart';
-import 'dart:io' as io;
 
 import 'app/settings_manager.dart';
 
@@ -27,16 +21,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  //await Purchases.setLogLevel(LogLevel.debug);
-  if (!kIsWeb) {
-    if (io.Platform.isAndroid) {
-      await Purchases.configure(PurchasesConfiguration('goog_eNzvAdoXecUbQnyFJzAcRNXcZHn'));
-    } else if (io.Platform.isIOS) {
-      await Purchases.configure(PurchasesConfiguration('KEY_API_IOS_HERE'));
-    }
-    await SubscriptionManager.checkSubscriptionStatus();
-  }
 
   FirebaseAuth.instance.setSettings(appVerificationDisabledForTesting: true);
 
