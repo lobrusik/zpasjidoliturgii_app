@@ -523,7 +523,7 @@ class _PathScreenState extends State<PathScreen> {
                       _buildBranchSection(
                         context: context,
                         title: 'Gałąź — Katecheza biblijna',
-                        description: areAdvancedCollectionUnlocked ? 'Opis' : 'Zablokowane.',
+                        description: areAdvancedCollectionUnlocked ? 'Cykl katechez odkrywających głębokie korzenie Eucharystii w Starym Przymierzu' : 'Zablokowane.',
                         icon: Icons.menu_book,
                         branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
                         courses: collectionBible2Courses,
