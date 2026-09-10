@@ -30,13 +30,14 @@ class AppRoutes {
     navigatorKey: _rootNavigatorKey,
 
     redirect: (context, state) {
-      final isLoggedIn = FirebaseAuth.instance.currentUser != null;
+      final user = FirebaseAuth.instance.currentUser;
+      final isLoggedIn = user != null;
       final isLoggingIn = state.matchedLocation == '/login';
       final isRegistering = state.matchedLocation == '/register';
 
       if (!isLoggedIn && !isLoggingIn && !isRegistering) return '/login';
       
-      final isEmailVerified = FirebaseAuth.instance.currentUser?.emailVerified ?? false;
+      final isEmailVerified = user?.emailVerified ?? false;
       if (isLoggedIn && (isLoggingIn || isRegistering) && isEmailVerified) return '/home';
 
       return null;
@@ -76,7 +77,8 @@ class AppRoutes {
               GoRoute(
                 path: '/courses',
                 builder: (context, state) {
-                  final tabIndex = state.extra as int? ?? 0;
+                  // Bezpieczne rzutowanie extra
+                  final tabIndex = state.extra is int ? state.extra as int : 0;
                   return BlocProvider(
                     create: (context) => CoursesBloc(
                       courseRepository: CourseRepositoryImpl(),
@@ -88,8 +90,9 @@ class AppRoutes {
                   GoRoute(
                     path: 'details/:id',
                     pageBuilder: (context, state) {
-                      final courseId = state.pathParameters['id']!;
-                      final courseTitle = state.extra as String? ?? 'Szczegóły kursu';
+                      // Zabezpieczone przed null-chekiem w ścieżce
+                      final courseId = state.pathParameters['id'] ?? '';
+                      final courseTitle = state.extra is String ? state.extra as String : 'Szczegóły kursu';
 
                       return CustomTransitionPage(
                         key: state.pageKey,
@@ -125,7 +128,6 @@ class AppRoutes {
             ],
           ),
           
-          
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -135,7 +137,9 @@ class AppRoutes {
                   GoRoute(
                     path: 'details',
                     builder: (context, state) {
-                      final extraData = state.extra as Map<String, dynamic>? ?? {};
+                      final extraData = state.extra is Map<String, dynamic> 
+                          ? state.extra as Map<String, dynamic> 
+                          : <String, dynamic>{};
                       final title = extraData['title'] as String? ?? 'Kompleta';
                       final youtubeUrl = extraData['url'] as String? ?? '';
 
@@ -158,7 +162,6 @@ class AppRoutes {
               ),
             ],
           ),
-
         ],
       ),
     ],

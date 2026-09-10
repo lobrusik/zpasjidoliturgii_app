@@ -387,6 +387,7 @@ class _PathScreenState extends State<PathScreen> {
           final collectionBibleCourses = courses.where((c) => c.category == 'collection_bible').toList();
           final collectionSoulCourses = courses.where((c) => c.category == 'collection_soul').toList();
           final collectionHistoryCourses = courses.where((c) => c.category == 'collection_history').toList();
+          final collectionBible2Courses = courses.where((c) => c.category == 'collection_bible2').toList();
 
           return StreamBuilder<DocumentSnapshot>(
             stream: userId != null 
@@ -510,10 +511,22 @@ class _PathScreenState extends State<PathScreen> {
                       _buildBranchSection(
                         context: context,
                         title: 'Gałąź — Historia ministrantury',
-                        description: areAdvancedCollectionUnlocked ? 'Ukazanie fascynującej historię i teologii posługi ministranckiej – od starożytnych korzeni i czasów tonsury, przez kryzysy trydenckie i zaangażowanie chłopców, aż po soborową odnowę opartą na fundamencie chrztu świętego.' : 'Zablokowane.',
+                        description: areAdvancedCollectionUnlocked ? 'Ukazanie fascynującej historii i teologii posługi ministranckiej – od starożytnych korzeni i czasów tonsury, przez kryzysy trydenckie i zaangażowanie chłopców, aż po soborową odnowę opartą na fundamencie chrztu świętego.' : 'Zablokowane.',
                         icon: Icons.account_balance,
                         branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
                         courses: collectionHistoryCourses,
+                        progressMap: progressMap,
+                        isBranchUnlocked: areAdvancedCollectionUnlocked,
+                        isAdmin: isAdmin,
+                      ),
+                      const SizedBox(height: 48),
+                      _buildBranchSection(
+                        context: context,
+                        title: 'Gałąź — Katecheza biblijna',
+                        description: areAdvancedCollectionUnlocked ? 'Opis' : 'Zablokowane.',
+                        icon: Icons.menu_book,
+                        branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
+                        courses: collectionBible2Courses,
                         progressMap: progressMap,
                         isBranchUnlocked: areAdvancedCollectionUnlocked,
                         isAdmin: isAdmin,
