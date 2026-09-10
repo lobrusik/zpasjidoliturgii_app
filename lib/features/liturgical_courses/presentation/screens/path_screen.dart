@@ -7,7 +7,6 @@ import '../bloc/courses_bloc.dart';
 import '../bloc/courses_state.dart';
 import 'psalms_menu_screen.dart';
 import 'timeline_screen.dart'; 
-// import '../../../monetization/presentation/widgets/ad_manager.dart'; 
 
 class PathScreen extends StatefulWidget {
   final int initialTabIndex;
@@ -22,13 +21,6 @@ class PathScreen extends StatefulWidget {
 }
 
 class _PathScreenState extends State<PathScreen> {
-  
-  @override
-  void initState() {
-    super.initState();
-    //InterstitialAdManager.loadAd();
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -203,7 +195,7 @@ class _PathScreenState extends State<PathScreen> {
                       context: context,
                       title: 'Gałąź - Przewodnik po Mszy Świętej',
                       description: areAdvancedBranchesUnlocked
-                          ? 'Każdy element Mszy Świętej ma ogromne znaczeni - i właśnie je chcemy tu poznawać.'
+                          ? 'Każdy element Mszy Świętej ma ogromne znaczenie - i właśnie je chcemy tu poznawać.'
                           : 'Zablokowane. Ukończono $completedTrunkLessons/$requiredLessons podstaw.',
                       icon: Icons.local_fire_department,
                       branchColor: areAdvancedBranchesUnlocked ? const Color(0xFFFFB300) : Colors.grey.shade800,
@@ -236,7 +228,6 @@ class _PathScreenState extends State<PathScreen> {
 
           final trunkCourses = courses.where((c) => c.category == 'trunk').toList();
           final musicTrunkCourses = courses.where((c) => c.category == 'music_trunk').toList();
-          final musicAdvancedCourses = courses.where((c) => c.category == 'music_choir').toList();
 
           return StreamBuilder<DocumentSnapshot>(
             stream: userId != null 
@@ -248,19 +239,6 @@ class _PathScreenState extends State<PathScreen> {
               final bool isAdmin = userData['isAdmin'] ?? false;
 
               bool isMusicBranchesUnlocked = isAdmin || _checkIfTrunkCompleted(trunkCourses, progressMap);
-
-              int completedMusicTrunkLessons = 0;
-              for (var course in musicTrunkCourses) {
-                if (progressMap.containsKey(course.id)) {
-                  final courseProgress = progressMap[course.id];
-                  if (courseProgress is List) {
-                    completedMusicTrunkLessons += courseProgress.length;
-                  }
-                }
-              }
-
-              final int requiredMusicLessons = 5; 
-              bool areAdvancedMusicUnlocked = completedMusicTrunkLessons >= requiredMusicLessons;
 
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(20.0),
@@ -293,7 +271,6 @@ class _PathScreenState extends State<PathScreen> {
                             builder: (context) => const PsalmsMenuScreen(),
                           ),
                         );
-                        //if (mounted) InterstitialAdManager.showAd(() {});
                       },
                       child: Container(
                         padding: const EdgeInsets.all(20),
@@ -383,18 +360,6 @@ class _PathScreenState extends State<PathScreen> {
                         isBranchUnlocked: true,
                         isAdmin: isAdmin,
                       ),
-                    //   const SizedBox(height: 24),
-                    //   _buildBranchSection(
-                    //     context: context,
-                    //     title: 'Gałąź — Zaawansowane',
-                    //     description: areAdvancedMusicUnlocked ? 'Opis gałęzi.' : 'Zablokowane.',
-                    //     icon: Icons.record_voice_over,
-                    //     branchColor: areAdvancedMusicUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
-                    //     courses: musicAdvancedCourses,
-                    //     progressMap: progressMap,
-                    //     isBranchUnlocked: areAdvancedMusicUnlocked,
-                    //     isAdmin: isAdmin,
-                    //   ),
                     ],
                     const SizedBox(height: 48),
                   ],
@@ -623,7 +588,6 @@ class _PathScreenState extends State<PathScreen> {
                             builder: (context) => const LiturgicalTimelineScreen(), 
                           ),
                         );
-                        //if (mounted) InterstitialAdManager.showAd(() {});
                       },
                       child: Container(
                         padding: const EdgeInsets.all(20),
@@ -793,9 +757,7 @@ class _PathScreenState extends State<PathScreen> {
       },
     );
   }
-
  
-  
   // === VIEW HELPERS === //
   Widget _buildBranchSection({
     required BuildContext context,
@@ -923,21 +885,14 @@ class _PathScreenState extends State<PathScreen> {
           ),
         ),
         trailing: trailingWidget,
-        
         onTap: () async {
           if (isUnlocked) {
             await context.push('/courses/details/$courseId', extra: title);
-            
-          //   if (mounted) {
-          //     InterstitialAdManager.showAd(() {});
-          //   }
-          // } else {
-          //   ScaffoldMessenger.of(context).showSnackBar(
-          //     const SnackBar(content: Text('Zablokowane. Opanuj wymagane podstawy!')),
-          //   );
-          // }
+          } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Zablokowane. Opanuj wymagane podstawy!')),
+            );
+          }
         },
       ),
     );
