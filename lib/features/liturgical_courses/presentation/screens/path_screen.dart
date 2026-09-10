@@ -486,7 +486,7 @@ class _PathScreenState extends State<PathScreen> {
                       _buildBranchSection(
                         context: context,
                         title: 'Gałąź — Wprowadzenie do Pisma Świętego',
-                        description: areAdvancedCollectionUnlocked ? 'Opis.' : 'Zablokowane.',
+                        description: areAdvancedCollectionUnlocked ? 'Wprowadzenie w biblijne korzenie Eucharystii i liturgii, łącząc starotestamentowe zapowiedzi oraz historię zbawienia z żywym doświadczeniem wiary i modlitwy w Kościele.' : 'Zablokowane.',
                         icon: Icons.menu_book,
                         branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
                         courses: collectionBibleCourses,
@@ -498,7 +498,7 @@ class _PathScreenState extends State<PathScreen> {
                       _buildBranchSection(
                         context: context,
                         title: 'Gałąź — Katecheza duchowościowa',
-                        description: areAdvancedCollectionUnlocked ? 'Opis.' : 'Zablokowane.',
+                        description: areAdvancedCollectionUnlocked ? 'Wprowadzenie w fundamenty chrześcijańskiej duchowości przez ukazanie nierozerwalnej jedności między modlitwą, życiem sakramentalnym, darami codzienności oraz łaską chrztu i pokuty.' : 'Zablokowane.',
                         icon: Icons.handshake,
                         branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
                         courses: collectionSoulCourses,
@@ -510,7 +510,7 @@ class _PathScreenState extends State<PathScreen> {
                       _buildBranchSection(
                         context: context,
                         title: 'Gałąź — Historia ministrantury',
-                        description: areAdvancedCollectionUnlocked ? 'Opis.' : 'Zablokowane.',
+                        description: areAdvancedCollectionUnlocked ? 'Ukazanie fascynującej historię i teologii posługi ministranckiej – od starożytnych korzeni i czasów tonsury, przez kryzysy trydenckie i zaangażowanie chłopców, aż po soborową odnowę opartą na fundamencie chrztu świętego.' : 'Zablokowane.',
                         icon: Icons.account_balance,
                         branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
                         courses: collectionHistoryCourses,
