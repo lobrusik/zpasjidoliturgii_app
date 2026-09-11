@@ -50,6 +50,10 @@ class StudyPlanModel extends Equatable {
   final List<QuizQuestion> quiz;
   final Map<String, dynamic>? interactiveActivity; //new - drag & drop
 
+  final String quote;
+  final String quoteAuthor;
+  final String deepReflection;
+
   const StudyPlanModel({
     required this.id,
     required this.courseId,
@@ -59,6 +63,10 @@ class StudyPlanModel extends Equatable {
     required this.videoLinks,
     required this.quiz,
     this.interactiveActivity,
+    required this.quote,
+    required this.quoteAuthor,
+    required this.deepReflection,
+
   });
 
   factory StudyPlanModel.fromFirestore(Map<String, dynamic> json, String documentId) {
@@ -82,6 +90,10 @@ class StudyPlanModel extends Equatable {
       interactiveActivity: json['interactiveActivity'] != null 
           ? Map<String, dynamic>.from(json['interactiveActivity'] as Map) 
           : null,
+          
+      quote: json['quote'] ?? '',
+      quoteAuthor: json['quoteAuthor'] ?? '',
+      deepReflection: json['deepReflection'] ?? '',
     );
   }
 

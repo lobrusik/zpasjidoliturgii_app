@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../widgets/buy_coffee_button.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../widgets/drag_and_drop_quiz.dart';
+import '../widgets/thought_card.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../data/models/interactive_lesson_model.dart';
@@ -186,6 +187,12 @@ class CourseDetailsScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   if (plan.videoLinks.isNotEmpty) 
                     YoutubeVideoPlayer(videoUrl: plan.videoLinks.first)
+                  else if (plan.quote.isNotEmpty)
+                    ThoughtOfTheDayCard(
+                      quote: plan.quote,
+                      author: plan.quoteAuthor,
+                      deepReflection: plan.deepReflection,
+                    )
                   else
                     Container(
                       height: 180,
