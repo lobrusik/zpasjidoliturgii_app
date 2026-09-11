@@ -27,29 +27,28 @@ class _ThoughtOfTheDayCardState extends State<ThoughtOfTheDayCard> {
       margin: const EdgeInsets.symmetric(vertical: 12),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D3039), // Spójny kolor tła z Twojej aplikacji
+        color: const Color(0xFF2D3039),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Nagłówek karty
-          Row(
-            children: [
-              Icon(Icons.format_quote_rounded, color: theme.colorScheme.primary, size: 26),
-              const SizedBox(width: 8),
-              Text(
-                'Myśl dnia i refleksja',
-                style: TextStyle(
-                  color: theme.colorScheme.primary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
+          // Row(
+          //   children: [
+          //     Icon(Icons.format_quote_rounded, color: theme.colorScheme.primary, size: 26),
+          //     const SizedBox(width: 8),
+          //     Text(
+          //       'Refleksja',
+          //       style: TextStyle(
+          //         color: theme.colorScheme.primary,
+          //         fontWeight: FontWeight.bold,
+          //         fontSize: 14,
+          //       ),
+          //     ),
+          //   ],
+          // ),
+          // const SizedBox(height: 14),
 
           AnimatedCrossFade(
             firstChild: Column(
@@ -82,7 +81,7 @@ class _ThoughtOfTheDayCardState extends State<ThoughtOfTheDayCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Głębsza refleksja:',
+                  'Kontekst:',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -119,7 +118,7 @@ class _ThoughtOfTheDayCardState extends State<ThoughtOfTheDayCard> {
                 size: 16,
               ),
               label: Text(
-                _showDeepReflection ? 'Wróć do cytatu' : 'Przełącz na głębszą refleksję',
+                _showDeepReflection ? 'Wróć do cytatu' : 'Przełącz na kontekst',
               ),
               style: TextButton.styleFrom(
                 foregroundColor: theme.colorScheme.primary,
