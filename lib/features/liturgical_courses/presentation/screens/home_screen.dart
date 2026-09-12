@@ -152,7 +152,7 @@ class HomeScreen extends StatelessWidget {
                 context, 
                 title: 'Podcasty', 
                 description: 'Mądrego to aż miło posłuchać.', 
-                imagePlaceholder: Icons.calendar_today_outlined, 
+                imagePlaceholder: Icons.mic_outlined, 
                 onTap: () => context.go('/podcast')
               ),
               _buildPathCard(
