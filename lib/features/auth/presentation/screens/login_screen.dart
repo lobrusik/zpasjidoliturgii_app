@@ -70,6 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 controller: resetEmailController,
                 keyboardType: TextInputType.emailAddress,
+                autofillHints: const [AutofillHints.email],
                 style: const TextStyle(color: Colors.white),
                 decoration: const InputDecoration(
                   labelText: 'Adres e-mail',
@@ -122,142 +123,146 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: SingleChildScrollView( 
           padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 48),
-                // LOGO
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.church_outlined, size: 64, color: theme.colorScheme.primary),
-                  ),
-                ),
-                const SizedBox(height: 32),
-                
-                // Welcome text
-                Text(
-                  'Zaloguj się',
-                  style: theme.textTheme.headlineLarge,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Kontynuuj swoją formację liturgiczną',
-                  style: theme.textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 48),
-                
-                // Form
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Adres e-mail',
-                    prefixIcon: Icon(Icons.email_outlined),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) return 'Podaj adres e-mail';
-                    if (!value.contains('@')) return 'Podaj poprawny adres e-mail';
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                
-                // Password field
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  decoration: InputDecoration(
-                    labelText: 'Hasło',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                        color: Colors.grey,
+          child: AutofillGroup(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 48),
+                  // LOGO
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withOpacity(0.1),
+                        shape: BoxShape.circle,
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
+                      child: Icon(Icons.church_outlined, size: 64, color: theme.colorScheme.primary),
                     ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) return 'Podaj hasło';
-                    return null;
-                  },
-                ),
-                
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () => _showForgotPasswordDialog(context),
-                    child: Text('Zapomniałeś hasła?', style: TextStyle(color: theme.colorScheme.primary)),
+                  const SizedBox(height: 32),
+                  
+                  // Welcome text
+                  Text(
+                    'Zaloguj się',
+                    style: theme.textTheme.headlineLarge,
+                    textAlign: TextAlign.center,
                   ),
-                ),
-                
-                const SizedBox(height: 16),
-                
-                // Action buttons
-                if (_isLoading)
-                  const Center(child: CircularProgressIndicator())
-                else ...[
-                  ElevatedButton(
-                    onPressed: _handleLogin,
-                    child: const Text('Zaloguj się'),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Kontynuuj swoją formację liturgiczną',
+                    style: theme.textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 48),
+                  
+                  // Form
+                  TextFormField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    autofillHints: const [AutofillHints.email, AutofillHints.username],
+                    decoration: const InputDecoration(
+                      labelText: 'Adres e-mail',
+                      prefixIcon: Icon(Icons.email_outlined),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) return 'Podaj adres e-mail';
+                      if (!value.contains('@')) return 'Podaj poprawny adres e-mail';
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const RegisterScreen(),
+                  
+                  // Password field
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: _obscurePassword,
+                    autofillHints: const [AutofillHints.password],
+                    decoration: InputDecoration(
+                      labelText: 'Hasło',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                          color: Colors.grey,
                         ),
-                      );
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) return 'Podaj hasło';
+                      return null;
                     },
-                    child: const Text('Nie masz konta? Zarejestruj się'),
                   ),
                   
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24.0),
-                    child: Row(
-                      children: [
-                        Expanded(child: Divider()),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Text('LUB', style: TextStyle(color: Colors.grey)),
-                        ),
-                        Expanded(child: Divider()),
-                      ],
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () => _showForgotPasswordDialog(context),
+                      child: Text('Zapomniałeś hasła?', style: TextStyle(color: theme.colorScheme.primary)),
                     ),
                   ),
                   
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.g_mobiledata, size: 28),
-                    label: const Text('Kontynuuj z Google'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      side: BorderSide(color: Colors.grey.shade300),
-                      foregroundColor: theme.colorScheme.onSurface,
+                  const SizedBox(height: 16),
+                  
+                  // Action buttons
+                  if (_isLoading)
+                    const Center(child: CircularProgressIndicator())
+                  else ...[
+                    ElevatedButton(
+                      onPressed: _handleLogin,
+                      child: const Text('Zaloguj się'),
                     ),
-                    onPressed: () async {
-                      setState(() => _isLoading = true);
-                      await _authRepo.signInWithGoogle();
-                      if (mounted) setState(() => _isLoading = false);
-                    },
-                  ),
-                ]
-              ],
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RegisterScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text('Nie masz konta? Zarejestruj się'),
+                    ),
+                    
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24.0),
+                      child: Row(
+                        children: [
+                          Expanded(child: Divider()),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Text('LUB', style: TextStyle(color: Colors.grey)),
+                          ),
+                          Expanded(child: Divider()),
+                        ],
+                      ),
+                    ),
+                    
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.g_mobiledata, size: 28),
+                      label: const Text('Kontynuuj z Google'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        side: BorderSide(color: Colors.grey.shade300),
+                        foregroundColor: theme.colorScheme.onSurface,
+                      ),
+                      onPressed: () async {
+                        setState(() => _isLoading = true);
+                        await _authRepo.signInWithGoogle();
+                        if (mounted) setState(() => _isLoading = false);
+                      },
+                    ),
+                  ]
+                ],
+              ),
             ),
           ),
         ),
