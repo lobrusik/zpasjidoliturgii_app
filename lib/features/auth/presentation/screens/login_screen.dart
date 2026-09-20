@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../data/repositories/auth_repository.dart';
 import 'register_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -28,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
       await _authRepo.signInWithEmail(_emailController.text.trim(), _passwordController.text);
       
       if (mounted){
-        Navigator.pushReplacementNamed(context, '/home');
+        context.go('/home');
       }
     } on FirebaseAuthException catch (e) {
       String errorMsg = 'Wystąpił błąd.';

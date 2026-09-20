@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
     appId: '1:1038776967097:web:942d864a577c4650fbe068',
     messagingSenderId: '1038776967097',
     projectId: 'liturgical-app',
-    authDomain: 'liturgical-app.firebaseapp.com',
+    authDomain: 'aplikacja.zpasjidoliturgii.pl',
     storageBucket: 'liturgical-app.firebasestorage.app',
     measurementId: 'G-5HNL1EVGMP',
   );
