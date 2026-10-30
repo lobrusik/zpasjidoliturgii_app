@@ -6,7 +6,7 @@ import '../widgets/news_carousel.dart';
 import '../widgets/buy_coffee_button.dart';
 import '../widgets/about_contact_section.dart';
 import '../../../game/liturgical_hangman.dart';
-import '../../../game/liturgical_word_search.dart'
+import '../../../game/liturgical_word_search.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
