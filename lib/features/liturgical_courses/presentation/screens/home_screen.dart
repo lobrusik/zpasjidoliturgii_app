@@ -170,7 +170,7 @@ class HomeScreen extends StatelessWidget {
               ),
               _buildPathCard(
                 context, 
-                title: 'Sprawdź swoją spostrzegawczość?', 
+                title: 'Sprawdź swoją spostrzegawczość!', 
                 description: 'Znajdź ukryte liturgiczne słowa.', 
                 imagePlaceholder: Icons.find_in_page_outlined, 
                 onTap: () {

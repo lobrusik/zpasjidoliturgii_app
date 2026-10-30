@@ -12,14 +12,12 @@ class LiturgicalWordSearch extends StatefulWidget {
 class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
   final Random _random = Random();
   
-  // Game state
   int _level = 1;
   int _gridSize = 8;
   List<String> _allWords = [];
   List<String> _currentWords = [];
   List<String> _foundWords = [];
   
-  // Board
   List<List<String>> _grid = [];
   List<Point<int>> _currentSelection = [];
   List<Point<int>> _foundCells = [];
@@ -32,34 +30,31 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
     _loadWordsFromFirestore();
   }
 
-  //Download words from hangman
   Future<void> _loadWordsFromFirestore() async {
     try {
       final snapshot = await FirebaseFirestore.instance.collection('liturgical_terms').get();
-      
       _allWords = snapshot.docs
           .map((doc) => (doc.data()['word'] as String).toUpperCase().replaceAll(' ', ''))
           .where((w) => w.length >= 3)
           .toList();
-          
       _startNewLevel();
     } catch (e) {
       debugPrint('Błąd pobierania słów: $e');
-      _allWords = ['ORNAT', 'MSZA', 'KIELICH', 'KORPORAŁ', 'PATENA', 'OŁTARZ', 'AMBONA'];
+      //_allWords = ['ORNAT', 'MSZA', 'KIELICH', 'KORPORAŁ', 'PATENA', 'OŁTARZ', 'AMBONA', 'KADZIDŁO', 'ALBA', 'STUŁA'];
+      _allWords = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+
       _startNewLevel();
     }
   }
 
-  //Generating a balanced level
   void _startNewLevel() {
     setState(() => _isLoading = true);
     
-    //Increasing the Difficulty
-    _gridSize = 7 + (_level ~/ 2); 
-    if (_gridSize > 12) _gridSize = 12;
+    _gridSize = 7 + _level; 
+    if (_gridSize > 14) _gridSize = 14; 
     
-    int wordsCount = 3 + (_level ~/ 2);
-    if (wordsCount > 8) wordsCount = 8;
+    int wordsCount = 3 + _level;
+    if (wordsCount > 12) wordsCount = 12;
 
     _allWords.shuffle(_random);
     _currentWords = _allWords
@@ -75,29 +70,34 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
     setState(() => _isLoading = false);
   }
 
-  //Word Arrangement Algorithm
+  List<Point<int>> _getAvailableDirections() {
+    List<Point<int>> dirs = [const Point(1, 0), const Point(0, 1)];
+    if (_level >= 2) dirs.add(const Point(1, 1));
+    if (_level >= 3) dirs.addAll([const Point(-1, 0), const Point(0, -1)]);
+    if (_level >= 4) dirs.addAll([const Point(-1, -1), const Point(1, -1), const Point(-1, 1)]);
+    return dirs;
+  }
+
   void _generateBoard() {
-    //Empty board
     _grid = List.generate(_gridSize, (_) => List.generate(_gridSize, (_) => ''));
-    
-    // Directions: horizontal (to the right), vertical (down), diagonal (right-down)
-    final directions = [const Point(1, 0), const Point(0, 1), const Point(1, 1)];
+    final directions = _getAvailableDirections();
+    List<String> successfullyPlacedWords = [];
     
     for (String word in _currentWords) {
       bool placed = false;
       int attempts = 0;
       
-      while (!placed && attempts < 100) {
+      while (!placed && attempts < 200) {
         attempts++;
         final dir = directions[_random.nextInt(directions.length)];
         
-        int maxX = _gridSize - (word.length * dir.x);
-        int maxY = _gridSize - (word.length * dir.y);
+        int startX = _random.nextInt(_gridSize);
+        int startY = _random.nextInt(_gridSize);
         
-        if (maxX < 0 || maxY < 0) continue;
+        int endX = startX + (word.length - 1) * dir.x;
+        int endY = startY + (word.length - 1) * dir.y;
         
-        int startX = _random.nextInt(maxX == 0 ? 1 : maxX);
-        int startY = _random.nextInt(maxY == 0 ? 1 : maxY);
+        if (endX < 0 || endX >= _gridSize || endY < 0 || endY >= _gridSize) continue;
         
         bool canPlace = true;
         for (int i = 0; i < word.length; i++) {
@@ -116,9 +116,12 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
             _grid[y][x] = word[i];
           }
           placed = true;
+          successfullyPlacedWords.add(word);
         }
       }
     }
+    
+    _currentWords = successfullyPlacedWords;
     
     const chars = 'AĄBCĆDEĘFGHIJKLŁMNŃOÓPQRSŚTUVWXYZŹŻ';
     for (int y = 0; y < _gridSize; y++) {
@@ -130,7 +133,6 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
     }
   }
 
-  //Finger-Swipe Support
   void _onPanUpdate(DragUpdateDetails details, BoxConstraints constraints) {
     double cellWidth = constraints.maxWidth / _gridSize;
     double cellHeight = constraints.maxHeight / _gridSize;
@@ -166,7 +168,7 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
       _currentSelection.clear();
     });
     
-    if (_foundWords.length == _currentWords.length) {
+    if (_foundWords.length == _currentWords.length && _currentWords.isNotEmpty) {
       _showLevelCompleteDialog();
     }
   }
@@ -175,18 +177,19 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => AlertDialog(
+      builder: (BuildContext dialogContext) => AlertDialog( 
         backgroundColor: const Color(0xFF22242B),
         title: const Text('Poziom ukończony!', style: TextStyle(color: Colors.white)),
-        content: Text('Znalazłeś wszystkie słowa.\nGotowy na trudniejsze wyzwanie?', style: TextStyle(color: Colors.grey.shade400)),
+        content: Text('Znalazłeś wszystkie słowa.\nGotowy na trudniejsze wyzwanie?', style: TextStyle(color: Colors.grey)),
         actions: [
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.of(dialogContext).pop();
               setState(() => _level++);
               _startNewLevel();
             },
-            child: const Text('Kolejny poziom'),
+            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary),
+            child: const Text('Kolejny poziom', style: TextStyle(color: Colors.white)),
           )
         ],
       ),
@@ -208,7 +211,6 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
       ),
       body: Column(
         children: [
-          //List of words to find
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Wrap(
@@ -228,7 +230,6 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
             ),
           ),
           
-          // Mesh with letters
           Expanded(
             child: Center(
               child: AspectRatio(
