@@ -6,6 +6,7 @@ import '../widgets/news_carousel.dart';
 import '../widgets/buy_coffee_button.dart';
 import '../widgets/about_contact_section.dart';
 import '../../../game/liturgical_hangman.dart';
+import '../../../game/liturgical_word_search.dart'
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -152,7 +153,7 @@ class HomeScreen extends StatelessWidget {
                 context, 
                 title: 'Podcasty', 
                 description: 'Mądrego to aż miło posłuchać.', 
-                imagePlaceholder: Icons.mic_outlined, 
+                imagePlaceholder: Icons.mic_outlined,
                 onTap: () => context.go('/podcast')
               ),
               _buildPathCard(
@@ -164,6 +165,18 @@ class HomeScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const LiturgicalHangman()),
+                  );
+                }
+              ),
+              _buildPathCard(
+                context, 
+                title: 'Sprawdź swoją spostrzegawczość?', 
+                description: 'Znajdź ukryte liturgiczne słowa.', 
+                imagePlaceholder: Icons.find_in_page_outlined, 
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LiturgicalWordSearch()),
                   );
                 }
               ),
