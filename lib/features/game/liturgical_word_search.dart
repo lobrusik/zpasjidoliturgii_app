@@ -160,7 +160,6 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
   }
 
   void _onPanStart(DragStartDetails details, BoxConstraints constraints) {
-    if (_startCell == null) return;
     double cellWidth = constraints.maxWidth / _gridSize;
     double cellHeight = constraints.maxHeight / _gridSize;
     

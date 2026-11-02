@@ -162,6 +162,9 @@ class ProfileScreen extends StatelessWidget {
                   //hangman game
                   int hangmanLevelsCompleted = 0; 
 
+                  //word search game
+                  int wordSearchLevelsCompleted = 0;
+
                   // Counting completed lessons if the user's data exists
                   if (snapshot.hasData && snapshot.data!.exists) {
                     final data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
@@ -169,6 +172,7 @@ class ProfileScreen extends StatelessWidget {
                     
                     // Appeal of the Game Result
                     hangmanLevelsCompleted = data['hangmanLevelsCompleted'] ?? 0; 
+                    wordSearchLevelsCompleted = data['wordSearchLevelsCompleted'] ?? 0; 
 
                     final progressMap = data['progress'] as Map<String, dynamic>? ?? {};
 
@@ -220,6 +224,8 @@ class ProfileScreen extends StatelessWidget {
                       _buildStatCard('Kompleta', completoriumStreak, Icons.nightlight_round, Colors.amber.shade400, theme),
                       //hangman game 
                       _buildStatCard('Odgadnięte\nterminy', hangmanLevelsCompleted, Icons.spellcheck, Colors.purple.shade300, theme),
+                      //word search game
+                      _buildStatCard('Ukończone\nwylreślanki', wordSearchLevelsCompleted, Icons.find_in_page_outlined, Colors.pink.shade300, theme),
                     ],
                   );
                 },
