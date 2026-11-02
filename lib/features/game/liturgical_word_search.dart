@@ -13,13 +13,12 @@ class LiturgicalWordSearch extends StatefulWidget {
 class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
   final Random _random = Random();
   
-  // Zmienne postępu i Firebase
   int maxUnlockedLevel = 0;
   int playingLevel = 0;
   bool isLoading = true;
   bool noMoreWords = false;
 
-  // Stan gry
+  Point<int>? _startCell;
   int _gridSize = 8;
   List<String> _allWords = [];
   List<String> _currentWords = [];
@@ -92,6 +91,7 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
     _foundWords.clear();
     _foundCells.clear();
     _currentSelection.clear();
+    _startCell = null;
     
     _generateBoard();
     setState(() => isLoading = false);
@@ -159,7 +159,8 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
     }
   }
 
-  void _onPanUpdate(DragUpdateDetails details, BoxConstraints constraints) {
+  void _onPanStart(DragStartDetails details, BoxConstraints constraints) {
+    if (_startCell == null) return;
     double cellWidth = constraints.maxWidth / _gridSize;
     double cellHeight = constraints.maxHeight / _gridSize;
     
@@ -167,14 +168,46 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
     int row = (details.localPosition.dy / cellHeight).floor();
     
     if (col >= 0 && col < _gridSize && row >= 0 && row < _gridSize) {
-      Point<int> p = Point(col, row);
-      if (!_currentSelection.contains(p)) {
-        setState(() => _currentSelection.add(p));
+        setState(() {
+        _startCell = Point(col, row);
+        _currentSelection = [_startCell!];
+      });
+    }
+  }
+
+  void _onPanUpdate(DragUpdateDetails details, BoxConstraints constraints) {
+    if (_startCell == null) return;
+
+    double cellWidth = constraints.maxWidth / _gridSize;
+    double cellHeight = constraints.maxHeight / _gridSize;
+    
+    int col = (details.localPosition.dx / cellWidth).floor();
+    int row = (details.localPosition.dy / cellHeight).floor();
+    
+    if (col >= 0 && col < _gridSize && row >= 0 && row < _gridSize) {
+      int dx = col - _startCell!.x;
+      int dy = row - _startCell!.y;
+
+      if (dx == 0 || dy == 0 || dx.abs() == dy.abs()) {
+        int steps = max(dx.abs(), dy.abs());
+        int stepX = dx == 0 ? 0 : (dx > 0 ? 1 : -1);
+        int stepY = dy == 0 ? 0 : (dy > 0 ? 1 : -1);
+
+        List<Point<int>> newSelection = [];
+        for (int i = 0; i <= steps; i++) {
+          newSelection.add(Point(_startCell!.x + (i * stepX), _startCell!.y + (i * stepY)));
+        }
+
+        if (_currentSelection.length != newSelection.length || _currentSelection.last != newSelection.last) {
+          setState(() {
+            _currentSelection = newSelection;
+          });
+        }
       }
     }
   }
 
-  void _onPanEnd(DragEndDetails details) {
+void _onPanEnd(DragEndDetails details) {
     if (_currentSelection.isEmpty) return;
     
     String selectedWord = _currentSelection.map((p) => _grid[p.y][p.x]).join('');
@@ -188,7 +221,10 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
       _foundCells.addAll(_currentSelection);
     }
     
-    setState(() => _currentSelection.clear());
+    setState(() {
+      _currentSelection.clear();
+      _startCell = null;
+    });
     
     if (_foundWords.length == _currentWords.length && _currentWords.isNotEmpty) {
       _handleWinCondition();
@@ -382,7 +418,7 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       return GestureDetector(
-                        onPanStart: (d) => _currentSelection.clear(),
+                        onPanStart: (d) => _onPanStart(d, constraints),
                         onPanUpdate: (d) => _onPanUpdate(d, constraints),
                         onPanEnd: _onPanEnd,
                         child: GridView.builder(
