@@ -13,7 +13,6 @@ class NewsCarousel extends StatelessWidget {
       final response = await http.get(
         Uri.parse('https://zpasjidoliturgii.pl/wp-json/wp/v2/posts?per_page=5'),
         headers: {
-          'User-Agent': 'ZPasjiDoLiturgii_MobileApp_W5x8Q',
           'Accept': 'application/json',
         },
       );
@@ -27,7 +26,6 @@ class NewsCarousel extends StatelessWidget {
       throw Exception('$e');
     }
   }
-
   Future<void> _launchURL(String url) async {
     final Uri uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
