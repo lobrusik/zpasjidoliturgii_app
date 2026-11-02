@@ -9,10 +9,18 @@ class NewsCarousel extends StatelessWidget {
   const NewsCarousel({super.key});
 
   Future<List> fetchNews() async {
-    final response = await http.get(Uri.parse('https://zpasjidoliturgii.pl/wp-json/wp/v2/posts?per_page=5'));
+    final response = await http.get(
+      Uri.parse('https://zpasjidoliturgii.pl/wp-json/wp/v2/posts?per_page=5'),
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/json',
+      },
+    );
+    
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
+      debugPrint('Błąd pobierania postów z WP. Kod HTTP: ${response.statusCode}');
       throw Exception('Błąd pobierania danych');
     }
   }
@@ -24,7 +32,6 @@ class NewsCarousel extends StatelessWidget {
     }
   }
 
-  // I love wordpress texts
   String _cleanText(String rawText) {
     if (rawText.isEmpty) return '';
 
@@ -46,12 +53,10 @@ class NewsCarousel extends StatelessWidget {
     text = unescape.convert(text);
 
     return text;
-
   }
 
   @override
   Widget build(BuildContext context) {
-
     return FutureBuilder<List<dynamic>>(
       future: fetchNews(),
       builder: (context, snapshot) {
