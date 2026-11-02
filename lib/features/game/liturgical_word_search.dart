@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,6 +19,9 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
   bool isLoading = true;
   bool noMoreWords = false;
 
+  Timer? _timer;
+  int _timeLeft = 0;
+
   Point<int>? _startCell;
   int _gridSize = 8;
   List<String> _allWords = [];
@@ -32,6 +36,12 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
   void initState() {
     super.initState();
     _loadUserDataAndWords();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadUserDataAndWords() async {
@@ -75,6 +85,7 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
 
   void _startLevel() {
     setState(() => isLoading = true);
+    _timer?.cancel();
     
     _gridSize = 7 + playingLevel; 
     if (_gridSize > 14) _gridSize = 14; 
@@ -94,7 +105,67 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
     _startCell = null;
     
     _generateBoard();
+
+    //time limit: 30 base and 15 sec for every word
+    _timeLeft = 30 +(_currentWords.length * 15);
+    _startTimer();
+
     setState(() => isLoading = false);
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_timeLeft > 0) {
+        setState(() => _timeLeft--);
+      } else {
+        _timer?.cancel();
+        _showTimeUpDialog();
+      }
+    });
+  }
+
+  void _showTimeUpDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF2D3039),
+        title: const Text('Czas minął!', style: TextStyle(color: Colors.redAccent)),
+        content: const Text(
+          'Nie udało Ci się odnaleźć wszystkich słów na czas.\nCo chcesz zrobić?', 
+          style: TextStyle(color: Colors.white70)
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actionsOverflowDirection: VerticalDirection.down,
+        actions: [
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.amber,
+              foregroundColor: const Color(0xFF141F1C),
+              minimumSize: const Size(double.infinity, 45),
+            ),
+            icon: const Icon(Icons.play_circle_outline),
+            label: const Text('Obejrzyj reklamę (+1:00)', style: TextStyle(fontWeight: FontWeight.bold)),
+            onPressed: () {
+              // TODO: In the future, you'll place an AdMob (RewardedAd) call here.
+              // The code for the ad will replace Navigator.pop(), and after the ad is viewed (onUserEarnedReward):
+              Navigator.of(dialogContext).pop();
+              setState(() => _timeLeft = 60);
+              _startTimer();
+            },
+          ),
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              _startLevel(); 
+            },
+            child: const Text('Zacznij od nowa', style: TextStyle(color: Colors.grey)),
+          )
+        ],
+      ),
+    );
   }
 
   List<Point<int>> _getAvailableDirections() {
@@ -231,6 +302,7 @@ void _onPanEnd(DragEndDetails details) {
   }
 
   Future<void> _handleWinCondition() async {
+    _timer?.cancel();
     final user = FirebaseAuth.instance.currentUser;
     if (user != null && playingLevel == maxUnlockedLevel) {
       maxUnlockedLevel++;
@@ -366,6 +438,9 @@ void _onPanEnd(DragEndDetails details) {
       );
     }
 
+    String timeString = '${_timeLeft ~/ 60}:${(_timeLeft % 60).toString().padLeft(2, '0')}';
+    Color timerColor = _timeLeft <= 10 ? Colors.redAccent : Colors.amber;
+
     return Scaffold(
       backgroundColor: const Color(0xFF141F1C),
       appBar: AppBar(
@@ -440,10 +515,12 @@ void _onPanEnd(DragEndDetails details) {
                             Color textColor = Colors.white70;
                             
                             if (isFound) {
-                              cellColor = Colors.green.shade700;
+                              cellColor = Colors.amber;
+                              //cellColor = Colors.green.shade700;
                               textColor = Colors.white;
                             } else if (isSelected) {
-                              cellColor = Colors.amber;
+                              //cellColor = Colors.amber;
+                              cellColor = Colors.green.shade700;
                               textColor = const Color(0xFF141F1C);
                             }
                             
