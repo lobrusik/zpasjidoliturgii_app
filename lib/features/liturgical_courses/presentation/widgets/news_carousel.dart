@@ -9,20 +9,22 @@ class NewsCarousel extends StatelessWidget {
   const NewsCarousel({super.key});
 
   Future<List> fetchNews() async {
-    final response = await http.get(
-      Uri.parse('https://zpasjidoliturgii.pl/wp-json/wp/v2/posts?per_page=5'),
-      headers: {
-        // Unique application identifier
-        'User-Agent': 'ZPasjiDoLiturgii_MobileApp_W5x8Q',
-        'Accept': 'application/json',
-      },
-    );
-    
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      debugPrint('Błąd pobierania postów z WP. Kod HTTP: ${response.statusCode}');
-      throw Exception('Błąd pobierania danych');
+    try {
+      final response = await http.get(
+        Uri.parse('https://zpasjidoliturgii.pl/wp-json/wp/v2/posts?per_page=5'),
+        headers: {
+          'User-Agent': 'ZPasjiDoLiturgii_MobileApp_W5x8Q',
+          'Accept': 'application/json',
+        },
+      );
+      
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception('Błąd HTTP: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('$e');
     }
   }
 
@@ -72,9 +74,13 @@ class NewsCarousel extends StatelessWidget {
           return SizedBox(
             height: 220,
             child: Center(
-              child: Text(
-                'Nie udało się pobrać aktualności.',
-                style: TextStyle(color: Colors.grey.shade600),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Szczegóły błędu:\n${snapshot.error}', // Wypisze błąd prosto na ekran!
+                  style: const TextStyle(color: Colors.redAccent, fontSize: 12),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           );
