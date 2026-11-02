@@ -416,7 +416,7 @@ void _onPanEnd(DragEndDetails details) {
     );
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Scaffold(
@@ -446,6 +446,7 @@ void _onPanEnd(DragEndDetails details) {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         title: Text('Poziom: ${playingLevel + 1}', style: const TextStyle(color: Colors.amber)),
+        centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.amber),
         actions: [
           IconButton(
@@ -462,6 +463,32 @@ void _onPanEnd(DragEndDetails details) {
       ),
       body: Column(
         children: [
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+            padding: const EdgeInsets.symmetric(vertical: 12.0),
+            decoration: BoxDecoration(
+              color: const Color(0xFF2D3039),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: timerColor.withOpacity(0.5), width: 2),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.timer_outlined, color: timerColor, size: 28),
+                const SizedBox(width: 8),
+                Text(
+                  timeString,
+                  style: TextStyle(
+                    color: timerColor,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Wrap(
@@ -514,14 +541,12 @@ void _onPanEnd(DragEndDetails details) {
                             Color cellColor = const Color(0xFF2D3039);
                             Color textColor = Colors.white70;
                             
-                            if (isFound) {
+                            if (isSelected) {
                               cellColor = Colors.amber;
-                              //cellColor = Colors.green.shade700;
-                              textColor = Colors.white;
-                            } else if (isSelected) {
-                              //cellColor = Colors.amber;
-                              cellColor = Colors.green.shade700;
                               textColor = const Color(0xFF141F1C);
+                            } else if (isFound) {
+                              cellColor = Colors.green.shade700;
+                              textColor = Colors.white;
                             }
                             
                             return Container(
