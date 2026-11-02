@@ -12,7 +12,8 @@ class NewsCarousel extends StatelessWidget {
     final response = await http.get(
       Uri.parse('https://zpasjidoliturgii.pl/wp-json/wp/v2/posts?per_page=5'),
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        // Unique application identifier
+        'User-Agent': 'ZPasjiDoLiturgii_MobileApp_W5x8Q',
         'Accept': 'application/json',
       },
     );
