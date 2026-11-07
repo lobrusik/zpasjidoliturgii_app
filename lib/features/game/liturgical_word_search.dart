@@ -587,3 +587,4 @@ void _onPanEnd(DragEndDetails details) {
       ),
     );
   }
+}
