@@ -7,6 +7,7 @@ import '../widgets/buy_coffee_button.dart';
 import '../widgets/about_contact_section.dart';
 import '../../../game/liturgical_hangman.dart';
 import '../../../game/liturgical_word_search.dart';
+import '../widgets/daily_quotes_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -123,7 +124,8 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
+              const SizedBox(height: 16),
+              const DailyQuotesCard(),
               const SizedBox(height: 32),
 
               Text('Aktualności', style: theme.textTheme.titleLarge),
