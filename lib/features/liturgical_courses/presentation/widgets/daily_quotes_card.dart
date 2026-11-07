@@ -74,6 +74,21 @@ class _DailyQuotesCardState extends State<DailyQuotesCard> {
     return christmas.difference(today).inDays;
   }
 
+  String? _getAdventWeek() {
+    final now = DateTime.now();
+    final month = now.month;
+    final day = now.day;
+
+    if (month == 11 && day >= 29) return 'I tydzień Adwentu';
+    if (month == 12) {
+      if (day >= 1 && day <= 5) return 'I tydzień Adwentu';
+      if (day >= 6 && day <= 12) return 'II tydzień Adwentu';
+      if (day >= 13 && day <= 19) return 'III tydzień Adwentu';
+      if (day >= 20 && day <= 24) return 'IV tydzień Adwentu';
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -88,6 +103,7 @@ class _DailyQuotesCardState extends State<DailyQuotesCard> {
     }
 
     final daysToChristmas = _calculateDaysToChristmas();
+    final adventWeek = _getAdventWeek();
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -113,24 +129,41 @@ class _DailyQuotesCardState extends State<DailyQuotesCard> {
                 color: Colors.amber.withOpacity(0.15),
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Column(
                 children: [
-                  const Icon(Icons.star_border, color: Colors.amber, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    daysToChristmas == 0 
-                        ? 'Dziś jest Boże Narodzenie!' 
-                        : 'Do Bożego Narodzenia: $daysToChristmas dni',
-                    style: const TextStyle(
-                      color: Colors.amber,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      letterSpacing: 0.5,
+                  if (adventWeek != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4.0),
+                      child: Text(
+                        adventWeek.toUpperCase(),
+                        style: const TextStyle(
+                          color: Colors.amber,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 11,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
                     ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.star_border, color: Colors.amber, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        daysToChristmas == 0 
+                            ? 'Dziś jest Boże Narodzenie!' 
+                            : 'Do Bożego Narodzenia: $daysToChristmas dni',
+                        style: const TextStyle(
+                          color: Colors.amber,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.star_border, color: Colors.amber, size: 20),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  const Icon(Icons.star_border, color: Colors.amber, size: 20),
                 ],
               ),
             ),
