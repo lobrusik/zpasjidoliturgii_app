@@ -12,7 +12,6 @@ import '../widgets/true_false_quiz.dart';
 import '../widgets/drag_and_drop_quiz.dart';
 import '../../data/models/study_plan_model.dart';
 import '../widgets/interactive_quiz.dart';
-// import '../../../monetization/presentation/widgets/ad_manager.dart';
 
 class InteractiveLessonScreen extends StatefulWidget {
   final InteractiveLesson lesson;
@@ -609,7 +608,6 @@ class _InteractiveLessonScreenState extends State<InteractiveLessonScreen> {
                 children: [
                   Text(q, style: const TextStyle(color: Colors.white, fontSize: 16)),
                   const SizedBox(height: 12),
-                  // Używamy TextFormField by poprawnie czytać wartość początkową z SharedPreferences
                   TextFormField(
                     initialValue: openAnswers[slideIndex]?[qIndex] ?? '',
                     style: const TextStyle(color: Colors.white),

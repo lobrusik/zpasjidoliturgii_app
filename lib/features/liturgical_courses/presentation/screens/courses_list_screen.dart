@@ -172,13 +172,13 @@ class CoursesListScreen extends StatelessWidget {
     Widget leadingIcon;
 
     if (isCompleted) {
-      nodeColor = const Color(0xFF2E7D32); // Zielony (ukończone)
+      nodeColor = const Color(0xFF2E7D32);
       leadingIcon = const Icon(Icons.check, color: Colors.white);
     } else if (isCurrent) {
-      nodeColor = theme.colorScheme.primary; // Kolor główny (do zrobienia)
+      nodeColor = theme.colorScheme.primary;
       leadingIcon = Text('$levelNumber', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18));
     } else {
-      nodeColor = const Color(0xFF2D3039); // Ciemnoszary (zablokowane)
+      nodeColor = const Color(0xFF2D3039);
       leadingIcon = const Icon(Icons.lock, color: Colors.grey, size: 20);
     }
 

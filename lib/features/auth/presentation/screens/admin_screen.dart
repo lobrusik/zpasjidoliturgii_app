@@ -77,7 +77,7 @@ class _AdminScreenState extends State<AdminScreen> {
                 maxLines: null,
                 expands: true,
                 decoration: const InputDecoration(
-                  hintText: '{\n  "courseId": "trunk_02",\n  "title": "..."\n}\n\nLUB DLA GRY:\n{\n  "lvl": 1,\n  "word": "ALBA",\n  "description": "Biała szata liturgiczna..."\n}',
+                  hintText: '{\n  "courseId": "trunk_02",\n  "title": "..."\n}\n\nDLA GRY:\n{\n  "lvl": 1,\n  "word": "ALBA",\n  "description": "Biała szata liturgiczna..."\n}\n\nDLA CYTATÓW:\n{\n "number": 1,\n "quote": "Tresc",\n "source": "Lb 24,17"\n}',
                   border: OutlineInputBorder(),
                   filled: true,
                   fillColor: Colors.black12,
@@ -124,6 +124,22 @@ class _AdminScreenState extends State<AdminScreen> {
                       onPressed: () => _uploadData('liturgical_terms', useAutoId: true),
                       icon: const Icon(Icons.spellcheck),
                       label: const Text('Wgraj słowo do gry'),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+                  
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade800,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      onPressed: () => _uploadData('quote', useAutoId: true),
+                      icon: const Icon(Icons.format_quote),
+                      label: const Text('Wgraj cytat'),
                     ),
                   ),
                 ],
