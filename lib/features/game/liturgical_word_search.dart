@@ -464,25 +464,26 @@ void _onPanEnd(DragEndDetails details) {
       body: Column(
         children: [
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-            padding: const EdgeInsets.symmetric(vertical: 12.0),
+            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
+            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
             decoration: BoxDecoration(
               color: const Color(0xFF2D3039),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: timerColor.withOpacity(0.5), width: 2),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: timerColor.withOpacity(0.5), width: 1.5),
             ),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.timer_outlined, color: timerColor, size: 28),
-                const SizedBox(width: 8),
+                Icon(Icons.timer_outlined, color: timerColor, size: 20),
+                const SizedBox(width: 6),
                 Text(
                   timeString,
                   style: TextStyle(
                     color: timerColor,
-                    fontSize: 24,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
+                    letterSpacing: 1.5,
                   ),
                 ),
               ],
@@ -490,10 +491,10 @@ void _onPanEnd(DragEndDetails details) {
           ),
 
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
             child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: 6,
+              runSpacing: -4,
               alignment: WrapAlignment.center,
               children: _currentWords.map((word) {
                 bool isFound = _foundWords.contains(word);
@@ -501,10 +502,15 @@ void _onPanEnd(DragEndDetails details) {
                   label: Text(word, style: TextStyle(
                     decoration: isFound ? TextDecoration.lineThrough : null,
                     color: isFound ? Colors.grey : Colors.white,
-                    fontWeight: FontWeight.bold
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
                   )),
                   backgroundColor: isFound ? Colors.transparent : Colors.amber.withOpacity(0.15),
-                  side: BorderSide(color: isFound ? Colors.grey.shade800 : Colors.amber),
+                  side: BorderSide(color: isFound ? Colors.grey.shade800 : Colors.amber, width: 1),
+                  visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  padding: EdgeInsets.zero,
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: -2),
                 );
               }).toList(),
             ),
@@ -515,9 +521,12 @@ void _onPanEnd(DragEndDetails details) {
               child: AspectRatio(
                 aspectRatio: 1,
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(6.0),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
+                      double cellWidth = constraints.maxWidth / _gridSize;
+                      double dynamicFontSize = cellWidth * 0.55;
+
                       return GestureDetector(
                         onPanStart: (d) => _onPanStart(d, constraints),
                         onPanUpdate: (d) => _onPanUpdate(d, constraints),
@@ -552,12 +561,16 @@ void _onPanEnd(DragEndDetails details) {
                             return Container(
                               decoration: BoxDecoration(
                                 color: cellColor,
-                                borderRadius: BorderRadius.circular(6),
+                                borderRadius: BorderRadius.circular(4),
                               ),
                               child: Center(
                                 child: Text(
                                   _grid[y][x],
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: textColor),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold, 
+                                    fontSize: dynamicFontSize,
+                                    color: textColor
+                                  ),
                                 ),
                               ),
                             );
@@ -574,4 +587,3 @@ void _onPanEnd(DragEndDetails details) {
       ),
     );
   }
-}
