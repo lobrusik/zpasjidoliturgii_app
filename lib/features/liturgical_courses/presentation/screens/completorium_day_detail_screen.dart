@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/youtube_video_player.dart';
-
+import '../widgets/youtube_video_player.dart'; 
 
 class CompletoriumDayDetailScreen extends StatelessWidget {
   final String dayTitle;

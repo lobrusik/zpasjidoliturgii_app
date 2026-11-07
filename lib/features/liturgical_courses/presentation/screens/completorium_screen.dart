@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'completorium_day_detail_screen.dart';
- 
+
 class CompletoriumScreen extends StatefulWidget {
   const CompletoriumScreen({super.key});
 
@@ -14,6 +13,35 @@ class CompletoriumScreen extends StatefulWidget {
 
 class _CompletoriumScreenState extends State<CompletoriumScreen> {
   bool _isCompletedToday = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfCompletedToday();
+  }
+
+  Future<void> _checkIfCompletedToday() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    try {
+      final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      if (doc.exists) {
+        final data = doc.data()!;
+        final todayStr = DateTime.now().toIso8601String().split('T')[0];
+        
+        if (data['lastCompletoriumDate'] == todayStr) {
+          if (mounted) {
+            setState(() {
+              _isCompletedToday = true;
+            });
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Błąd sprawdzania statusu modlitwy: $e');
+    }
+  }
 
   Future<void> _markAsCompleted() async {
     if (_isCompletedToday) return;
@@ -38,29 +66,43 @@ class _CompletoriumScreenState extends State<CompletoriumScreen> {
         
         int currentStreak = 0;
         List<dynamic> completedDays = [];
+        String lastDateStr = '';
 
         if (snapshot.exists) {
           final data = snapshot.data() as Map<String, dynamic>? ?? {};
           currentStreak = data['completoriumStreak'] ?? 0;
           completedDays = List.from(data['completedCompletoriumDays'] ?? []);
+          lastDateStr = data['lastCompletoriumDate'] ?? '';
         }
         
-        String todayKey = DateTime.now().toIso8601String().split('T')[0];
-        String uniqueRecord = 'Kompleta_$todayKey';
+        final now = DateTime.now();
+        final todayStr = now.toIso8601String().split('T')[0];
+        
+        final yesterday = now.subtract(const Duration(days: 1));
+        final yesterdayStr = yesterday.toIso8601String().split('T')[0];
 
+        if (lastDateStr == todayStr) {
+          return;
+        } else if (lastDateStr == yesterdayStr) {
+          currentStreak += 1;
+        } else {
+          currentStreak = 1;
+        }
+
+        String uniqueRecord = 'Kompleta_$todayStr';
         if (!completedDays.contains(uniqueRecord)) {
           completedDays.add(uniqueRecord);
-          currentStreak += 1;
-
-          transaction.set(
-            userDocRef,
-            {
-              'completoriumStreak': currentStreak,
-              'completedCompletoriumDays': completedDays,
-            },
-            SetOptions(merge: true),
-          );
         }
+
+        transaction.set(
+          userDocRef,
+          {
+            'completoriumStreak': currentStreak,
+            'lastCompletoriumDate': todayStr,
+            'completedCompletoriumDays': completedDays,
+          },
+          SetOptions(merge: true),
+        );
       });
 
       if (mounted) {
@@ -184,12 +226,15 @@ class _CompletoriumScreenState extends State<CompletoriumScreen> {
                                 ),
                                 trailing: const Icon(Icons.play_circle_fill, color: Colors.amber, size: 28),
                                 onTap: () {
-                                  context.push(
-                                    '/completorium/details',
-                                    extra: {
-                                      'title': day['title']!,
-                                      'url': day['url']!,
-                                    },
+                                  // POPRAWKA: Używamy standardowego Navigatora zamiast routera
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CompletoriumDayDetailScreen(
+                                        dayTitle: day['title']!,
+                                        youtubeUrl: day['url']!,
+                                      ),
+                                    ),
                                   );
                                 },
                               ),
