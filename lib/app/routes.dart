@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:zpasjidoliturgii/features/liturgical_courses/presentation/bloc/study_plan_bloc.dart';
 import 'package:zpasjidoliturgii/features/liturgical_courses/presentation/screens/completorium_screen.dart';
 import 'package:zpasjidoliturgii/features/liturgical_courses/presentation/screens/course_details_screen.dart';
+import 'package:zpasjidoliturgii/features/liturgical_courses/presentation/screens/games_panel_screen.dart';
 
 import 'main_wrapper.dart';
 import '../features/liturgical_courses/data/repositories/course_repository_impl.dart';
@@ -77,7 +78,6 @@ class AppRoutes {
               GoRoute(
                 path: '/courses',
                 builder: (context, state) {
-                  // Bezpieczne rzutowanie extra
                   final tabIndex = state.extra is int ? state.extra as int : 0;
                   return BlocProvider(
                     create: (context) => CoursesBloc(
@@ -90,7 +90,6 @@ class AppRoutes {
                   GoRoute(
                     path: 'details/:id',
                     pageBuilder: (context, state) {
-                      // Zabezpieczone przed null-chekiem w ścieżce
                       final courseId = state.pathParameters['id'] ?? '';
                       final courseTitle = state.extra is String ? state.extra as String : 'Szczegóły kursu';
 
@@ -127,6 +126,15 @@ class AppRoutes {
               ),
             ],
           ),
+
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/games',
+                builder: (context, state) => const GamesPanelScreen(),
+              ),
+            ],
+          ),
           
           StatefulShellBranch(
             routes: [
@@ -150,15 +158,6 @@ class AppRoutes {
                     },
                   ),
                 ],
-              ),
-            ],
-          ),
-
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/podcast',
-                builder: (context, state) => const PodcastScreen(),
               ),
             ],
           ),

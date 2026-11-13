@@ -185,10 +185,9 @@ class HomeScreen extends StatelessWidget {
               
               _buildPathCard(
                 context, 
-                title: 'Gry i quizy', 
+                title: 'Gry', 
                 description: 'Sprawdź zdobytą wiedzę! Zagraj, aby zobaczyć, co już umiesz.', 
                 imagePlaceholder: Icons.videogame_asset,
-                iconColor: Colors.greenAccent, 
                 onTap: () {
                   Navigator.push(
                     context,
