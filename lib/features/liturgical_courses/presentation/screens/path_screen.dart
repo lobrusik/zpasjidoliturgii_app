@@ -413,7 +413,7 @@ class _PathScreenState extends State<PathScreen> {
           final trunkCourses = courses.where((c) => c.category == 'trunk').toList();
           final liturgyCourses = courses.where((c) => c.category == 'liturgy').toList();
           final guideMassCourses = courses.where((c) => c.category == 'trunk_guide').toList();
-          final sacredSpaceCourses = courses.where((c) => c.category == 'trunk_sacred_space').toList(); //przestrzeń sakralna - dodać do bazy
+          final sacredSpaceCourses = courses.where((c) => c.category == 'trunk_sacred_space').toList();
 
           return StreamBuilder<DocumentSnapshot>(
             stream: userId != null 

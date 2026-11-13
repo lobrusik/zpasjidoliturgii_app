@@ -175,12 +175,13 @@ class HomeScreen extends StatelessWidget {
                 imagePlaceholder: Icons.bedtime_outlined, 
                 onTap: () => context.go('/completorium')
               ),
+              
               _buildPathCard(
                 context, 
                 title: 'Podcasty', 
                 description: 'Mądrego to aż miło posłuchać.', 
                 imagePlaceholder: Icons.mic_outlined,
-                onTap: () => context.go('/podcast')
+                onTap: () => context.push('/podcast') // Zmiana na push()
               ),
               
               _buildPathCard(
