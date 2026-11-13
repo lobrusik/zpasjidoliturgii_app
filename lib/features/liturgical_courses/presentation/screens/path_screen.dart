@@ -154,13 +154,8 @@ class _PathScreenState extends State<PathScreen> {
     return completedTrunkLessons >= totalTrunkLessons;
   }
 
-    // === EVENT - ADVENT TREE === //
+ // === EVENT - ADVENT TREE === //
   Widget _buildAdventTree(BuildContext context, ThemeData theme, String? userId) {
-    final now = DateTime.now();
-    final isAdventSeason = (now.month == 11 && now.day > 20) || (now.month == 12 && now.day < 25);
-    if (!isAdventSeason) {
-      return const SizedBox.shrink(); 
-    }
     return BlocBuilder<CoursesBloc, CoursesState>(
       builder: (context, state) {
         if (state is CoursesLoading) return const Center(child: CircularProgressIndicator());
@@ -245,7 +240,7 @@ class _PathScreenState extends State<PathScreen> {
                         context: context,
                         title: 'Wielkie Antyfony',
                         description: 'Napisz opis w przyszłości',
-                        icon: Icons.psychology,//tu pomyśleć nad ikoną
+                        icon: Icons.psychology,
                         branchColor: const Color(0xFF00965E),
                         courses: adventCourses,
                         progressMap: progressMap,
@@ -256,9 +251,9 @@ class _PathScreenState extends State<PathScreen> {
                         context: context,
                         title: 'Pieśni adwentowe',
                         description: 'Napisz opis w przyszłości',
-                        icon: Icons.psychology,//tu pomyśleć nad ikoną
+                        icon: Icons.music_note,
                         branchColor: const Color(0xFF00965E),
-                        courses: adventCourses,
+                        courses: adventCourses, 
                         progressMap: progressMap,
                         isBranchUnlocked: true,
                         isAdmin: isAdmin,
@@ -267,7 +262,7 @@ class _PathScreenState extends State<PathScreen> {
                         context: context,
                         title: 'Hymny Liturgii Godzin na Adwent',
                         description: 'Napisz opis w przyszłości',
-                        icon: Icons.psychology,//tu pomyśleć nad ikoną
+                        icon: Icons.menu_book,
                         branchColor: const Color(0xFF00965E),
                         courses: adventCourses,
                         progressMap: progressMap,
@@ -285,17 +280,10 @@ class _PathScreenState extends State<PathScreen> {
       },
     );
   }
-  
+
   // === EVENT - CHRISTMAS TREE === //
   Widget _buildChristmasTree(BuildContext context, ThemeData theme, String? userId) {
-    final now = DateTime.now();
-    final isChristmasSeason = (now.month == 12 && now.day >= 25) || now.month == 1;
-
-    if (!isChristmasSeason) {
-      return const SizedBox.shrink(); 
-    }
-
-    return BlocBuilder<CoursesBloc, CoursesState>(
+     return BlocBuilder<CoursesBloc, CoursesState>(
       builder: (context, state) {
         if (state is CoursesLoading) return const Center(child: CircularProgressIndicator());
         if (state is CoursesError) return Center(child: Text(state.message));
@@ -323,7 +311,7 @@ class _PathScreenState extends State<PathScreen> {
                   children: [
                     Row(
                       children: [
-                        const Text('🌟', style: TextStyle(fontSize: 28)), // Zmieniona ikona
+                        const Text('🌟', style: TextStyle(fontSize: 28)),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
@@ -408,7 +396,7 @@ class _PathScreenState extends State<PathScreen> {
       },
     );
   }
-
+  
   // === 1. LITURGICAL TREE === //
   Widget _buildLiturgyTree(BuildContext context, ThemeData theme, String? userId) {
     return BlocBuilder<CoursesBloc, CoursesState>(
