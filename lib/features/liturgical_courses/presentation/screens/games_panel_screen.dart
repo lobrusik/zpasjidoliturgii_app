@@ -13,6 +13,7 @@ class GameMenuOption {
   final IconData icon;
   final Color color;
   final Widget widget;
+  final String? Function(Map<String, dynamic> userData)? progressBuilder;
 
   GameMenuOption({
     required this.title,
@@ -20,6 +21,7 @@ class GameMenuOption {
     required this.icon,
     required this.color,
     required this.widget,
+    this.progressBuilder,
   });
 }
 
@@ -33,18 +35,32 @@ class GamesPanelScreen extends StatelessWidget {
 
     final games = [
       GameMenuOption(
-        title: 'Wisielec',
-        description: 'Odgaduj ukryte hasła',
+        title: 'Zgadnij słowo',
+        description: 'Litera po literze odkryj termin liturgiczny.',
         icon: Icons.spellcheck,
         color: Colors.blueAccent,
         widget: const LiturgicalHangman(),
+        progressBuilder: (userData) {
+          final levels = userData['hangmanCompletedLevels'] ?? 0;
+          if (levels > 0) {
+            return 'Ukończono: $levels';
+          }
+          return 'Brak postępu'; 
+        },
       ),
       GameMenuOption(
         title: 'Wykreślanka',
-        description: 'Znajdź słowa',
+        description: 'Znajdź ukryte liturgiczne słowa.',
         icon: Icons.find_in_page_outlined,
         color: Colors.greenAccent,
         widget: const LiturgicalWordSearch(),
+        progressBuilder: (userData) {
+          final levels = userData['wordSearchCompletedLevels'] ?? 0;
+          if (levels > 0) {
+            return 'Ukończono: $levels';
+          }
+          return 'Brak postępu'; 
+        },
       ),
     ];
 
@@ -58,7 +74,7 @@ class GamesPanelScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Gry i quizy', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Gry', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
       ),
