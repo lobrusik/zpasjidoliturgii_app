@@ -280,14 +280,13 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
               
+              
             const SizedBox(height: 16),
           ],
         ),
       ),
     );
   }
-
-// Function that draws a square statistics tile
   Widget _buildStatCard(String title, int count, IconData icon, Color iconColor, ThemeData theme) {
     return Card(
       elevation: 2,

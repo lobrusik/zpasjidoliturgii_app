@@ -226,7 +226,6 @@ class _CompletoriumScreenState extends State<CompletoriumScreen> {
                                 ),
                                 trailing: const Icon(Icons.play_circle_fill, color: Colors.amber, size: 28),
                                 onTap: () {
-                                  // POPRAWKA: Używamy standardowego Navigatora zamiast routera
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(

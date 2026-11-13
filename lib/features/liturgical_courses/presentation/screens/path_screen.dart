@@ -47,6 +47,8 @@ class _PathScreenState extends State<PathScreen> {
                   Tab(icon: Icon(Icons.groups), text: 'E-zbiórka'),
                   Tab(icon: Icon(Icons.history), text: 'Ruch liturgiczny'),
                   Tab(icon: Icon(Icons.psychology), text: 'Rozważania'),
+                  Tab(icon: Icon(Icons.hourglass_bottom), text: 'Adwent'),
+                  Tab(icon: Icon(Icons.star_rate), text: 'Boże Narodzenie')
                 ],
               ),
             ),
@@ -58,6 +60,8 @@ class _PathScreenState extends State<PathScreen> {
                   _buildCollectionTree(context, theme, userId), 
                   _buildHistoryTree(context, theme, userId), 
                   _buildReflectionsTree(context, theme, userId), 
+                  _buildAdventTree(context, theme, userId),
+                  _buildChristmasTree(context, theme, userId),
                 ] 
               ),
             ),
@@ -116,6 +120,7 @@ class _PathScreenState extends State<PathScreen> {
           final trunkCourses = courses.where((c) => c.category == 'trunk').toList();
           final liturgyCourses = courses.where((c) => c.category == 'liturgy').toList();
           final guideMassCourses = courses.where((c) => c.category == 'trunk_guide').toList();
+          final sacredSpaceCourses = courses.where((c) => c.category == 'trunk_sacred_space').toList(); //przestrzeń sakralna - dodać do bazy
 
           return StreamBuilder<DocumentSnapshot>(
             stream: userId != null 
@@ -200,6 +205,21 @@ class _PathScreenState extends State<PathScreen> {
                       icon: Icons.local_fire_department,
                       branchColor: areAdvancedBranchesUnlocked ? const Color(0xFFFFB300) : Colors.grey.shade800,
                       courses: guideMassCourses,
+                      progressMap: progressMap,
+                      isBranchUnlocked: areAdvancedBranchesUnlocked,
+                      isAdmin: isAdmin,
+                    ),
+
+                    //nowa - przestrzeń sakralna
+                    _buildBranchSection(
+                      context: context,
+                      title: 'Gałąź - Przestrzeń sakralna',
+                      description: areAdvancedBranchesUnlocked
+                          ? 'Tu wymyśl krótki opis do tego.'
+                          : 'Zablokowane. Ukończono $completedTrunkLessons/$requiredLessons podstaw.',
+                      icon: Icons.local_fire_department,
+                      branchColor: areAdvancedBranchesUnlocked ? const Color(0xFFFFB300) : Colors.grey.shade800,
+                      courses: sacredSpaceCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedBranchesUnlocked,
                       isAdmin: isAdmin,
@@ -771,6 +791,261 @@ class _PathScreenState extends State<PathScreen> {
     );
   }
  
+  // === 6. ADVENT TREE === //
+  Widget _buildAdventTree(BuildContext context, ThemeData theme, String? userId) {
+    final now = DateTime.now();
+    final isAdventSeason = (now.month == 11 && now.day > 20) || (now.month == 12 && now.day < 25);
+    if (!isAdventSeason) {
+      return const SizedBox.shrink(); 
+    }
+    return BlocBuilder<CoursesBloc, CoursesState>(
+      builder: (context, state) {
+        if (state is CoursesLoading) return const Center(child: CircularProgressIndicator());
+        if (state is CoursesError) return Center(child: Text(state.message));
+
+        if (state is CoursesLoaded) {
+          final courses = state.courses;
+          final trunkCourses = courses.where((c) => c.category == 'advent').toList();
+          final adventCourses = courses.where((c) => c.category == 'advent_antiphons' || c.category == 'advent').toList();
+
+          return StreamBuilder<DocumentSnapshot>(
+            stream: userId != null 
+              ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
+              : const Stream.empty(),
+            builder: (context, snapshot) {
+              final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
+              final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
+              final bool isAdmin = userData['isAdmin'] ?? false;
+
+              bool isUnlocked = isAdmin || _checkIfTrunkCompleted(trunkCourses, progressMap);
+
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Text('💡', style: TextStyle(fontSize: 28)),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Wszystko o Adwencie',
+                            style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      isUnlocked ? 'Materiały pomagające lepiej zrozumieć adwent i wejść głębiej w ten czas oczekiwania.' : '🔒 Zablokowane. Wymagane ukończenie wszystkich lekcji z Teologii Liturgii.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: isUnlocked ? Colors.grey.shade400 : Colors.redAccent.shade100,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    if (!isUnlocked) ...[
+                      GestureDetector(
+                        onTap: () => _showLockedDialog(context, 'Adwent'),
+                        child: Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade900,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
+                          ),
+                          child: Row(
+                            children: const [
+                              CircleAvatar(
+                                backgroundColor: Colors.white12,
+                                radius: 30,
+                                child: Icon(Icons.lock, color: Colors.redAccent, size: 32),
+                              ),
+                              SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Moduł zablokowany', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                                    SizedBox(height: 6),
+                                    Text('Ukończ wszystkie lekcje z Teologii Liturgii, aby odblokować ten materiał.', style: TextStyle(fontSize: 13, color: Colors.white70)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ] else ...[
+                      _buildBranchSection(
+                        context: context,
+                        title: 'Wielkie Antyfony',
+                        description: 'Napisz opis w przyszłości',
+                        icon: Icons.psychology,//tu pomyśleć nad ikoną
+                        branchColor: const Color(0xFF00965E),
+                        courses: adventCourses,
+                        progressMap: progressMap,
+                        isBranchUnlocked: true,
+                        isAdmin: isAdmin,
+                      ),
+                      _buildBranchSection(
+                        context: context,
+                        title: 'Pieśni adwentowe',
+                        description: 'Napisz opis w przyszłości',
+                        icon: Icons.psychology,//tu pomyśleć nad ikoną
+                        branchColor: const Color(0xFF00965E),
+                        courses: adventCourses,
+                        progressMap: progressMap,
+                        isBranchUnlocked: true,
+                        isAdmin: isAdmin,
+                      ),
+                      _buildBranchSection(
+                        context: context,
+                        title: 'Hymny Liturgii Godzin na Adwent',
+                        description: 'Napisz opis w przyszłości',
+                        icon: Icons.psychology,//tu pomyśleć nad ikoną
+                        branchColor: const Color(0xFF00965E),
+                        courses: adventCourses,
+                        progressMap: progressMap,
+                        isBranchUnlocked: true,
+                        isAdmin: isAdmin,
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            },
+          );
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+  
+  // === 7. CHRISTMAS TREE === //
+  Widget _buildChristmasTree(BuildContext context, ThemeData theme, String? userId) {
+    final now = DateTime.now();
+    final isChristmasSeason = (now.month == 12 && now.day >= 25) || now.month == 1;
+
+    if (!isChristmasSeason) {
+      return const SizedBox.shrink(); 
+    }
+
+    return BlocBuilder<CoursesBloc, CoursesState>(
+      builder: (context, state) {
+        if (state is CoursesLoading) return const Center(child: CircularProgressIndicator());
+        if (state is CoursesError) return Center(child: Text(state.message));
+
+        if (state is CoursesLoaded) {
+          final courses = state.courses;
+          final trunkCourses = courses.where((c) => c.category == 'christmas').toList();
+          final christmasCourses = courses.where((c) => c.category == 'christmas').toList();
+
+          return StreamBuilder<DocumentSnapshot>(
+            stream: userId != null 
+              ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
+              : const Stream.empty(),
+            builder: (context, snapshot) {
+              final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
+              final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
+              final bool isAdmin = userData['isAdmin'] ?? false;
+
+              bool isUnlocked = isAdmin || _checkIfTrunkCompleted(trunkCourses, progressMap);
+
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Text('🌟', style: TextStyle(fontSize: 28)), // Zmieniona ikona
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Boże Narodzenie',
+                            style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      isUnlocked ? 'Zgłębiaj tajemnicę Wcielenia i celebruj liturgię okresu Bożego Narodzenia.' : '🔒 Zablokowane. Wymagane ukończenie lekcji z Teologii Liturgii.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: isUnlocked ? Colors.grey.shade400 : Colors.redAccent.shade100,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    if (!isUnlocked) ...[
+                      GestureDetector(
+                        onTap: () => _showLockedDialog(context, 'Boże Narodzenie'),
+                        child: Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade900,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
+                          ),
+                          child: Row(
+                            children: const [
+                              CircleAvatar(
+                                backgroundColor: Colors.white12,
+                                radius: 30,
+                                child: Icon(Icons.lock, color: Colors.redAccent, size: 32),
+                              ),
+                              SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Moduł zablokowany', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                                    SizedBox(height: 6),
+                                    Text('Ukończ wszystkie lekcje z Teologii Liturgii, aby odblokować ten materiał.', style: TextStyle(fontSize: 13, color: Colors.white70)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ] else ...[
+                      _buildBranchSection(
+                        context: context,
+                        title: '1 moduł',
+                        description: 'Napisz opis w przyszłości',
+                        icon: Icons.church,
+                        branchColor: Colors.amber.shade700,
+                        courses: christmasCourses,
+                        progressMap: progressMap,
+                        isBranchUnlocked: true,
+                        isAdmin: isAdmin,
+                      ),
+                      _buildBranchSection(
+                        context: context,
+                        title: '2 moduł',
+                        description: 'Napisz opis w przyszłości',
+                        icon: Icons.music_note, 
+                        branchColor: Colors.amber.shade700,
+                        courses: christmasCourses,
+                        progressMap: progressMap,
+                        isBranchUnlocked: true,
+                        isAdmin: isAdmin,
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            },
+          );
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+  
   // === VIEW HELPERS === //
   Widget _buildBranchSection({
     required BuildContext context,

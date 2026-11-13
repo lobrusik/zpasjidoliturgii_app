@@ -5,9 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/news_carousel.dart';
 import '../widgets/buy_coffee_button.dart';
 import '../widgets/about_contact_section.dart';
-import '../../../game/liturgical_hangman.dart';
-import '../../../game/liturgical_word_search.dart';
 import '../widgets/daily_quotes_card.dart';
+import 'games_panel_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -16,6 +15,10 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final userId = FirebaseAuth.instance.currentUser?.uid;
+
+    final now = DateTime.now();
+    final isAdventSeason = (now.month == 11 && now.day > 20) || (now.month == 12 && now.day < 25);
+    final isChristmasSeason = (now.month == 12 && now.day >= 25) || now.month == 1;
 
     return Scaffold(
       body: SafeArea(
@@ -144,11 +147,32 @@ class HomeScreen extends StatelessWidget {
                 imagePlaceholder: Icons.account_tree_outlined, 
                 onTap: () => context.go('/courses', extra: 0)
               ),
+              
+              if (isAdventSeason)
+                _buildPathCard(
+                  context, 
+                  title: 'Wszystko o Adwencie', 
+                  description: 'Specjalny moduł przygotowujący do świąt. Odkryj głębię oczekiwania.', 
+                  imagePlaceholder: Icons.calendar_month, 
+                  iconColor: Colors.purpleAccent,
+                  onTap: () => context.go('/courses')
+                ),
+
+              if (isChristmasSeason)
+                _buildPathCard(
+                  context, 
+                  title: 'Boże Narodzenie', 
+                  description: 'Tajemnica Wcielenia, liturgia i kolędy. Świętuj okres Bożego Narodzenia.', 
+                  imagePlaceholder: Icons.star_border,
+                  iconColor: Colors.amber, 
+                  onTap: () => context.go('/courses') 
+                ),
+
               _buildPathCard(
                 context, 
                 title: 'Kompleta', 
                 description: 'Liturgiczny sposób na zakończenie dnia.', 
-                imagePlaceholder: Icons.calendar_today_outlined, 
+                imagePlaceholder: Icons.bedtime_outlined, 
                 onTap: () => context.go('/completorium')
               ),
               _buildPathCard(
@@ -158,27 +182,17 @@ class HomeScreen extends StatelessWidget {
                 imagePlaceholder: Icons.mic_outlined,
                 onTap: () => context.go('/podcast')
               ),
+              
               _buildPathCard(
                 context, 
-                title: 'Czy znasz te liturgiczne terminy?', 
-                description: 'Sprawdź swoją wiedzę w grze i odgaduj ukryte hasła.', 
-                imagePlaceholder: Icons.spellcheck, 
+                title: 'Gry i quizy', 
+                description: 'Sprawdź zdobytą wiedzę! Zagraj, aby zobaczyć, co już umiesz.', 
+                imagePlaceholder: Icons.videogame_asset,
+                iconColor: Colors.greenAccent, 
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const LiturgicalHangman()),
-                  );
-                }
-              ),
-              _buildPathCard(
-                context, 
-                title: 'Sprawdź swoją spostrzegawczość!', 
-                description: 'Znajdź ukryte liturgiczne słowa.', 
-                imagePlaceholder: Icons.find_in_page_outlined, 
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LiturgicalWordSearch()),
+                    MaterialPageRoute(builder: (_) => const GamesPanelScreen()), 
                   );
                 }
               ),
@@ -225,7 +239,13 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPathCard(BuildContext context, {required String title, required String description, required IconData imagePlaceholder, required VoidCallback onTap}) {
+  Widget _buildPathCard(BuildContext context, {
+    required String title, 
+    required String description, 
+    required IconData imagePlaceholder, 
+    required VoidCallback onTap,
+    Color iconColor = Colors.grey 
+  }) {
     final theme = Theme.of(context);
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -235,7 +255,7 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(height: 100, width: double.infinity, color: const Color(0xFF2D3039), child: Icon(imagePlaceholder, size: 48, color: Colors.grey)),
+            Container(height: 100, width: double.infinity, color: const Color(0xFF2D3039), child: Icon(imagePlaceholder, size: 48, color: iconColor)),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
