@@ -57,10 +57,8 @@ class GamesPanelScreen extends StatelessWidget {
                         final userData = snapshot.data!.data() as Map<String, dynamic>? ?? {};
                         final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
 
-                        var nextCourse = mainCourses.cast<dynamic>().firstWhere(
-                          (course) => !progressMap.containsKey(course.id),
-                          orElse: () => null,
-                        );
+                        final notCompleted = mainCourses.where((course) => !progressMap.containsKey(course.id));
+                        final nextCourse = notCompleted.isNotEmpty ? notCompleted.first : null;
 
                         if (nextCourse != null) {
                           return _buildNextLevelBanner(theme, nextCourse.title);
