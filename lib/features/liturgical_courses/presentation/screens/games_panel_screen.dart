@@ -7,6 +7,22 @@ import '../bloc/courses_state.dart';
 import '../../../game/liturgical_hangman.dart';
 import '../../../game/liturgical_word_search.dart';
 
+class GameMenuOption {
+  final String title;
+  final String description;
+  final IconData icon;
+  final Color color;
+  final Widget widget;
+
+  GameMenuOption({
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.color,
+    required this.widget,
+  });
+}
+
 class GamesPanelScreen extends StatelessWidget {
   const GamesPanelScreen({super.key});
 
@@ -16,21 +32,28 @@ class GamesPanelScreen extends StatelessWidget {
     final userId = FirebaseAuth.instance.currentUser?.uid;
 
     final games = [
-      {
-        'title': 'Wisielec',
-        'description': 'Odgaduj ukryte hasła',
-        'icon': Icons.spellcheck,
-        'color': Colors.blueAccent,
-        'widget': const LiturgicalHangman(),
-      },
-      {
-        'title': 'Wykreślanka',
-        'description': 'Znajdź słowa',
-        'icon': Icons.find_in_page_outlined,
-        'color': Colors.greenAccent,
-        'widget': const LiturgicalWordSearch(),
-      },
+      GameMenuOption(
+        title: 'Wisielec',
+        description: 'Odgaduj ukryte hasła',
+        icon: Icons.spellcheck,
+        color: Colors.blueAccent,
+        widget: const LiturgicalHangman(),
+      ),
+      GameMenuOption(
+        title: 'Wykreślanka',
+        description: 'Znajdź słowa',
+        icon: Icons.find_in_page_outlined,
+        color: Colors.greenAccent,
+        widget: const LiturgicalWordSearch(),
+      ),
     ];
+
+    CoursesBloc? coursesBloc;
+    try {
+      coursesBloc = context.read<CoursesBloc>();
+    } catch (e) {
+      debugPrint('CoursesBloc nie jest dostępny - ukrywam baner postępu');
+    }
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -42,8 +65,9 @@ class GamesPanelScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            if (userId != null)
+            if (userId != null && coursesBloc != null)
               BlocBuilder<CoursesBloc, CoursesState>(
+                bloc: coursesBloc,
                 builder: (context, state) {
                   if (state is CoursesLoaded) {
                     final mainCourses = state.courses.where((c) => c.category == 'trunk').toList();
@@ -94,7 +118,7 @@ class GamesPanelScreen extends StatelessWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => game['widget'] as Widget),
+                          MaterialPageRoute(builder: (_) => game.widget),
                         );
                       },
                       child: Container(
@@ -115,18 +139,18 @@ class GamesPanelScreen extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: (game['color'] as Color).withOpacity(0.15),
+                                color: game.color.withOpacity(0.15),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
-                                game['icon'] as IconData,
+                                game.icon,
                                 size: 36,
-                                color: game['color'] as Color,
+                                color: game.color,
                               ),
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              game['title'] as String,
+                              game.title,
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 color: Colors.white,
@@ -138,7 +162,7 @@ class GamesPanelScreen extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 8.0),
                               child: Text(
-                                game['description'] as String,
+                                game.description,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.grey.shade400,
