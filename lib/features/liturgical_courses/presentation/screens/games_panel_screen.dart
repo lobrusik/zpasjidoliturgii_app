@@ -41,7 +41,7 @@ class GamesPanelScreen extends StatelessWidget {
         color: Colors.blueAccent,
         widget: const LiturgicalHangman(),
         progressBuilder: (userData) {
-          final levels = userData['hangmanCompletedLevels'] ?? 0;
+          final levels = userData['hangmanLevelsCompleted'] ?? 0;
           if (levels > 0) {
             return 'Ukończono: $levels';
           }
@@ -55,7 +55,7 @@ class GamesPanelScreen extends StatelessWidget {
         color: Colors.greenAccent,
         widget: const LiturgicalWordSearch(),
         progressBuilder: (userData) {
-          final levels = userData['wordSearchCompletedLevels'] ?? 0;
+          final levels = userData['wordSearchLevelsCompleted'] ?? 0;
           if (levels > 0) {
             return 'Ukończono: $levels';
           }
