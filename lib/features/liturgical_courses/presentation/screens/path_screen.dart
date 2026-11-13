@@ -163,8 +163,10 @@ class _PathScreenState extends State<PathScreen> {
 
         if (state is CoursesLoaded) {
           final courses = state.courses;
-          final trunkCourses = courses.where((c) => c.category == 'advent').toList();
-          final adventCourses = courses.where((c) => c.category == 'advent_antiphons' || c.category == 'advent').toList();
+          //final trunkCourses = courses.where((c) => c.category == 'advent').toList();
+          final adventSongs = courses.where((c) => c.category == 'advent_songs').toList();
+          final adventAntiphons= courses.where((c) => c.category == 'advent_antiphons').toList();
+          final adventHymns= courses.where((c) => c.category == 'advent_hymns').toList();
 
           return StreamBuilder<DocumentSnapshot>(
             stream: userId != null 
@@ -175,7 +177,7 @@ class _PathScreenState extends State<PathScreen> {
               final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
               final bool isAdmin = userData['isAdmin'] ?? false;
 
-              bool isUnlocked = isAdmin || _checkIfTrunkCompleted(trunkCourses, progressMap);
+              bool isUnlocked = isAdmin || _checkIfTrunkCompleted(adventAntiphons, progressMap);
 
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(20.0),
@@ -242,7 +244,7 @@ class _PathScreenState extends State<PathScreen> {
                         description: 'Napisz opis w przyszłości',
                         icon: Icons.psychology,
                         branchColor: const Color(0xFF00965E),
-                        courses: adventCourses,
+                        courses: adventAntiphons,
                         progressMap: progressMap,
                         isBranchUnlocked: true,
                         isAdmin: isAdmin,
@@ -253,7 +255,7 @@ class _PathScreenState extends State<PathScreen> {
                         description: 'Napisz opis w przyszłości',
                         icon: Icons.music_note,
                         branchColor: const Color(0xFF00965E),
-                        courses: adventCourses, 
+                        courses: adventSongs, 
                         progressMap: progressMap,
                         isBranchUnlocked: true,
                         isAdmin: isAdmin,
@@ -264,7 +266,7 @@ class _PathScreenState extends State<PathScreen> {
                         description: 'Napisz opis w przyszłości',
                         icon: Icons.menu_book,
                         branchColor: const Color(0xFF00965E),
-                        courses: adventCourses,
+                        courses: adventHymns,
                         progressMap: progressMap,
                         isBranchUnlocked: true,
                         isAdmin: isAdmin,
