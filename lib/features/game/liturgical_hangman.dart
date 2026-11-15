@@ -32,8 +32,6 @@ class _LiturgicalHangmanState extends State<LiturgicalHangman> {
   @override
   void initState() {
     super.initState();
-    _loadInterstitialAd();
-    _loadRewardedAd();
     _loadUserDataAndWord();
   }
 
@@ -280,7 +278,7 @@ class _LiturgicalHangmanState extends State<LiturgicalHangman> {
 
   void _loadInterstitialAd(){
     InterstitialAd.load(
-      adUnitId: 'ca-app-pub-3940256099942544/1033173712',
+      adUnitId: 'ca-app-pub-3940256099942544/1033173712', // Test ID Android (full)
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {

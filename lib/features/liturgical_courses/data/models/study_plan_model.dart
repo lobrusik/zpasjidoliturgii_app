@@ -66,7 +66,6 @@ class StudyPlanModel extends Equatable {
     required this.quote,
     required this.quoteAuthor,
     required this.deepReflection,
-
   });
 
   factory StudyPlanModel.fromFirestore(Map<String, dynamic> json, String documentId) {
@@ -83,14 +82,11 @@ class StudyPlanModel extends Equatable {
       dayStage: json['dayStage'] ?? 0,
       liturgicalContent: json['liturgicalContent'] ?? '',
       textMaterials: json['textMaterials'] ?? '',
-      // Safely mapping a dynamic array from Firebase to a List<String>
       videoLinks: List<String>.from(json['videoLinks'] ?? []),
       quiz: parsedQuiz,
-
       interactiveActivity: json['interactiveActivity'] != null 
           ? Map<String, dynamic>.from(json['interactiveActivity'] as Map) 
           : null,
-          
       quote: json['quote'] ?? '',
       quoteAuthor: json['quoteAuthor'] ?? '',
       deepReflection: json['deepReflection'] ?? '',
@@ -106,6 +102,9 @@ class StudyPlanModel extends Equatable {
       'videoLinks': videoLinks,
       'quiz': quiz.map((q) => q.toMap()).toList(), 
       if (interactiveActivity != null) 'interactiveActivity': interactiveActivity,
+      'quote': quote,
+      'quoteAuthor': quoteAuthor,
+      'deepReflection': deepReflection,
     };
   }
 

@@ -60,8 +60,7 @@ class MainWrapper extends StatelessWidget {
               BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Start'),
               BottomNavigationBarItem(icon: Icon(Icons.account_tree_outlined), label: 'Ścieżka'),
               BottomNavigationBarItem(icon: Icon(Icons.gamepad), label: 'Gry'),
-              BottomNavigationBarItem(icon: Icon(Icons.nightlight_outlined), label: 'Kompleta')
-              ,
+              BottomNavigationBarItem(icon: Icon(Icons.nightlight_outlined), label: 'Kompleta'),
             ],
             selectedItemColor: theme.colorScheme.primary,
             unselectedItemColor: Colors.grey,
