@@ -3,6 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+  InterstitialAd? _interstitialAd;
+  RewardedAd? _rewardedAd;
+  int _levelsPlayed = 0;
 
 class LiturgicalWordSearch extends StatefulWidget {
   const LiturgicalWordSearch({super.key});
@@ -35,11 +40,15 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
   @override
   void initState() {
     super.initState();
+    _loadInterstitialAd();
+    _loadRewardedAd();
     _loadUserDataAndWords();
   }
 
   @override
   void dispose() {
+    _interstitialAd?.dispose();
+    _rewardedAd?.dispose();
     _timer?.cancel();
     super.dispose();
   }
@@ -126,42 +135,34 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
   }
 
   void _showTimeUpDialog() {
+    if (!mounted) return;
+    
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) => AlertDialog(
         backgroundColor: const Color(0xFF2D3039),
-        title: const Text('Czas minął!', style: TextStyle(color: Colors.redAccent)),
-        content: const Text(
-          'Nie udało Ci się odnaleźć wszystkich słów na czas.\nCo chcesz zrobić?', 
-          style: TextStyle(color: Colors.white70)
-        ),
-        actionsAlignment: MainAxisAlignment.center,
-        actionsOverflowDirection: VerticalDirection.down,
+        title: const Text('Koniec czasu!', style: TextStyle(color: Colors.redAccent)),
+        content: const Text('Niestety, czas minął. Spróbuj ponownie lub dobierz dodatkową minutę oglądając wideo.', style: TextStyle(color: Colors.white70)),
         actions: [
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.amber,
-              foregroundColor: const Color(0xFF141F1C),
-              minimumSize: const Size(double.infinity, 45),
-            ),
-            icon: const Icon(Icons.play_circle_outline),
-            label: const Text('Obejrzyj reklamę (+1:00)', style: TextStyle(fontWeight: FontWeight.bold)),
-            onPressed: () {
-              // TODO: In the future, you'll place an AdMob (RewardedAd) call here.
-              // The code for the ad will replace Navigator.pop(), and after the ad is viewed (onUserEarnedReward):
-              Navigator.of(dialogContext).pop();
-              setState(() => _timeLeft = 60);
-              _startTimer();
-            },
-          ),
-          const SizedBox(height: 8),
           TextButton(
             onPressed: () {
               Navigator.of(dialogContext).pop();
               _startLevel(); 
             },
-            child: const Text('Zacznij od nowa', style: TextStyle(color: Colors.grey)),
+            child: const Text('Zacznij od nowa', style: TextStyle(color: Colors.white70)),
+          ),
+          
+          ElevatedButton.icon(
+            onPressed: () {
+               _addTimeWithAd();
+            },
+            icon: const Icon(Icons.add_alarm),
+            label: const Text('+1 Minuta'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.amber, 
+              foregroundColor: const Color(0xFF141F1C),
+            ),
           )
         ],
       ),
@@ -277,7 +278,7 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
     }
   }
 
-void _onPanEnd(DragEndDetails details) {
+  void _onPanEnd(DragEndDetails details) {
     if (_currentSelection.isEmpty) return;
     
     String selectedWord = _currentSelection.map((p) => _grid[p.y][p.x]).join('');
@@ -326,7 +327,15 @@ void _onPanEnd(DragEndDetails details) {
             onPressed: () {
               Navigator.of(dialogContext).pop();
               setState(() => playingLevel++);
-              _startLevel();
+              _startLevel(); // Tu upewnij się, że ta funkcja startuje nową grę i resetuje czas
+
+              // --- LOGIKA REKLAMY PEŁNOEKRANOWEJ ---
+              _levelsPlayed++;
+              if (_levelsPlayed % 2 == 0) {
+                _interstitialAd?.show();
+                _interstitialAd = null; // Czyścimy po wyświetleniu, żeby uniknąć duplikatów
+              }
+              // --------------------------------------
             },
             child: const Text('Następny poziom', style: TextStyle(color: Colors.amber)),
           )
@@ -334,7 +343,7 @@ void _onPanEnd(DragEndDetails details) {
       ),
     );
   }
-
+  
   void _showInstructions() {
     showDialog(
       context: context,
@@ -414,6 +423,77 @@ void _onPanEnd(DragEndDetails details) {
         );
       },
     );
+  }
+
+ void _loadInterstitialAd(){
+    InterstitialAd.load(
+      adUnitId: 'ca-app-pub-3940256099942544/1033173712', // Test ID Android (full)
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _interstitialAd = ad;
+          _interstitialAd?.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              ad.dispose();
+              _loadInterstitialAd();
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              ad.dispose();
+              _loadInterstitialAd();
+            },
+          );
+        },
+        onAdFailedToLoad: (error) {
+          debugPrint('Błąd ładowania Interstitial: $error');
+        },
+      ),
+    );
+  }
+
+void _loadRewardedAd() {
+    RewardedAd.load(
+      adUnitId: 'ca-app-pub-3940256099942544/5224354917',
+      request: const AdRequest(),
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
+        onAdLoaded: (ad) {
+          _rewardedAd = ad;
+          _rewardedAd?.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              ad.dispose();
+              _loadRewardedAd(); 
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              ad.dispose();
+              _loadRewardedAd();
+            },
+          );
+        },
+        onAdFailedToLoad: (error) {
+          debugPrint('Błąd ładowania Rewarded: $error');
+        },
+      ),
+    );
+  }
+
+void _addTimeWithAd() {
+    if (_rewardedAd != null) {
+      _rewardedAd!.show(onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
+        
+        Navigator.pop(context);
+
+        setState(() {
+          _timeLeft += 60; 
+        });
+
+        _startTimer(); 
+      });
+      _rewardedAd = null;
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Reklama się jeszcze ładuje lub brak sieci.')),
+      );
+      _loadRewardedAd();
+    }
   }
 
 @override
