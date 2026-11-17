@@ -80,7 +80,7 @@ class AboutAndContactSection extends StatelessWidget {
                 icon: const Icon(Icons.camera_alt_outlined, color: Colors.white70),
                 tooltip: 'Odwiedź nasz Instagram',
               ),
-              // 4. Strona WWW
+              // 4. WWW
               IconButton(
                 onPressed: () => _openSocialLink('https://zpasjidoliturgii.pl/'),
                 icon: const Icon(Icons.language, color: Colors.white70),

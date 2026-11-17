@@ -177,7 +177,7 @@ class _PathScreenState extends State<PathScreen> {
               final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
               final bool isAdmin = userData['isAdmin'] ?? false;
 
-              bool isUnlocked = isAdmin || _checkIfTrunkCompleted(adventAntiphons, progressMap);
+              bool isUnlocked = isAdmin || _checkIfTrunkCompleted(adventSongs, progressMap);
 
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(20.0),
@@ -241,7 +241,7 @@ class _PathScreenState extends State<PathScreen> {
                       _buildBranchSection(
                         context: context,
                         title: 'Wielkie Antyfony',
-                        description: 'Napisz opis w przyszłości',
+                        description: '7 dni odliczania do Narodzenia Pańskiego',
                         icon: Icons.psychology,
                         branchColor: const Color(0xFF00965E),
                         courses: adventAntiphons,
@@ -252,7 +252,7 @@ class _PathScreenState extends State<PathScreen> {
                       _buildBranchSection(
                         context: context,
                         title: 'Pieśni adwentowe',
-                        description: 'Napisz opis w przyszłości',
+                        description: 'Znaczenie i sens',
                         icon: Icons.music_note,
                         branchColor: const Color(0xFF00965E),
                         courses: adventSongs, 
@@ -263,7 +263,7 @@ class _PathScreenState extends State<PathScreen> {
                       _buildBranchSection(
                         context: context,
                         title: 'Hymny Liturgii Godzin na Adwent',
-                        description: 'Napisz opis w przyszłości',
+                        description: 'Czujne oczekiwanie i modlitwa Kościoła w czasie radosnego adwentowego czuwania na przyjście Pana.',
                         icon: Icons.menu_book,
                         branchColor: const Color(0xFF00965E),
                         courses: adventHymns,
@@ -292,8 +292,8 @@ class _PathScreenState extends State<PathScreen> {
 
         if (state is CoursesLoaded) {
           final courses = state.courses;
-          final trunkCourses = courses.where((c) => c.category == 'christmas').toList();
-          final christmasCourses = courses.where((c) => c.category == 'christmas').toList();
+          final christmasHymns = courses.where((c) => c.category == 'christmas_hymns').toList();
+          final christmasCourses = courses.where((c) => c.category == 'christmas_').toList();
 
           return StreamBuilder<DocumentSnapshot>(
             stream: userId != null 
@@ -304,7 +304,7 @@ class _PathScreenState extends State<PathScreen> {
               final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
               final bool isAdmin = userData['isAdmin'] ?? false;
 
-              bool isUnlocked = isAdmin || _checkIfTrunkCompleted(trunkCourses, progressMap);
+              bool isUnlocked = isAdmin || _checkIfTrunkCompleted(christmasHymns, progressMap);
 
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(20.0),
@@ -367,8 +367,8 @@ class _PathScreenState extends State<PathScreen> {
                     ] else ...[
                       _buildBranchSection(
                         context: context,
-                        title: '1 moduł',
-                        description: 'Napisz opis w przyszłości',
+                        title: 'Hymny Liturgii Godzin na Boże Narodzenie',
+                        description: 'Radosne hymny brewiarzowe wysławiające tajemnicę Wcielenia i zamieszkania Boga pośród nas.',
                         icon: Icons.church,
                         branchColor: Colors.amber.shade700,
                         courses: christmasCourses,
@@ -503,7 +503,7 @@ class _PathScreenState extends State<PathScreen> {
                       isAdmin: isAdmin,
                     ),
 
-                    //nowa - przestrzeń sakralna
+                    //new - sacred space
                     _buildBranchSection(
                       context: context,
                       title: 'Gałąź - Przestrzeń sakralna',
