@@ -6,6 +6,8 @@ class AppTheme {
   static const Color _backgroundDark = Color(0xFF0F1014);
   static const Color _surfaceDark = Color(0xFF1A1C23);
   static const Color _primaryOrange = Color(0xFFE68A00);
+  static const Color _primaryViolet = Color(0xFF930EE6 ); // moze tak, zebym nie musiała tego ręcznie przeklikiwać - jakiś kalendrz świąt? Czy da się zrobić z różowym?
+  static const Color _primaryRed = Color(0xFFC5191);
   static const Color _textWhite = Color(0xFFF8FAFC);
   static const Color _textGrey = Color(0xFF94A3B8);
   static const Color _successGreen = Color(0xFF2E7D32);
