@@ -164,6 +164,7 @@ class _PathScreenState extends State<PathScreen> {
         if (state is CoursesLoaded) {
           final courses = state.courses;
           //final trunkCourses = courses.where((c) => c.category == 'advent').toList();
+          final advent = courses.where((c) => c.category == 'advent').toList();
           final adventSongs = courses.where((c) => c.category == 'advent_songs').toList();
           final adventAntiphons= courses.where((c) => c.category == 'advent_antiphons').toList();
           final adventHymns= courses.where((c) => c.category == 'advent_hymns').toList();
@@ -240,9 +241,20 @@ class _PathScreenState extends State<PathScreen> {
                     ] else ...[
                       _buildBranchSection(
                         context: context,
+                        title: 'Wprowadzenie do Adwentu',
+                        description: 'Wszystko, co musisz wiedzieć o bieżącym okresie liturgicznym',
+                        icon: Icons.book_rounded,
+                        branchColor: const Color(0xFF00965E),
+                        courses: advent,
+                        progressMap: progressMap,
+                        isBranchUnlocked: true,
+                        isAdmin: isAdmin,
+                      ),
+                      _buildBranchSection(
+                        context: context,
                         title: 'Wielkie Antyfony',
                         description: '7 dni odliczania do Narodzenia Pańskiego',
-                        icon: Icons.psychology,
+                        icon: Icons.calendar_month,
                         branchColor: const Color(0xFF00965E),
                         courses: adventAntiphons,
                         progressMap: progressMap,
