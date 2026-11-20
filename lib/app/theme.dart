@@ -97,9 +97,12 @@ class LiturgicalCalendar {
     final pentecost = easter.add(const Duration(days: 49));
 
     final christmas = DateTime(year, 12, 25);
-    final presentationOfTheLord = DateTime(year, 2, 2);
     final firstSundayOfAdvent = christmas.subtract(Duration(days: christmas.weekday + 21));
     final gaudeteSunday = firstSundayOfAdvent.add(const Duration(days: 14));
+
+    final epiphany = DateTime(year, 1, 6);
+    final daysAfterEpiphany = 7 - (epiphany.weekday % 7);
+    final baptismOfTheLord = epiphany.add(Duration(days: daysAfterEpiphany));
 
 
     //Pink:Gaudete & Laetare
@@ -113,7 +116,7 @@ class LiturgicalCalendar {
     }
 
     //GOLD: Christmas and the Easter Season
-    final isChristmasSeason = !today.isBefore(christmas) || !today.isAfter(presentationOfTheLord);
+    final isChristmasSeason = !today.isBefore(christmas) || !today.isAfter(baptismOfTheLord);
     final isEasterSeason = !today.isBefore(easter) && !today.isAfter(pentecost);
     if (isChristmasSeason || isEasterSeason) {
       return AppTheme._liturgicalGold;
@@ -165,8 +168,10 @@ class LiturgicalCalendar {
   static bool isChristmas(DateTime date) {
     final today = DateTime(date.year, date.month, date.day);
     final christmas = DateTime(date.year, 12, 25);
-    final presentationOfTheLord = DateTime(date.year, 2, 2);
+    final epiphany = DateTime(date.year, 1, 6);
+    final daysAfterEpiphany = 7 - (epiphany.weekday % 7);
+    final baptismOfTheLord = epiphany.add(Duration(days: daysAfterEpiphany));
     
-    return !today.isBefore(christmas) || !today.isAfter(presentationOfTheLord);
+    return !today.isBefore(christmas) || !today.isAfter(baptismOfTheLord);
   }
 }
