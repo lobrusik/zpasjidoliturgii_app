@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart'; 
 import 'package:html_unescape/html_unescape.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class NewsCarousel extends StatelessWidget {
   const NewsCarousel({super.key});
@@ -12,9 +13,12 @@ class NewsCarousel extends StatelessWidget {
     try {
       final response = await http.get(
         Uri.parse('https://zpasjidoliturgii.pl/wp-json/wp/v2/posts?per_page=5'),
-        headers: {
-          'Accept': 'application/json',
-        },
+        headers: kIsWeb
+          ? null
+          : {
+              'Accept': 'application/json',
+              'User-Agent': 'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+            },
       );
       
       if (response.statusCode == 200) {
