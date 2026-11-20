@@ -12,6 +12,7 @@ class _DailyQuotesCardState extends State<DailyQuotesCard> {
   Map<String, dynamic>? _bibleQuote;
   Map<String, dynamic>? _otherQuote;
   bool _isLoading = true;
+  int _selectedIndex = 0; // 0 = Bible, 1 = Other
 
   @override
   void initState() {
@@ -19,12 +20,12 @@ class _DailyQuotesCardState extends State<DailyQuotesCard> {
     _fetchDailyQuotes();
   }
 
-  _fetchDailyQuotes() async {
+  Future<void> _fetchDailyQuotes() async {
     final now = DateTime.now();
     final dateInt = now.year * 10000 + now.month * 100 + now.day;
 
-    final bibleNumber = (dateInt % 30) + 1; 
-    final otherNumber = (dateInt % 25) + 31; 
+    final bibleNumber = (dateInt % 30) + 1;
+    final otherNumber = (dateInt % 25) + 31;
 
     try {
       final bibleSnapshot = await FirebaseFirestore.instance
@@ -39,12 +40,12 @@ class _DailyQuotesCardState extends State<DailyQuotesCard> {
           .limit(1)
           .get();
 
-      final bibleData = bibleSnapshot.docs.isNotEmpty 
-          ? bibleSnapshot.docs.first.data() 
+      final bibleData = bibleSnapshot.docs.isNotEmpty
+          ? bibleSnapshot.docs.first.data()
           : {'quote': 'Brak cytatu biblijnego.', 'source': ''};
-          
-      final otherData = otherSnapshot.docs.isNotEmpty 
-          ? otherSnapshot.docs.first.data() 
+
+      final otherData = otherSnapshot.docs.isNotEmpty
+          ? otherSnapshot.docs.first.data()
           : {'quote': 'Brak cytatu innego.', 'source': ''};
 
       if (mounted) {
@@ -70,7 +71,6 @@ class _DailyQuotesCardState extends State<DailyQuotesCard> {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final christmas = DateTime(now.year, 12, 25);
-    
     return christmas.difference(today).inDays;
   }
 
@@ -93,7 +93,7 @@ class _DailyQuotesCardState extends State<DailyQuotesCard> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(24.0),
         child: Center(child: CircularProgressIndicator(color: Colors.amber)),
       );
     }
@@ -105,129 +105,172 @@ class _DailyQuotesCardState extends State<DailyQuotesCard> {
     final daysToChristmas = _calculateDaysToChristmas();
     final adventWeek = _getAdventWeek();
 
+    final isBible = _selectedIndex == 0;
+    final currentData = isBible ? _bibleQuote! : _otherQuote!;
+    final accentColor = isBible ? Colors.amber : Colors.lightBlueAccent;
+
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D3039),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.amber.withOpacity(0.3), width: 1),
+        color: const Color(0xFF23262F),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFF343844), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
-            blurRadius: 8,
+            blurRadius: 10,
             offset: const Offset(0, 4),
-          )
+          ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (daysToChristmas >= 0)
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.15),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
-              ),
-              child: Column(
-                children: [
-                  if (adventWeek != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4.0),
-                      child: Text(
-                        adventWeek.toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.amber,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 11,
-                          letterSpacing: 1.2,
-                        ),
+          // 1. Switch
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: const Color(0xFF171920),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildSegmentButton(
+                    label: 'Pismo Święte',
+                    icon: Icons.menu_book_rounded,
+                    isSelected: _selectedIndex == 0,
+                    activeColor: Colors.amber,
+                    onTap: () => setState(() => _selectedIndex = 0),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: _buildSegmentButton(
+                    label: 'Liturgia',
+                    icon: Icons.format_quote_rounded,
+                    isSelected: _selectedIndex == 1,
+                    activeColor: Colors.lightBlueAccent,
+                    onTap: () => setState(() => _selectedIndex = 1),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // 2. Content with smooth switch
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 220),
+            child: Column(
+              key: ValueKey(_selectedIndex),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '„${currentData['quote']}”',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15.5,
+                    height: 1.5,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+                if ((currentData['source'] ?? '').toString().isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      '— ${currentData['source']}',
+                      style: TextStyle(
+                        color: accentColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.star_border, color: Colors.amber, size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        daysToChristmas == 0 
-                            ? 'Dziś jest Boże Narodzenie!' 
-                            : 'Do Bożego Narodzenia: $daysToChristmas dni',
-                        style: const TextStyle(
-                          color: Colors.amber,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.star_border, color: Colors.amber, size: 20),
-                    ],
                   ),
                 ],
-              ),
+              ],
             ),
+          ),
 
-          _buildQuoteSection(
-            quote: _bibleQuote!['quote'],
-            source: _bibleQuote!['source'],
-            icon: Icons.menu_book_rounded,
-            iconColor: Colors.amber,
-            isFirst: daysToChristmas < 0,
-          ),
-          Divider(color: Colors.grey.shade800, height: 1, thickness: 1),
-          
-          _buildQuoteSection(
-            quote: _otherQuote!['quote'],
-            source: _otherQuote!['source'],
-            icon: Icons.format_quote_rounded,
-            iconColor: Colors.blueAccent,
-            isFirst: false,
-          ),
+          // 3. Day to Christmas
+          if (daysToChristmas >= 0) ...[
+            const SizedBox(height: 16),
+            Divider(color: Colors.white.withOpacity(0.08), height: 1),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.star_rounded, color: Colors.amber, size: 16),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    daysToChristmas == 0
+                        ? 'Dziś jest Boże Narodzenie!'
+                        : (adventWeek != null
+                            ? '$adventWeek • Do świąt: $daysToChristmas dni'
+                            : 'Do Bożego Narodzenia: $daysToChristmas dni'),
+                    style: TextStyle(
+                      color: Colors.amber.shade200,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildQuoteSection({
-    required String quote, 
-    required String source, 
-    required IconData icon, 
-    required Color iconColor,
-    required bool isFirst,
+  Widget _buildSegmentButton({
+    required String label,
+    required IconData icon,
+    required bool isSelected,
+    required Color activeColor,
+    required VoidCallback onTap,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: isFirst ? const BorderRadius.vertical(top: Radius.circular(15)) : null,
-      ),
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, color: iconColor, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                'Słowo na dziś',
-                style: TextStyle(color: iconColor, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            '"$quote"',
-            style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.4, fontStyle: FontStyle.italic),
-          ),
-          const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              '– $source',
-              style: TextStyle(color: Colors.grey.shade400, fontSize: 13, fontWeight: FontWeight.bold),
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF2D313D) : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          border: isSelected
+              ? Border.all(color: activeColor.withOpacity(0.4), width: 1)
+              : Border.all(color: Colors.transparent, width: 1),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isSelected ? activeColor : Colors.grey.shade500,
             ),
-          ),
-        ],
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : Colors.grey.shade400,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
