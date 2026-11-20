@@ -7,6 +7,7 @@ import '../widgets/buy_coffee_button.dart';
 import '../widgets/about_contact_section.dart';
 import '../widgets/daily_quotes_card.dart';
 import 'games_panel_screen.dart';
+import '../../../../app/theme.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -17,8 +18,8 @@ class HomeScreen extends StatelessWidget {
     final userId = FirebaseAuth.instance.currentUser?.uid;
 
     final now = DateTime.now();
-    final isAdventSeason = (now.month == 11 && now.day > 20) || (now.month == 12 && now.day < 25);
-    final isChristmasSeason = (now.month == 12 && now.day >= 25) || now.month == 1;
+    final isAdventSeason = LiturgicalCalendar.isAdvent(now);
+    final isChristmasSeason = LiturgicalCalendar.isChristmas(now);
 
     return Scaffold(
       body: SafeArea(
