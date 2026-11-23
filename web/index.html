@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 <head>
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="Z pasji do lturgii  iz myślą o was.">
+  <meta name="description" content="Z pasji do liturgii i z myślą o was.">
   <meta name="google-signin-client_id" content="1038776967097-3hk6apt3h9v2ic7es19so5snc6qdh8oq.apps.googleusercontent.com">
 
   <!-- iOS meta tags & icons -->
@@ -20,31 +20,18 @@
   <title>Z pasji do liturgii</title>
   <link rel="manifest" href="manifest.json">
 
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+  <script>
+    if (window.location.hostname === 'aplikacja.zpasjidoliturgii.pl' || 
+        window.location.hostname === 'www.aplikacja.zpasjidoliturgii.pl') {
+      const adScript = document.createElement('script');
+      adScript.async = true;
+      adScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-TWOJ_NUMER_ADSENSE';
+      adScript.crossOrigin = 'anonymous';
+      document.head.appendChild(adScript);
+    }
+  </script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
-  
-  <script>
-  if (window.location.hostname === 'aplikacja.zpasjidoliturgii.pl') {
-    const adContainer = document.createElement('div');
-    adContainer.style.position = 'fixed';
-    adContainer.style.bottom = '0';
-    adContainer.style.width = '100%';
-    adContainer.style.textAlign = 'center';
-    adContainer.style.zIndex = '9999';
-    
-    adContainer.innerHTML = `
-      <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-client="ca-pub-TWOJ_NUMER_ADSENSE"
-           data-ad-slot="TWOJ_SLOT_REKLAMY"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
-    `;
-    document.body.appendChild(adContainer);
-    (adsbygoogle = window.adsbygoogle || []).push({});
-  }
-</script>
 </body>
 </html>

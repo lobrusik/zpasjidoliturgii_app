@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-//import '../features/monetization/presentation/widgets/premium_offer_dialog.dart';
+import '../features/monetization/ad_config.dart';
+import '../features/monetization/presentation/widgets/premium_offer_dialog.dart';
+import '../features/monetization/presentation/widgets/web_ad_banner.dart';
 
 class MainWrapper extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -20,13 +22,13 @@ class MainWrapper extends StatelessWidget {
         centerTitle: true,
         backgroundColor: theme.scaffoldBackgroundColor,
         actions: [
-          // Premium offer (temporary)
-          // IconButton(
-          //   icon: const Icon(Icons.workspace_premium, color: Colors.amber, size: 28),
-          //   onPressed: () {
-          //     PremiumOfferDialog.show(context);
-          //   },
-          // ),
+          if (AdConfig.showAds)
+            IconButton(
+              icon: const Icon(Icons.workspace_premium, color: Colors.amber, size: 28),
+              onPressed: () {
+                PremiumOfferDialog.show(context);
+              },
+            ),
 
           IconButton(
             icon: const CircleAvatar(
@@ -46,7 +48,9 @@ class MainWrapper extends StatelessWidget {
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          
+          if (AdConfig.showAds)
+            const WebAdBanner(),
+
           BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             currentIndex: navigationShell.currentIndex,
