@@ -1,59 +1,59 @@
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+// import 'package:flutter/material.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-class AdHelper {
-  static const String bannerAdUnitId = 'ca-app-pub-5441445790355006/1579097517'; //small banner
-  static const String _interstitialAdUnitId = 'ca-app-pub-5441445790355006/2836338866';//big banner
+// class AdHelper {
+//   static const String bannerAdUnitId = 'ca-app-pub-5441445790355006/1579097517'; //small banner
+//   static const String _interstitialAdUnitId = 'ca-app-pub-5441445790355006/2836338866';//big banner
 
-  static Future<void> showInterstitialAd(BuildContext context, {required VoidCallback onComplete}) async {
-    final user = FirebaseAuth.instance.currentUser;
+//   static Future<void> showInterstitialAd(BuildContext context, {required VoidCallback onComplete}) async {
+//     final user = FirebaseAuth.instance.currentUser;
     
-    if (user != null) {
-      try {
-        final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-        if (doc.exists) {
-          final data = doc.data() as Map<String, dynamic>;
-          final Timestamp? adsFreeUntil = data['adsFreeUntil'];
+//     if (user != null) {
+//       try {
+//         final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+//         if (doc.exists) {
+//           final data = doc.data() as Map<String, dynamic>;
+//           final Timestamp? adsFreeUntil = data['adsFreeUntil'];
 
-          if (adsFreeUntil != null && adsFreeUntil.toDate().isAfter(DateTime.now())) {
-            onComplete(); 
-            return;
-          }
-        }
-      } catch (e) {
-        debugPrint('Błąd sprawdzania statusu premium: $e');
-      }
-    }
+//           if (adsFreeUntil != null && adsFreeUntil.toDate().isAfter(DateTime.now())) {
+//             onComplete(); 
+//             return;
+//           }
+//         }
+//       } catch (e) {
+//         debugPrint('Błąd sprawdzania statusu premium: $e');
+//       }
+//     }
 
-    _loadAndShowAd(onComplete);
-  }
+//     _loadAndShowAd(onComplete);
+//   }
 
-  static void _loadAndShowAd(VoidCallback onComplete) {
-    InterstitialAd.load(
-      adUnitId: _interstitialAdUnitId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (InterstitialAd ad) {
-          ad.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (InterstitialAd ad) {
-              ad.dispose();
-              onComplete();
-            },
-            onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
-              ad.dispose();
-              onComplete();
-            },
-          );
+//   static void _loadAndShowAd(VoidCallback onComplete) {
+//     InterstitialAd.load(
+//       adUnitId: _interstitialAdUnitId,
+//       request: const AdRequest(),
+//       adLoadCallback: InterstitialAdLoadCallback(
+//         onAdLoaded: (InterstitialAd ad) {
+//           ad.fullScreenContentCallback = FullScreenContentCallback(
+//             onAdDismissedFullScreenContent: (InterstitialAd ad) {
+//               ad.dispose();
+//               onComplete();
+//             },
+//             onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+//               ad.dispose();
+//               onComplete();
+//             },
+//           );
           
-          ad.show();
-        },
-        onAdFailedToLoad: (LoadAdError error) {
-          debugPrint('Błąd ładowania reklamy pełnoekranowej: ${error.message}');
-          onComplete(); 
-        },
-      ),
-    );
-  }
-}
+//           ad.show();
+//         },
+//         onAdFailedToLoad: (LoadAdError error) {
+//           debugPrint('Błąd ładowania reklamy pełnoekranowej: ${error.message}');
+//           onComplete(); 
+//         },
+//       ),
+//     );
+//   }
+// }

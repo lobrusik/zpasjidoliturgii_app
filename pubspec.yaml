@@ -30,7 +30,7 @@ dependencies:
   firebase_crashlytics: ^4.0.1
 
   # Monetization & Subscriptions
-  google_mobile_ads: ^9.1.0
+  # google_mobile_ads: ^9.1.0
   purchases_flutter: ^10.10.0
 
   # Multimedia & Utilities

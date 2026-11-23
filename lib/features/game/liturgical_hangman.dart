@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:math';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-InterstitialAd? _interstitialAd;
-RewardedAd? _rewardedAd;
 int _levelsPlayed = 0;
 
 class LiturgicalHangman extends StatefulWidget {
@@ -154,10 +151,6 @@ class _LiturgicalHangmanState extends State<LiturgicalHangman> {
                   _fetchNewWord(); 
 
                   _levelsPlayed++;
-                  if (_levelsPlayed % 2 == 0) {
-                    _interstitialAd?.show();
-                    _interstitialAd = null;
-                  }
                 },
                 child: const Text('Następny poziom', style: TextStyle(color: Colors.amber)),
               )
@@ -210,7 +203,7 @@ class _LiturgicalHangmanState extends State<LiturgicalHangman> {
         content: const Text(
           'Twoim zadaniem jest odgadnięcie ukrytego pojęcia lub frazy liturgicznej poprzez podawanie liter.\n\n'
           'Za każdą niepoprawną literę rysowany jest kolejny element dzwonu. Masz 6 szans, zanim dzwon zostanie narysowany w całości i przegrasz!\n\n'
-          'W prawym górnym rogu znajdziesz przycisk wyboru poziomu – w każdej chwili możesz wrócić do poprzednich haseł.',
+          'W prawym górnym rogu znajdziesz przycisk wyboru poziomu - w każdej chwili możesz wrócić do poprzednich haseł.',
           style: TextStyle(color: Colors.white, height: 1.4),
         ),
         actions: [
@@ -274,86 +267,6 @@ class _LiturgicalHangmanState extends State<LiturgicalHangman> {
         );
       },
     );
-  }
-
-  void _loadInterstitialAd(){
-    InterstitialAd.load(
-      adUnitId: 'ca-app-pub-3940256099942544/1033173712', // Test ID Android (full)
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          _interstitialAd = ad;
-          _interstitialAd?.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (ad) {
-              ad.dispose();
-              _loadInterstitialAd();
-            },
-            onAdFailedToShowFullScreenContent: (ad, error) {
-              ad.dispose();
-              _loadInterstitialAd();
-            },
-          );
-        },
-        onAdFailedToLoad: (error) {
-          debugPrint('Błąd ładowania Interstitial: $error');
-        },
-      ),
-    );
-  }
-
-  void _loadRewardedAd() {
-    RewardedAd.load(
-      adUnitId: 'ca-app-pub-3940256099942544/5224354917', // Test Android ID (with prize)
-      request: const AdRequest(),
-      rewardedAdLoadCallback: RewardedAdLoadCallback(
-        onAdLoaded: (ad) {
-          _rewardedAd = ad;
-          _rewardedAd?.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (ad) {
-              ad.dispose();
-              _loadRewardedAd();
-            },
-            onAdFailedToShowFullScreenContent: (ad, error) {
-              ad.dispose();
-              _loadRewardedAd();
-            },
-          );
-        },
-        onAdFailedToLoad: (error) {
-          debugPrint('Błąd ładowania Rewarded: $error');
-        },
-      ),
-    );
-  }
-
-void _showHintWithAd() {
-    if (_rewardedAd != null) {
-      _rewardedAd!.show(onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            backgroundColor: const Color(0xFF2D3039),
-            title: const Text('Podpowiedź', style: TextStyle(color: Colors.amber)),
-            content: Text(
-              currentDescription, 
-              style: const TextStyle(color: Colors.white, height: 1.5)
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context), 
-                child: const Text('OK, gram dalej!', style: TextStyle(color: Colors.amber))
-              )
-            ],
-          ),
-        );
-      });
-      _rewardedAd = null;
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Reklama się jeszcze ładuje lub brak połączenia z siecią.')),
-      );
-      _loadRewardedAd();
-    }
   }
 
 @override
@@ -457,21 +370,6 @@ void _showHintWithAd() {
               ),
             ),
             
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: ElevatedButton.icon(
-                onPressed: _showHintWithAd,
-                icon: const Icon(Icons.ondemand_video),
-                label: const Text('Obejrzyj, by zdobyć podpowiedź'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.amber.shade700, 
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  )
-                ),
-              ),
-            ),
             const SizedBox(height: 12),
 
             Padding(

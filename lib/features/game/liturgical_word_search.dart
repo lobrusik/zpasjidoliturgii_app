@@ -3,11 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-  InterstitialAd? _interstitialAd;
-  RewardedAd? _rewardedAd;
-  int _levelsPlayed = 0;
+int _levelsPlayed = 0;
 
 class LiturgicalWordSearch extends StatefulWidget {
   const LiturgicalWordSearch({super.key});
@@ -40,15 +37,11 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
   @override
   void initState() {
     super.initState();
-    _loadInterstitialAd();
-    _loadRewardedAd();
     _loadUserDataAndWords();
   }
 
   @override
   void dispose() {
-    _interstitialAd?.dispose();
-    _rewardedAd?.dispose();
     _timer?.cancel();
     super.dispose();
   }
@@ -152,18 +145,6 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
             },
             child: const Text('Zacznij od nowa', style: TextStyle(color: Colors.white70)),
           ),
-          
-          ElevatedButton.icon(
-            onPressed: () {
-               _addTimeWithAd();
-            },
-            icon: const Icon(Icons.add_alarm),
-            label: const Text('+1 Minuta'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.amber, 
-              foregroundColor: const Color(0xFF141F1C),
-            ),
-          )
         ],
       ),
     );
@@ -327,15 +308,7 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
             onPressed: () {
               Navigator.of(dialogContext).pop();
               setState(() => playingLevel++);
-              _startLevel(); // Tu upewnij się, że ta funkcja startuje nową grę i resetuje czas
-
-              // --- LOGIKA REKLAMY PEŁNOEKRANOWEJ ---
-              _levelsPlayed++;
-              if (_levelsPlayed % 2 == 0) {
-                _interstitialAd?.show();
-                _interstitialAd = null; // Czyścimy po wyświetleniu, żeby uniknąć duplikatów
-              }
-              // --------------------------------------
+              _startLevel(); 
             },
             child: const Text('Następny poziom', style: TextStyle(color: Colors.amber)),
           )
@@ -423,77 +396,6 @@ class _LiturgicalWordSearchState extends State<LiturgicalWordSearch> {
         );
       },
     );
-  }
-
- void _loadInterstitialAd(){
-    InterstitialAd.load(
-      adUnitId: 'ca-app-pub-3940256099942544/1033173712', // Test ID Android (full)
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          _interstitialAd = ad;
-          _interstitialAd?.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (ad) {
-              ad.dispose();
-              _loadInterstitialAd();
-            },
-            onAdFailedToShowFullScreenContent: (ad, error) {
-              ad.dispose();
-              _loadInterstitialAd();
-            },
-          );
-        },
-        onAdFailedToLoad: (error) {
-          debugPrint('Błąd ładowania Interstitial: $error');
-        },
-      ),
-    );
-  }
-
-void _loadRewardedAd() {
-    RewardedAd.load(
-      adUnitId: 'ca-app-pub-3940256099942544/5224354917',
-      request: const AdRequest(),
-      rewardedAdLoadCallback: RewardedAdLoadCallback(
-        onAdLoaded: (ad) {
-          _rewardedAd = ad;
-          _rewardedAd?.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (ad) {
-              ad.dispose();
-              _loadRewardedAd(); 
-            },
-            onAdFailedToShowFullScreenContent: (ad, error) {
-              ad.dispose();
-              _loadRewardedAd();
-            },
-          );
-        },
-        onAdFailedToLoad: (error) {
-          debugPrint('Błąd ładowania Rewarded: $error');
-        },
-      ),
-    );
-  }
-
-void _addTimeWithAd() {
-    if (_rewardedAd != null) {
-      _rewardedAd!.show(onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
-        
-        Navigator.pop(context);
-
-        setState(() {
-          _timeLeft += 60; 
-        });
-
-        _startTimer(); 
-      });
-      _rewardedAd = null;
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Reklama się jeszcze ładuje lub brak sieci.')),
-      );
-      _loadRewardedAd();
-    }
   }
 
 @override
