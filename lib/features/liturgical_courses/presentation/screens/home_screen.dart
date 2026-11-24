@@ -155,7 +155,6 @@ class HomeScreen extends StatelessWidget {
                   title: 'Wszystko o Adwencie', 
                   description: 'Specjalny moduł przygotowujący do świąt. Odkryj głębię oczekiwania.', 
                   imagePlaceholder: Icons.calendar_month, 
-                  iconColor: Colors.purpleAccent,
                   onTap: () => context.go('/courses')
                 ),
 
@@ -165,7 +164,6 @@ class HomeScreen extends StatelessWidget {
                   title: 'Boże Narodzenie', 
                   description: 'Tajemnica Wcielenia, liturgia i kolędy. Świętuj okres Bożego Narodzenia.', 
                   imagePlaceholder: Icons.star_border,
-                  iconColor: Colors.amber, 
                   onTap: () => context.go('/courses') 
                 ),
 

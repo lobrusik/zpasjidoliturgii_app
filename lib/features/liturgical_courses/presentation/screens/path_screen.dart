@@ -390,8 +390,8 @@ class _PathScreenState extends State<PathScreen> {
                       ),
                       _buildBranchSection(
                         context: context,
-                        title: '2 moduł',
-                        description: 'Napisz opis w przyszłości',
+                        title: 'Antyfony Bożonarodzeniowe',
+                        description: 'Przeżyj dobrze ten okres!',
                         icon: Icons.music_note, 
                         branchColor: Colors.amber.shade700,
                         courses: christmasCourses,
