@@ -91,10 +91,12 @@ class _DailyQuotesCardState extends State<DailyQuotesCard> {
 
   @override
   Widget build(BuildContext context) {
+    final liturgicalColor = Theme.of(context).colorScheme.primary;
+
     if (_isLoading) {
-      return const Padding(
-        padding: EdgeInsets.all(24.0),
-        child: Center(child: CircularProgressIndicator(color: Colors.amber)),
+      return Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Center(child: CircularProgressIndicator(color: liturgicalColor)),
       );
     }
 
@@ -107,7 +109,6 @@ class _DailyQuotesCardState extends State<DailyQuotesCard> {
 
     final isBible = _selectedIndex == 0;
     final currentData = isBible ? _bibleQuote! : _otherQuote!;
-    final accentColor = isBible ? Colors.amber : Colors.lightBlueAccent;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -141,7 +142,7 @@ class _DailyQuotesCardState extends State<DailyQuotesCard> {
                     label: 'Pismo Święte',
                     icon: Icons.menu_book_rounded,
                     isSelected: _selectedIndex == 0,
-                    activeColor: Colors.amber,
+                    activeColor: liturgicalColor,
                     onTap: () => setState(() => _selectedIndex = 0),
                   ),
                 ),
@@ -151,7 +152,7 @@ class _DailyQuotesCardState extends State<DailyQuotesCard> {
                     label: 'Liturgia',
                     icon: Icons.format_quote_rounded,
                     isSelected: _selectedIndex == 1,
-                    activeColor: Colors.lightBlueAccent,
+                    activeColor: liturgicalColor,
                     onTap: () => setState(() => _selectedIndex = 1),
                   ),
                 ),
@@ -184,7 +185,7 @@ class _DailyQuotesCardState extends State<DailyQuotesCard> {
                     child: Text(
                       '— ${currentData['source']}',
                       style: TextStyle(
-                        color: accentColor,
+                        color: liturgicalColor,
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                       ),
@@ -203,7 +204,7 @@ class _DailyQuotesCardState extends State<DailyQuotesCard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.star_rounded, color: Colors.amber, size: 16),
+                Icon(Icons.star_rounded, color: liturgicalColor, size: 16),
                 const SizedBox(width: 6),
                 Flexible(
                   child: Text(
@@ -213,7 +214,7 @@ class _DailyQuotesCardState extends State<DailyQuotesCard> {
                             ? '$adventWeek • Do świąt: $daysToChristmas dni'
                             : 'Do Bożego Narodzenia: $daysToChristmas dni'),
                     style: TextStyle(
-                      color: Colors.amber.shade200,
+                      color: Color.lerp(liturgicalColor, Colors.white, 0.35),
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.3,

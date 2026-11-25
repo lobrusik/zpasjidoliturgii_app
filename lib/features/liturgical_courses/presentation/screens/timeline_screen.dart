@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../../app/theme.dart';
 
 class TimelineEvent {
   final String period;
@@ -73,8 +74,8 @@ class _LiturgicalTimelineScreenState extends State<LiturgicalTimelineScreen> {
       location: 'Ośrodki Włoskie (Mediolan, Genua, Brescia...)',
       description: 'Rozkwit duszpasterstwa liturgicznego, powstawanie instytutów i czasopism.',
       figures: [
-        'Agostino Gemelli', 'Giuseppe Polvara', 'Adriano Bernareggi', 'Carlo Rossi', 
-        'Giacomo Moglia', 'Matteo Angelo Filipello', 'Giulio Bevilacqua', 
+        'Agostino Gemelli', 'Giuseppe Polvara', 'Adriano Bernareggi', 'Carlo Rossi',
+        'Giacomo Moglia', 'Matteo Angelo Filipello', 'Giulio Bevilacqua',
         'Emanuele Caronti', 'Eusebio Vismara', 'Giacomo Alberione'
       ],
     ),
@@ -102,6 +103,8 @@ class _LiturgicalTimelineScreenState extends State<LiturgicalTimelineScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
+    final liturgicalColor = Theme.of(context).colorScheme.primary;
+
     final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
     final data = userDoc.data() ?? {};
     final progressMap = data['progress'] as Map<String, dynamic>? ?? {};
@@ -122,7 +125,7 @@ class _LiturgicalTimelineScreenState extends State<LiturgicalTimelineScreen> {
           context: context,
           builder: (context) => AlertDialog(
             backgroundColor: const Color(0xFF2D3039),
-            title: const Text('Sekcja zablokowana', style: TextStyle(color: Colors.amber)),
+            title: Text('Sekcja zablokowana', style: TextStyle(color: liturgicalColor)),
             content: const Text(
               'Aby odblokować lekcje z Postaci Ruchu Liturgicznego, musisz najpierw ukończyć lekcje z Teologii Liturgii (główne drzewko)',
               style: TextStyle(color: Colors.white70, height: 1.4),
@@ -130,13 +133,13 @@ class _LiturgicalTimelineScreenState extends State<LiturgicalTimelineScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Rozumiem', style: TextStyle(color: Colors.amber)),
+                child: Text('Rozumiem', style: TextStyle(color: liturgicalColor)),
               ),
             ],
           ),
         );
       }
-      return; 
+      return;
     }
 
     String cleanName = figureName.toLowerCase().replaceAll(' ', '_').replaceAll('-', '_');
@@ -147,17 +150,24 @@ class _LiturgicalTimelineScreenState extends State<LiturgicalTimelineScreen> {
         .replaceAll('ę', 'e').replaceAll('.', '').replaceAll('(', '').replaceAll(')', '');
 
     String lessonId = 'history_$cleanName';
-    context.push('/courses/details/$lessonId', extra: figureName);
+    if (mounted) {
+      context.push('/courses/details/$lessonId', extra: figureName);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final liturgicalColor = Theme.of(context).colorScheme.primary;
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Oś czasu Ruchu Liturgicznego - postacie', style: TextStyle(color: Colors.amber, fontSize: 18)),
+        title: Text(
+          'Oś czasu Ruchu Liturgicznego - postacie',
+          style: TextStyle(color: liturgicalColor, fontSize: 18),
+        ),
         backgroundColor: Colors.black,
-        iconTheme: const IconThemeData(color: Colors.amber),
+        iconTheme: IconThemeData(color: liturgicalColor),
         elevation: 0,
       ),
       body: ListView.builder(
@@ -182,10 +192,10 @@ class _LiturgicalTimelineScreenState extends State<LiturgicalTimelineScreen> {
                         decoration: BoxDecoration(
                           color: Colors.black,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.amber, width: 4),
+                          border: Border.all(color: liturgicalColor, width: 4),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.amber.withOpacity(0.3),
+                              color: liturgicalColor.withOpacity(0.3),
                               blurRadius: 8,
                               spreadRadius: 2,
                             )
@@ -196,7 +206,7 @@ class _LiturgicalTimelineScreenState extends State<LiturgicalTimelineScreen> {
                         Expanded(
                           child: Container(
                             width: 3,
-                            color: Colors.amber.withOpacity(0.4),
+                            color: liturgicalColor.withOpacity(0.4),
                           ),
                         ),
                     ],
@@ -213,19 +223,27 @@ class _LiturgicalTimelineScreenState extends State<LiturgicalTimelineScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: Colors.amber.withOpacity(0.2),
+                                color: liturgicalColor.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 event.period,
-                                style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 12),
+                                style: TextStyle(
+                                  color: liturgicalColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 event.location,
-                                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
@@ -249,29 +267,36 @@ class _LiturgicalTimelineScreenState extends State<LiturgicalTimelineScreen> {
                                 padding: EdgeInsets.only(left: 16, top: 12, bottom: 4),
                                 child: Text(
                                   'Związane postacie:',
-                                  style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    color: Colors.white54,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                               ...event.figures.map((figure) => InkWell(
-                                onTap: () => _navigateToLesson(figure),
-                                borderRadius: BorderRadius.circular(12),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.person, color: Colors.amber, size: 20),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Text(
-                                          figure,
-                                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                                        ),
+                                    onTap: () => _navigateToLesson(figure),
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.person, color: liturgicalColor, size: 20),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Text(
+                                              figure,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          const Icon(Icons.chevron_right, color: Colors.white24, size: 20),
+                                        ],
                                       ),
-                                      const Icon(Icons.chevron_right, color: Colors.white24, size: 20),
-                                    ],
-                                  ),
-                                ),
-                              )),
+                                    ),
+                                  )),
                               const SizedBox(height: 4),
                             ],
                           ),
