@@ -6,7 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../bloc/courses_bloc.dart';
 import '../bloc/courses_state.dart';
 import 'psalms_menu_screen.dart';
-import 'timeline_screen.dart'; 
+import 'timeline_screen.dart';
+import '../../../../app/theme.dart';
 
 class PathScreen extends StatefulWidget {
   final int initialTabIndex;
@@ -22,6 +23,7 @@ class PathScreen extends StatefulWidget {
 
 class _PathScreenState extends State<PathScreen> {
   bool isAdmin = false;
+
   @override
   void initState() {
     super.initState();
@@ -48,25 +50,23 @@ class _PathScreenState extends State<PathScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final userId = FirebaseAuth.instance.currentUser?.uid;
+    final liturgicalColor = theme.colorScheme.primary;
 
     final now = DateTime.now();
-    final isAdventSeason = (now.month == 11 && now.day > 20) || (now.month == 12 && now.day < 25);
-    final isChristmasSeason = (now.month == 12 && now.day >= 25) || now.month == 1;
-
-    final showAdvent = isAdmin || isAdventSeason;
-    final showChristmas = isAdmin || isChristmasSeason;
+    final showAdvent = isAdmin || LiturgicalCalendar.isAdvent(now);
+    final showChristmas = isAdmin || LiturgicalCalendar.isChristmas(now);
 
     List<Tab> activeTabs = [];
     List<Widget> activeViews = [];
 
     if (showAdvent) {
       activeTabs.add(const Tab(icon: Icon(Icons.hourglass_bottom), text: 'Adwent'));
-      activeViews.add(_buildAdventTree(context, theme, userId));
+      activeViews.add(_buildAdventTree(context, theme, userId, liturgicalColor));
     }
 
     if (showChristmas) {
       activeTabs.add(const Tab(icon: Icon(Icons.star_rate), text: 'Boże Narodzenie'));
-      activeViews.add(_buildChristmasTree(context, theme, userId));
+      activeViews.add(_buildChristmasTree(context, theme, userId, liturgicalColor));
     }
 
     activeTabs.addAll(const [
@@ -74,15 +74,15 @@ class _PathScreenState extends State<PathScreen> {
       Tab(icon: Icon(Icons.music_note), text: 'Psałterz'),
       Tab(icon: Icon(Icons.groups), text: 'E-zbiórka'),
       Tab(icon: Icon(Icons.history), text: 'Ruch liturgiczny'),
-      Tab(icon: Icon(Icons.psychology), text: 'Rozważania')
+      Tab(icon: Icon(Icons.psychology), text: 'Rozważania'),
     ]);
 
     activeViews.addAll([
-      _buildLiturgyTree(context, theme, userId), 
-      _buildMusicTree(context, theme, userId), 
-      _buildCollectionTree(context, theme, userId), 
-      _buildHistoryTree(context, theme, userId), 
-      _buildReflectionsTree(context, theme, userId),
+      _buildLiturgyTree(context, theme, userId, liturgicalColor),
+      _buildMusicTree(context, theme, userId, liturgicalColor),
+      _buildCollectionTree(context, theme, userId, liturgicalColor),
+      _buildHistoryTree(context, theme, userId, liturgicalColor),
+      _buildReflectionsTree(context, theme, userId, liturgicalColor),
     ]);
 
     int adjustedInitialIndex = widget.initialTabIndex;
@@ -91,9 +91,9 @@ class _PathScreenState extends State<PathScreen> {
     }
 
     return DefaultTabController(
-      key: ValueKey(widget.initialTabIndex),
-      initialIndex: widget.initialTabIndex,
-      length: 5, 
+      key: ValueKey('${adjustedInitialIndex}_${activeTabs.length}'),
+      initialIndex: adjustedInitialIndex,
+      length: activeTabs.length,
       child: Scaffold(
         body: Column(
           children: [
@@ -101,16 +101,16 @@ class _PathScreenState extends State<PathScreen> {
               color: theme.scaffoldBackgroundColor,
               child: TabBar(
                 isScrollable: true,
-                indicatorColor: Color(0xFF00965E),
-                labelColor: Color(0xFF00965E),
+                indicatorColor: liturgicalColor,
+                labelColor: liturgicalColor,
                 unselectedLabelColor: Colors.grey,
-                labelPadding: EdgeInsets.symmetric(horizontal: 16),
+                labelPadding: const EdgeInsets.symmetric(horizontal: 16),
                 tabs: activeTabs,
               ),
             ),
             Expanded(
               child: TabBarView(
-                children: activeViews, 
+                children: activeViews,
               ),
             ),
           ],
@@ -154,8 +154,8 @@ class _PathScreenState extends State<PathScreen> {
     return completedTrunkLessons >= totalTrunkLessons;
   }
 
- // === EVENT - ADVENT TREE === //
-  Widget _buildAdventTree(BuildContext context, ThemeData theme, String? userId) {
+  // === EVENT - ADVENT TREE === //
+  Widget _buildAdventTree(BuildContext context, ThemeData theme, String? userId, Color liturgicalColor) {
     return BlocBuilder<CoursesBloc, CoursesState>(
       builder: (context, state) {
         if (state is CoursesLoading) return const Center(child: CircularProgressIndicator());
@@ -163,16 +163,15 @@ class _PathScreenState extends State<PathScreen> {
 
         if (state is CoursesLoaded) {
           final courses = state.courses;
-          //final trunkCourses = courses.where((c) => c.category == 'advent').toList();
           final advent = courses.where((c) => c.category == 'advent').toList();
           final adventSongs = courses.where((c) => c.category == 'advent_songs').toList();
-          final adventAntiphons= courses.where((c) => c.category == 'advent_antiphons').toList();
-          final adventHymns= courses.where((c) => c.category == 'advent_hymns').toList();
+          final adventAntiphons = courses.where((c) => c.category == 'advent_antiphons').toList();
+          final adventHymns = courses.where((c) => c.category == 'advent_hymns').toList();
 
           return StreamBuilder<DocumentSnapshot>(
-            stream: userId != null 
-              ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
-              : const Stream.empty(),
+            stream: userId != null
+                ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
+                : const Stream.empty(),
             builder: (context, snapshot) {
               final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
               final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
@@ -187,7 +186,7 @@ class _PathScreenState extends State<PathScreen> {
                   children: [
                     Row(
                       children: [
-                        const Text('💡', style: TextStyle(fontSize: 28)),
+                        Icon(Icons.hourglass_bottom, color: liturgicalColor, size: 28),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
@@ -199,13 +198,14 @@ class _PathScreenState extends State<PathScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      isUnlocked ? 'Materiały pomagające lepiej zrozumieć adwent i wejść głębiej w ten czas oczekiwania.' : '🔒 Zablokowane. Wymagane ukończenie wszystkich lekcji z Teologii Liturgii.',
+                      isUnlocked
+                          ? 'Materiały pomagające lepiej zrozumieć adwent i wejść głębiej w ten czas oczekiwania.'
+                          : '🔒 Zablokowane. Wymagane ukończenie wszystkich lekcji z Teologii Liturgii.',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: isUnlocked ? Colors.grey.shade400 : Colors.redAccent.shade100,
                       ),
                     ),
                     const SizedBox(height: 32),
-
                     if (!isUnlocked) ...[
                       GestureDetector(
                         onTap: () => _showLockedDialog(context, 'Adwent'),
@@ -216,8 +216,8 @@ class _PathScreenState extends State<PathScreen> {
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
                           ),
-                          child: Row(
-                            children: const [
+                          child: const Row(
+                            children: [
                               CircleAvatar(
                                 backgroundColor: Colors.white12,
                                 radius: 30,
@@ -244,7 +244,7 @@ class _PathScreenState extends State<PathScreen> {
                         title: 'Wprowadzenie do Adwentu',
                         description: 'Wszystko, co musisz wiedzieć o bieżącym okresie liturgicznym',
                         icon: Icons.book_rounded,
-                        branchColor: const Color(0xFF00965E),
+                        branchColor: liturgicalColor,
                         courses: advent,
                         progressMap: progressMap,
                         isBranchUnlocked: true,
@@ -255,7 +255,7 @@ class _PathScreenState extends State<PathScreen> {
                         title: 'Wielkie Antyfony',
                         description: '7 dni odliczania do Narodzenia Pańskiego',
                         icon: Icons.calendar_month,
-                        branchColor: const Color(0xFF00965E),
+                        branchColor: liturgicalColor,
                         courses: adventAntiphons,
                         progressMap: progressMap,
                         isBranchUnlocked: true,
@@ -266,8 +266,8 @@ class _PathScreenState extends State<PathScreen> {
                         title: 'Pieśni adwentowe',
                         description: 'Znaczenie i sens',
                         icon: Icons.music_note,
-                        branchColor: const Color(0xFF00965E),
-                        courses: adventSongs, 
+                        branchColor: liturgicalColor,
+                        courses: adventSongs,
                         progressMap: progressMap,
                         isBranchUnlocked: true,
                         isAdmin: isAdmin,
@@ -277,7 +277,7 @@ class _PathScreenState extends State<PathScreen> {
                         title: 'Hymny Liturgii Godzin na Adwent',
                         description: 'Czujne oczekiwanie i modlitwa Kościoła w czasie radosnego adwentowego czuwania na przyjście Pana.',
                         icon: Icons.menu_book,
-                        branchColor: const Color(0xFF00965E),
+                        branchColor: liturgicalColor,
                         courses: adventHymns,
                         progressMap: progressMap,
                         isBranchUnlocked: true,
@@ -296,8 +296,8 @@ class _PathScreenState extends State<PathScreen> {
   }
 
   // === EVENT - CHRISTMAS TREE === //
-  Widget _buildChristmasTree(BuildContext context, ThemeData theme, String? userId) {
-     return BlocBuilder<CoursesBloc, CoursesState>(
+  Widget _buildChristmasTree(BuildContext context, ThemeData theme, String? userId, Color liturgicalColor) {
+    return BlocBuilder<CoursesBloc, CoursesState>(
       builder: (context, state) {
         if (state is CoursesLoading) return const Center(child: CircularProgressIndicator());
         if (state is CoursesError) return Center(child: Text(state.message));
@@ -308,9 +308,9 @@ class _PathScreenState extends State<PathScreen> {
           final christmasCourses = courses.where((c) => c.category == 'christmas_').toList();
 
           return StreamBuilder<DocumentSnapshot>(
-            stream: userId != null 
-              ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
-              : const Stream.empty(),
+            stream: userId != null
+                ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
+                : const Stream.empty(),
             builder: (context, snapshot) {
               final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
               final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
@@ -325,7 +325,7 @@ class _PathScreenState extends State<PathScreen> {
                   children: [
                     Row(
                       children: [
-                        const Text('🌟', style: TextStyle(fontSize: 28)),
+                        Icon(Icons.star_rate, color: liturgicalColor, size: 28),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
@@ -337,13 +337,14 @@ class _PathScreenState extends State<PathScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      isUnlocked ? 'Zgłębiaj tajemnicę Wcielenia i celebruj liturgię okresu Bożego Narodzenia.' : '🔒 Zablokowane. Wymagane ukończenie lekcji z Teologii Liturgii.',
+                      isUnlocked
+                          ? 'Zgłębiaj tajemnicę Wcielenia i celebruj liturgię okresu Bożego Narodzenia.'
+                          : '🔒 Zablokowane. Wymagane ukończenie lekcji z Teologii Liturgii.',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: isUnlocked ? Colors.grey.shade400 : Colors.redAccent.shade100,
                       ),
                     ),
                     const SizedBox(height: 32),
-
                     if (!isUnlocked) ...[
                       GestureDetector(
                         onTap: () => _showLockedDialog(context, 'Boże Narodzenie'),
@@ -354,8 +355,8 @@ class _PathScreenState extends State<PathScreen> {
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
                           ),
-                          child: Row(
-                            children: const [
+                          child: const Row(
+                            children: [
                               CircleAvatar(
                                 backgroundColor: Colors.white12,
                                 radius: 30,
@@ -382,7 +383,7 @@ class _PathScreenState extends State<PathScreen> {
                         title: 'Hymny Liturgii Godzin na Boże Narodzenie',
                         description: 'Radosne hymny brewiarzowe wysławiające tajemnicę Wcielenia i zamieszkania Boga pośród nas.',
                         icon: Icons.church,
-                        branchColor: Colors.amber.shade700,
+                        branchColor: liturgicalColor,
                         courses: christmasCourses,
                         progressMap: progressMap,
                         isBranchUnlocked: true,
@@ -392,8 +393,8 @@ class _PathScreenState extends State<PathScreen> {
                         context: context,
                         title: 'Antyfony Bożonarodzeniowe',
                         description: 'Przeżyj dobrze ten okres!',
-                        icon: Icons.music_note, 
-                        branchColor: Colors.amber.shade700,
+                        icon: Icons.music_note,
+                        branchColor: liturgicalColor,
                         courses: christmasCourses,
                         progressMap: progressMap,
                         isBranchUnlocked: true,
@@ -410,9 +411,9 @@ class _PathScreenState extends State<PathScreen> {
       },
     );
   }
-  
+
   // === 1. LITURGICAL TREE === //
-  Widget _buildLiturgyTree(BuildContext context, ThemeData theme, String? userId) {
+  Widget _buildLiturgyTree(BuildContext context, ThemeData theme, String? userId, Color liturgicalColor) {
     return BlocBuilder<CoursesBloc, CoursesState>(
       builder: (context, state) {
         if (state is CoursesLoading) return const Center(child: CircularProgressIndicator());
@@ -428,9 +429,9 @@ class _PathScreenState extends State<PathScreen> {
           final sacredSpaceCourses = courses.where((c) => c.category == 'trunk_sacred_space').toList();
 
           return StreamBuilder<DocumentSnapshot>(
-            stream: userId != null 
-              ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
-              : const Stream.empty(),
+            stream: userId != null
+                ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
+                : const Stream.empty(),
             builder: (context, snapshot) {
               final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
               final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
@@ -456,7 +457,7 @@ class _PathScreenState extends State<PathScreen> {
                   children: [
                     Row(
                       children: [
-                        const Text('🌳', style: TextStyle(fontSize: 28)),
+                        Icon(Icons.menu_book, color: liturgicalColor, size: 28),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
@@ -472,20 +473,18 @@ class _PathScreenState extends State<PathScreen> {
                       style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey.shade400),
                     ),
                     const SizedBox(height: 32),
-
                     _buildBranchSection(
                       context: context,
                       title: 'Teologia Liturgii',
                       description: 'Obowiązkowe dla wszystkich.',
                       icon: Icons.eco,
-                      branchColor: const Color(0xFF4CAF50),
+                      branchColor: liturgicalColor,
                       courses: trunkCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: true,
                       isAdmin: isAdmin,
                     ),
                     const SizedBox(height: 24),
-
                     _buildBranchSection(
                       context: context,
                       title: 'Gałąź - Szkoła Liturgii',
@@ -493,14 +492,13 @@ class _PathScreenState extends State<PathScreen> {
                           ? 'Chcemy tutaj zgłębiać poszczególne elementy z dziejów liturgii.'
                           : 'Zablokowane. Ukończono $completedTrunkLessons/$requiredLessons podstaw.',
                       icon: Icons.local_fire_department,
-                      branchColor: areAdvancedBranchesUnlocked ? const Color(0xFFFFB300) : Colors.grey.shade800,
+                      branchColor: areAdvancedBranchesUnlocked ? liturgicalColor : Colors.grey.shade800,
                       courses: liturgyCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedBranchesUnlocked,
                       isAdmin: isAdmin,
                     ),
                     const SizedBox(height: 24),
-
                     _buildBranchSection(
                       context: context,
                       title: 'Gałąź - Przewodnik po Mszy Świętej',
@@ -508,14 +506,13 @@ class _PathScreenState extends State<PathScreen> {
                           ? 'Każdy element Mszy Świętej ma ogromne znaczenie - i właśnie je chcemy tu poznawać.'
                           : 'Zablokowane. Ukończono $completedTrunkLessons/$requiredLessons podstaw.',
                       icon: Icons.local_fire_department,
-                      branchColor: areAdvancedBranchesUnlocked ? const Color(0xFFFFB300) : Colors.grey.shade800,
+                      branchColor: areAdvancedBranchesUnlocked ? liturgicalColor : Colors.grey.shade800,
                       courses: guideMassCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedBranchesUnlocked,
                       isAdmin: isAdmin,
                     ),
-
-                    //new - sacred space
+                    const SizedBox(height: 24),
                     _buildBranchSection(
                       context: context,
                       title: 'Gałąź - Przestrzeń sakralna',
@@ -523,7 +520,7 @@ class _PathScreenState extends State<PathScreen> {
                           ? 'Tu wymyśl krótki opis do tego.'
                           : 'Zablokowane. Ukończono $completedTrunkLessons/$requiredLessons podstaw.',
                       icon: Icons.local_fire_department,
-                      branchColor: areAdvancedBranchesUnlocked ? const Color(0xFFFFB300) : Colors.grey.shade800,
+                      branchColor: areAdvancedBranchesUnlocked ? liturgicalColor : Colors.grey.shade800,
                       courses: sacredSpaceCourses,
                       progressMap: progressMap,
                       isBranchUnlocked: areAdvancedBranchesUnlocked,
@@ -540,8 +537,8 @@ class _PathScreenState extends State<PathScreen> {
     );
   }
 
-   // === 2. MUSICAL TREE === //
-  Widget _buildMusicTree(BuildContext context, ThemeData theme, String? userId) {
+  // === 2. MUSICAL TREE === //
+  Widget _buildMusicTree(BuildContext context, ThemeData theme, String? userId, Color liturgicalColor) {
     return BlocBuilder<CoursesBloc, CoursesState>(
       builder: (context, state) {
         if (state is CoursesLoading) return const Center(child: CircularProgressIndicator());
@@ -555,9 +552,9 @@ class _PathScreenState extends State<PathScreen> {
           final musicTrunkCourses = courses.where((c) => c.category == 'music_trunk').toList();
 
           return StreamBuilder<DocumentSnapshot>(
-            stream: userId != null 
-              ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
-              : const Stream.empty(),
+            stream: userId != null
+                ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
+                : const Stream.empty(),
             builder: (context, snapshot) {
               final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
               final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
@@ -572,7 +569,7 @@ class _PathScreenState extends State<PathScreen> {
                   children: [
                     Row(
                       children: [
-                        const Text('🎵', style: TextStyle(fontSize: 28)),
+                        Icon(Icons.music_note, color: liturgicalColor, size: 28),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
@@ -588,7 +585,6 @@ class _PathScreenState extends State<PathScreen> {
                       style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey.shade400),
                     ),
                     const SizedBox(height: 32),
-
                     GestureDetector(
                       onTap: () async {
                         await Navigator.of(context).push(
@@ -610,18 +606,18 @@ class _PathScreenState extends State<PathScreen> {
                             BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 5)),
                           ],
                         ),
-                        child: Row(
+                        child: const Row(
                           children: [
-                            const CircleAvatar(
+                            CircleAvatar(
                               backgroundColor: Colors.white24,
                               radius: 30,
                               child: Icon(Icons.headphones, color: Colors.white, size: 32),
                             ),
-                            const SizedBox(width: 16),
+                            SizedBox(width: 16),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
+                                children: [
                                   Text(
                                     'Melodie Psalmów',
                                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
@@ -634,13 +630,12 @@ class _PathScreenState extends State<PathScreen> {
                                 ],
                               ),
                             ),
-                            const Icon(Icons.arrow_forward_ios, color: Colors.white54),
+                            Icon(Icons.arrow_forward_ios, color: Colors.white54),
                           ],
                         ),
                       ),
                     ),
                     const SizedBox(height: 48),
-
                     if (!isMusicBranchesUnlocked) ...[
                       GestureDetector(
                         onTap: () => _showLockedDialog(context, 'Ścieżka Psałterzysty (Lekcje)'),
@@ -651,8 +646,8 @@ class _PathScreenState extends State<PathScreen> {
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
                           ),
-                          child: Row(
-                            children: const [
+                          child: const Row(
+                            children: [
                               CircleAvatar(
                                 backgroundColor: Colors.white12,
                                 radius: 30,
@@ -679,7 +674,7 @@ class _PathScreenState extends State<PathScreen> {
                         title: 'Pień — Podstawy Psałterzysty',
                         description: 'Rytm, nuty i wprowadzenie do śpiewu. Obowiązkowe.',
                         icon: Icons.music_note,
-                        branchColor: const Color(0xFF2196F3),
+                        branchColor: liturgicalColor,
                         courses: musicTrunkCourses,
                         progressMap: progressMap,
                         isBranchUnlocked: true,
@@ -699,7 +694,7 @@ class _PathScreenState extends State<PathScreen> {
   }
 
   // === 3. E-ZBIÓRKA === //
-  Widget _buildCollectionTree(BuildContext context, ThemeData theme, String? userId) {
+  Widget _buildCollectionTree(BuildContext context, ThemeData theme, String? userId, Color liturgicalColor) {
     return BlocBuilder<CoursesBloc, CoursesState>(
       builder: (context, state) {
         if (state is CoursesLoading) return const Center(child: CircularProgressIndicator());
@@ -715,9 +710,9 @@ class _PathScreenState extends State<PathScreen> {
           final collectionBible2Courses = courses.where((c) => c.category == 'collection_bible2').toList();
 
           return StreamBuilder<DocumentSnapshot>(
-            stream: userId != null 
-              ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
-              : const Stream.empty(),
+            stream: userId != null
+                ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
+                : const Stream.empty(),
             builder: (context, snapshot) {
               final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
               final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
@@ -735,7 +730,7 @@ class _PathScreenState extends State<PathScreen> {
                 }
               }
 
-              final int requiredCollectionLessons = 4; 
+              final int requiredCollectionLessons = 4;
               bool areAdvancedCollectionUnlocked = completedCollectionTrunkLessons >= requiredCollectionLessons;
 
               return SingleChildScrollView(
@@ -745,7 +740,7 @@ class _PathScreenState extends State<PathScreen> {
                   children: [
                     Row(
                       children: [
-                        const Text('📱', style: TextStyle(fontSize: 28)),
+                        Icon(Icons.groups, color: liturgicalColor, size: 28),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
@@ -763,7 +758,6 @@ class _PathScreenState extends State<PathScreen> {
                       ),
                     ),
                     const SizedBox(height: 32),
-
                     if (!isUnlocked) ...[
                       GestureDetector(
                         onTap: () => _showLockedDialog(context, 'E-zbiórka'),
@@ -774,8 +768,8 @@ class _PathScreenState extends State<PathScreen> {
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
                           ),
-                          child: Row(
-                            children: const [
+                          child: const Row(
+                            children: [
                               CircleAvatar(
                                 backgroundColor: Colors.white12,
                                 radius: 30,
@@ -802,7 +796,7 @@ class _PathScreenState extends State<PathScreen> {
                         title: 'Podstawy liturgii',
                         description: 'Obowiązkowe dla wszystkich',
                         icon: Icons.groups,
-                        branchColor: const Color(0xFFFF9800),
+                        branchColor: liturgicalColor,
                         courses: collectionCourses,
                         progressMap: progressMap,
                         isBranchUnlocked: true,
@@ -812,9 +806,11 @@ class _PathScreenState extends State<PathScreen> {
                       _buildBranchSection(
                         context: context,
                         title: 'Gałąź — Wprowadzenie do Pisma Świętego',
-                        description: areAdvancedCollectionUnlocked ? 'Wprowadzenie w biblijne korzenie Eucharystii i liturgii, łącząc starotestamentowe zapowiedzi oraz historię zbawienia z żywym doświadczeniem wiary i modlitwy w Kościele.' : 'Zablokowane.',
+                        description: areAdvancedCollectionUnlocked
+                            ? 'Wprowadzenie w biblijne korzenie Eucharystii i liturgii, łącząc starotestamentowe zapowiedzi oraz historię zbawienia z żywym doświadczeniem wiary i modlitwy w Kościele.'
+                            : 'Zablokowane.',
                         icon: Icons.menu_book,
-                        branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
+                        branchColor: areAdvancedCollectionUnlocked ? liturgicalColor : Colors.grey.shade800,
                         courses: collectionBibleCourses,
                         progressMap: progressMap,
                         isBranchUnlocked: areAdvancedCollectionUnlocked,
@@ -824,9 +820,11 @@ class _PathScreenState extends State<PathScreen> {
                       _buildBranchSection(
                         context: context,
                         title: 'Gałąź — Katecheza duchowościowa',
-                        description: areAdvancedCollectionUnlocked ? 'Wprowadzenie w fundamenty chrześcijańskiej duchowości przez ukazanie nierozerwalnej jedności między modlitwą, życiem sakramentalnym, darami codzienności oraz łaską chrztu i pokuty.' : 'Zablokowane.',
+                        description: areAdvancedCollectionUnlocked
+                            ? 'Wprowadzenie w fundamenty chrześcijańskiej duchowości przez ukazanie nierozerwalnej jedności między modlitwą, życiem sakramentalnym, darami codzienności oraz łaską chrztu i pokuty.'
+                            : 'Zablokowane.',
                         icon: Icons.handshake,
-                        branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
+                        branchColor: areAdvancedCollectionUnlocked ? liturgicalColor : Colors.grey.shade800,
                         courses: collectionSoulCourses,
                         progressMap: progressMap,
                         isBranchUnlocked: areAdvancedCollectionUnlocked,
@@ -836,9 +834,11 @@ class _PathScreenState extends State<PathScreen> {
                       _buildBranchSection(
                         context: context,
                         title: 'Gałąź — Historia ministrantury',
-                        description: areAdvancedCollectionUnlocked ? 'Ukazanie fascynującej historii i teologii posługi ministranckiej – od starożytnych korzeni i czasów tonsury, przez kryzysy trydenckie i zaangażowanie chłopców, aż po soborową odnowę opartą na fundamencie chrztu świętego.' : 'Zablokowane.',
+                        description: areAdvancedCollectionUnlocked
+                            ? 'Ukazanie fascynującej historii i teologii posługi ministranckiej – od starożytnych korzeni i czasów tonsury, przez kryzysy trydenckie i zaangażowanie chłopców, aż po soborową odnowę opartą na fundamencie chrztu świętego.'
+                            : 'Zablokowane.',
                         icon: Icons.account_balance,
-                        branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
+                        branchColor: areAdvancedCollectionUnlocked ? liturgicalColor : Colors.grey.shade800,
                         courses: collectionHistoryCourses,
                         progressMap: progressMap,
                         isBranchUnlocked: areAdvancedCollectionUnlocked,
@@ -848,9 +848,11 @@ class _PathScreenState extends State<PathScreen> {
                       _buildBranchSection(
                         context: context,
                         title: 'Gałąź — Katecheza biblijna',
-                        description: areAdvancedCollectionUnlocked ? 'Cykl katechez odkrywających głębokie korzenie Eucharystii w Starym Przymierzu' : 'Zablokowane.',
+                        description: areAdvancedCollectionUnlocked
+                            ? 'Cykl katechez odkrywających głębokie korzenie Eucharystii w Starym Przymierzu'
+                            : 'Zablokowane.',
                         icon: Icons.menu_book,
-                        branchColor: areAdvancedCollectionUnlocked ? const Color(0xFFE91E63) : Colors.grey.shade800,
+                        branchColor: areAdvancedCollectionUnlocked ? liturgicalColor : Colors.grey.shade800,
                         courses: collectionBible2Courses,
                         progressMap: progressMap,
                         isBranchUnlocked: areAdvancedCollectionUnlocked,
@@ -869,7 +871,7 @@ class _PathScreenState extends State<PathScreen> {
   }
 
   // === 4. HISTORICAL TREE === //
-  Widget _buildHistoryTree(BuildContext context, ThemeData theme, String? userId) {
+  Widget _buildHistoryTree(BuildContext context, ThemeData theme, String? userId, Color liturgicalColor) {
     return BlocBuilder<CoursesBloc, CoursesState>(
       builder: (context, state) {
         if (state is CoursesLoading) return const Center(child: CircularProgressIndicator());
@@ -880,9 +882,9 @@ class _PathScreenState extends State<PathScreen> {
           final trunkCourses = courses.where((c) => c.category == 'trunk').toList();
 
           return StreamBuilder<DocumentSnapshot>(
-            stream: userId != null 
-              ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
-              : const Stream.empty(),
+            stream: userId != null
+                ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
+                : const Stream.empty(),
             builder: (context, snapshot) {
               final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
               final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
@@ -897,7 +899,7 @@ class _PathScreenState extends State<PathScreen> {
                   children: [
                     Row(
                       children: [
-                        const Text('📜', style: TextStyle(fontSize: 28)),
+                        Icon(Icons.history, color: liturgicalColor, size: 28),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
@@ -913,7 +915,6 @@ class _PathScreenState extends State<PathScreen> {
                       style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey.shade400),
                     ),
                     const SizedBox(height: 32),
-
                     GestureDetector(
                       onTap: () async {
                         if (!isHistoryUnlocked) {
@@ -923,7 +924,7 @@ class _PathScreenState extends State<PathScreen> {
 
                         await Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => const LiturgicalTimelineScreen(), 
+                            builder: (context) => const LiturgicalTimelineScreen(),
                           ),
                         );
                       },
@@ -931,9 +932,9 @@ class _PathScreenState extends State<PathScreen> {
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: isHistoryUnlocked 
-                              ? [const Color(0xFF8D6E63), const Color(0xFF4E342E)]
-                              : [Colors.grey.shade800, Colors.grey.shade900],
+                            colors: isHistoryUnlocked
+                                ? [const Color(0xFF8D6E63), const Color(0xFF4E342E)]
+                                : [Colors.grey.shade800, Colors.grey.shade900],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
@@ -948,9 +949,9 @@ class _PathScreenState extends State<PathScreen> {
                               backgroundColor: Colors.white24,
                               radius: 30,
                               child: Icon(
-                                isHistoryUnlocked ? Icons.timeline : Icons.lock, 
-                                color: Colors.white, 
-                                size: 32
+                                isHistoryUnlocked ? Icons.timeline : Icons.lock,
+                                color: Colors.white,
+                                size: 32,
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -964,17 +965,17 @@ class _PathScreenState extends State<PathScreen> {
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    isHistoryUnlocked 
-                                      ? 'Prześledź postacie odnowy liturgicznej\nod XIX wieku po dzisiejsze czasy.'
-                                      : 'Ukończ najpierw Teologię Liturgii, aby odblokować ten moduł.',
+                                    isHistoryUnlocked
+                                        ? 'Prześledź postacie odnowy liturgicznej\nod XIX wieku po dzisiejsze czasy.'
+                                        : 'Ukończ najpierw Teologię Liturgii, aby odblokować ten moduł.',
                                     style: const TextStyle(fontSize: 13, color: Colors.white70),
                                   ),
                                 ],
                               ),
                             ),
                             Icon(
-                              isHistoryUnlocked ? Icons.arrow_forward_ios : Icons.lock_outline, 
-                              color: Colors.white54
+                              isHistoryUnlocked ? Icons.arrow_forward_ios : Icons.lock_outline,
+                              color: Colors.white54,
                             ),
                           ],
                         ),
@@ -992,7 +993,7 @@ class _PathScreenState extends State<PathScreen> {
   }
 
   // === 5. REFLECTIONS TREE === //
-  Widget _buildReflectionsTree(BuildContext context, ThemeData theme, String? userId) {
+  Widget _buildReflectionsTree(BuildContext context, ThemeData theme, String? userId, Color liturgicalColor) {
     return BlocBuilder<CoursesBloc, CoursesState>(
       builder: (context, state) {
         if (state is CoursesLoading) return const Center(child: CircularProgressIndicator());
@@ -1004,9 +1005,9 @@ class _PathScreenState extends State<PathScreen> {
           final reflectionCourses = courses.where((c) => c.category == 'reflection_trunk' || c.category == 'reflection').toList();
 
           return StreamBuilder<DocumentSnapshot>(
-            stream: userId != null 
-              ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
-              : const Stream.empty(),
+            stream: userId != null
+                ? FirebaseFirestore.instance.collection('users').doc(userId).snapshots()
+                : const Stream.empty(),
             builder: (context, snapshot) {
               final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
               final progressMap = userData['progress'] as Map<String, dynamic>? ?? {};
@@ -1021,7 +1022,7 @@ class _PathScreenState extends State<PathScreen> {
                   children: [
                     Row(
                       children: [
-                        const Text('💡', style: TextStyle(fontSize: 28)),
+                        Icon(Icons.psychology, color: liturgicalColor, size: 28),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
@@ -1033,13 +1034,14 @@ class _PathScreenState extends State<PathScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      isUnlocked ? 'Głębsze refleksje duchowe i lekcje formacyjne.' : '🔒 Zablokowane. Wymagane ukończenie wszystkich lekcji z Teologii Liturgii.',
+                      isUnlocked
+                          ? 'Głębsze refleksje duchowe i lekcje formacyjne.'
+                          : '🔒 Zablokowane. Wymagane ukończenie wszystkich lekcji z Teologii Liturgii.',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: isUnlocked ? Colors.grey.shade400 : Colors.redAccent.shade100,
                       ),
                     ),
                     const SizedBox(height: 32),
-
                     if (!isUnlocked) ...[
                       GestureDetector(
                         onTap: () => _showLockedDialog(context, 'Rozważania'),
@@ -1050,8 +1052,8 @@ class _PathScreenState extends State<PathScreen> {
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
                           ),
-                          child: Row(
-                            children: const [
+                          child: const Row(
+                            children: [
                               CircleAvatar(
                                 backgroundColor: Colors.white12,
                                 radius: 30,
@@ -1078,7 +1080,7 @@ class _PathScreenState extends State<PathScreen> {
                         title: 'Rozważania Duchowe',
                         description: 'Interaktywne materiały formacyjne.',
                         icon: Icons.psychology,
-                        branchColor: const Color(0xFF00965E),
+                        branchColor: liturgicalColor,
                         courses: reflectionCourses,
                         progressMap: progressMap,
                         isBranchUnlocked: true,
@@ -1095,7 +1097,6 @@ class _PathScreenState extends State<PathScreen> {
       },
     );
   }
- 
 
   // === VIEW HELPERS === //
   Widget _buildBranchSection({
@@ -1129,18 +1130,18 @@ class _PathScreenState extends State<PathScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title, 
+                      title,
                       style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold, 
-                        color: isBranchUnlocked ? Colors.white : Colors.grey.shade500
-                      )
+                        fontWeight: FontWeight.bold,
+                        color: isBranchUnlocked ? Colors.white : Colors.grey.shade500,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      description, 
+                      description,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: isBranchUnlocked ? Colors.grey.shade400 : Colors.redAccent.shade100
-                      )
+                        color: isBranchUnlocked ? Colors.grey.shade400 : Colors.redAccent.shade100,
+                      ),
                     ),
                   ],
                 ),
@@ -1169,6 +1170,7 @@ class _PathScreenState extends State<PathScreen> {
               isCompleted: isCompleted,
               isCurrent: isCurrent,
               isUnlocked: isUnlocked,
+              liturgicalColor: branchColor,
             );
           }),
       ],
@@ -1183,14 +1185,15 @@ class _PathScreenState extends State<PathScreen> {
     required bool isCompleted,
     required bool isCurrent,
     required bool isUnlocked,
+    required Color liturgicalColor,
   }) {
     final theme = Theme.of(context);
-    
+
     Widget trailingWidget;
     if (isCompleted) {
       trailingWidget = const Icon(Icons.check, color: Color(0xFF4CAF50));
     } else if (isCurrent) {
-      trailingWidget = const Icon(Icons.arrow_forward, color: Colors.orange);
+      trailingWidget = Icon(Icons.arrow_forward, color: liturgicalColor);
     } else {
       trailingWidget = const Icon(Icons.lock, color: Colors.grey, size: 20);
     }
@@ -1201,7 +1204,7 @@ class _PathScreenState extends State<PathScreen> {
         color: const Color(0xFF22242B),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isCurrent ? Colors.orange.withOpacity(0.5) : const Color(0xFF2D3039),
+          color: isCurrent ? liturgicalColor.withOpacity(0.5) : const Color(0xFF2D3039),
           width: isCurrent ? 1.5 : 1.0,
         ),
       ),
