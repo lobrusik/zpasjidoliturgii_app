@@ -11,7 +11,6 @@ class InteractiveQuiz extends StatefulWidget {
     required this.onQuizCompleted,
   });
 
-
   @override
   State<InteractiveQuiz> createState() => _InteractiveQuizState();
 }
@@ -22,14 +21,30 @@ class _InteractiveQuizState extends State<InteractiveQuiz> {
   bool _isAnswerChecked = false;
   int _score = 0;
 
-  void _checkAnswer(int index) {
+  late List<int> _shuffledOptionIndices;
+
+  @override
+  void initState() {
+    super.initState();
+    _shuffleCurrentQuestionOptions();
+  }
+
+  void _shuffleCurrentQuestionOptions() {
+    final optionsCount = widget.questions[_currentQuestionIndex].options.length;
+    _shuffledOptionIndices = List.generate(optionsCount, (i) => i)..shuffle();
+  }
+
+  void _checkAnswer(int displayedIndex) {
     if (_isAnswerChecked) return;
-    bool isCorrect = index == widget.questions[_currentQuestionIndex].correctAnswerIndex;
+    final originalIndex = _shuffledOptionIndices[displayedIndex];
+    final isCorrect =
+        originalIndex == widget.questions[_currentQuestionIndex].correctAnswerIndex;
+
     if (isCorrect) {
       _score++;
     }
     setState(() {
-      _selectedOptionIndex = index;
+      _selectedOptionIndex = displayedIndex;
       _isAnswerChecked = true;
     });
   }
@@ -40,32 +55,36 @@ class _InteractiveQuizState extends State<InteractiveQuiz> {
         _currentQuestionIndex++;
         _selectedOptionIndex = null;
         _isAnswerChecked = false;
+        _shuffleCurrentQuestionOptions();
       });
     } else {
-        if (_score >= 5) {
-          widget.onQuizCompleted();
-        } else {
-          _showFailureDialog();
-        }
-      
+      if (_score >= 5) {
+        widget.onQuizCompleted();
+      } else {
+        _showFailureDialog();
+      }
     }
   }
+
   void _showFailureDialog() {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: const Text('Jeszcze raz!'),
-        content: Text('Zdobyłeś $_score/${widget.questions.length} punktów. Potrzebujesz min. 5, aby zaliczyć etap.'),
+        content: Text(
+          'Zdobyłeś $_score/${widget.questions.length} punktów. Potrzebujesz min. 5, aby zaliczyć etap.',
+        ),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              setState(() { 
+              setState(() {
                 _currentQuestionIndex = 0;
                 _score = 0;
                 _selectedOptionIndex = null;
                 _isAnswerChecked = false;
+                _shuffleCurrentQuestionOptions();
               });
             },
             child: const Text('Spróbuj ponownie'),
@@ -102,10 +121,11 @@ class _InteractiveQuizState extends State<InteractiveQuiz> {
           ),
           const SizedBox(height: 24),
 
-          ...List.generate(question.options.length, (index) {
-            final isSelected = _selectedOptionIndex == index;
-            final isCorrect = index == question.correctAnswerIndex;
-            
+          ...List.generate(_shuffledOptionIndices.length, (displayedIndex) {
+            final originalIndex = _shuffledOptionIndices[displayedIndex];
+            final isSelected = _selectedOptionIndex == displayedIndex;
+            final isCorrect = originalIndex == question.correctAnswerIndex;
+
             Color buttonColor = Colors.transparent;
             Color borderColor = const Color(0xFF2D3039);
             Widget? trailingIcon;
@@ -129,28 +149,33 @@ class _InteractiveQuizState extends State<InteractiveQuiz> {
             return Padding(
               padding: const EdgeInsets.only(bottom: 12.0),
               child: InkWell(
-                onTap: () => _checkAnswer(index),
+                onTap: () => _checkAnswer(displayedIndex),
                 borderRadius: BorderRadius.circular(12),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   decoration: BoxDecoration(
                     color: buttonColor,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: borderColor, width: isSelected || _isAnswerChecked ? 2 : 1),
+                    border: Border.all(
+                      color: borderColor,
+                      width: isSelected || _isAnswerChecked ? 2 : 1,
+                    ),
                   ),
                   child: Row(
                     children: [
                       Text(
-                        letters[index],
+                        letters[displayedIndex],
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: _isAnswerChecked && isCorrect ? const Color(0xFF2E7D32) : Colors.grey,
+                          color: _isAnswerChecked && isCorrect
+                              ? const Color(0xFF2E7D32)
+                              : Colors.grey,
                         ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Text(
-                          question.options[index],
+                          question.options[originalIndex],
                           style: TextStyle(color: theme.colorScheme.onSurface),
                         ),
                       ),
