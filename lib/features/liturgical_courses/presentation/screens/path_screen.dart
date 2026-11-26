@@ -23,7 +23,6 @@ class PathScreen extends StatefulWidget {
 
 class _PathScreenState extends State<PathScreen> {
   bool isAdmin = false;
-
   @override
   void initState() {
     super.initState();

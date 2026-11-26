@@ -6,7 +6,7 @@ class AppTheme {
   static const Color _backgroundDark = Color(0xFF0F1014);
   static const Color _surfaceDark = Color(0xFF1A1C23);
   static const Color _textWhite = Color(0xFFF8FAFC);
-  static const Color _textGrey = Color(0xFF94A3B8);
+  static const Color _textGrey = Color.fromARGB(255, 26, 30, 35);
 
   //Colors of the Liturgical Seasons
   static const Color _liturgicalGold = Color(0xFFE68A00);   //Christmas, Easter
