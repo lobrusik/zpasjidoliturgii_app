@@ -12,7 +12,6 @@ class WebAdBanner extends StatefulWidget {
 class _WebAdBannerState extends State<WebAdBanner> {
   late final String _viewType;
 
-  // PODMIEŃ NA SWOJE DANE Z PANELU GOOGLE ADSENSE:
   static const String _adClient = 'ca-pub-TWOJ_NUMER_ADSENSE';
   static const String _adSlot = 'TWOJ_NUMER_SLOTU';
 
